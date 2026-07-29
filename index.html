@@ -39,41 +39,29 @@
               <span class="section-kicker">01 / TEMPLATE</span>
               <strong data-i18n="templateLibrary">选择模板</strong>
             </div>
-            <div class="template-switch" role="group" aria-label="海报版式" data-i18n-aria="posterFormat">
-              <button id="landscapeTemplate" class="is-active" type="button" aria-pressed="true" data-i18n="landscapeTemplate">横版</button>
-              <button id="portraitTemplate" type="button" aria-pressed="false" data-i18n="portraitTemplate">竖版</button>
-            </div>
           </div>
           <div class="template-gallery" aria-label="海报模板" data-i18n-aria="templateLibrary">
-            <button class="template-option is-active" type="button" data-template="tour" aria-pressed="true">
-              <span class="template-art template-art--tour" aria-hidden="true">
+            <button class="template-option is-active" type="button" data-template="template1" aria-pressed="true">
+              <span class="template-art template-art--template1" aria-hidden="true">
                 <i class="template-art__score">68</i>
                 <i class="template-art__subject"></i>
                 <i class="template-art__table"></i>
               </span>
-              <strong data-i18n="templateTour">赛事经典</strong>
+              <strong data-i18n="templateOne">模板 1</strong>
             </button>
-            <button class="template-option" type="button" data-template="victory" aria-pressed="false">
-              <span class="template-art template-art--victory" aria-hidden="true">
-                <i class="template-art__score">61</i>
-                <i class="template-art__subject"></i>
-                <i class="template-art__table"></i>
-              </span>
-              <strong data-i18n="templateVictory">冠军黑场</strong>
-            </button>
-            <button class="template-option" type="button" data-template="editorial" aria-pressed="false">
-              <span class="template-art template-art--editorial" aria-hidden="true">
+            <button class="template-option" type="button" data-template="template2" aria-pressed="false">
+              <span class="template-art template-art--template2" aria-hidden="true">
                 <i class="template-art__score">62</i>
                 <i class="template-art__subject"></i>
                 <i class="template-art__table"></i>
               </span>
-              <strong data-i18n="templateEditorial">杂志侧栏</strong>
+              <strong data-i18n="templateTwo">模板 2</strong>
             </button>
           </div>
         </div>
 
         <div class="poster-stage">
-          <canvas id="posterCanvas" class="is-layout-mode" width="1080" height="1080" aria-label="海报预览画布" data-i18n-aria="posterCanvas"></canvas>
+          <canvas id="posterCanvas" class="is-layout-mode" width="1000" height="1265" aria-label="海报预览画布" data-i18n-aria="posterCanvas"></canvas>
         </div>
 
         <div class="primary-actions">
@@ -118,19 +106,19 @@
             </label>
           </div>
           <label class="field">
-            <span data-i18n="club">俱乐部</span>
+            <span data-i18n="club">球场信息 / 赛事名称</span>
             <input id="club" type="text" value="" maxlength="26" autocomplete="off">
           </label>
           <div class="style-row">
             <label class="field">
               <div class="field-heading">
-                <span data-i18n="clubSize">俱乐部字号</span>
+                <span data-i18n="clubSize">赛事信息字号</span>
                 <output id="clubFontSizeValue" for="clubFontSize">34px</output>
               </div>
               <input id="clubFontSize" type="range" min="18" max="54" value="34">
             </label>
             <label class="field color-field">
-              <span data-i18n="clubColor">俱乐部颜色</span>
+              <span data-i18n="clubColor">赛事信息颜色</span>
               <input id="clubColor" type="color" value="#ffffff">
             </label>
           </div>

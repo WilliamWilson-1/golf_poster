@@ -270,37 +270,9 @@ h1 {
   font-weight: 950;
 }
 
-.template-switch {
-  display: grid;
-  grid-template-columns: repeat(2, 78px);
-  padding: 3px;
-  border: 1px solid var(--navy);
-  border-radius: 4px;
-  background: var(--white);
-}
-
-.template-switch button {
-  min-height: 34px;
-  border-radius: 2px;
-  color: var(--navy);
-  background: transparent;
-  font-size: 12px;
-  font-weight: 950;
-}
-
-.template-switch button.is-active {
-  color: var(--navy-deep);
-  background: var(--yellow);
-}
-
-.template-switch button:focus-visible {
-  outline: 3px solid rgba(0, 43, 80, 0.24);
-  outline-offset: 2px;
-}
-
 .template-gallery {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
   padding-bottom: 3px;
 }
@@ -396,67 +368,62 @@ h1 {
   background: rgba(0, 43, 80, 0.72);
 }
 
-.template-art--victory {
-  background:
-    linear-gradient(180deg, rgba(0, 0, 0, 0.08) 35%, rgba(0, 0, 0, 0.82) 100%),
-    linear-gradient(120deg, #1d2d23 0%, #111713 48%, #050706 100%);
-  box-shadow: inset 0 0 36px rgba(0, 0, 0, 0.72);
+.template-art--template1 {
+  background: linear-gradient(180deg, #2d6547 0%, #173b2c 100%);
 }
 
-.template-art--victory::before {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.38);
+.template-art--template1 .template-art__score {
+  top: 60px;
+  right: 0;
+  left: 0;
+  color: rgba(255, 255, 255, 0.78);
+  text-align: center;
 }
 
-.template-art--victory .template-art__score {
-  top: 16px;
-  right: 4px;
-  color: #d43842;
-  font-size: 47px;
-}
-
-.template-art--victory .template-art__subject {
-  left: 13px;
-  width: 42px;
-  background: #d8d3cc;
-}
-
-.template-art--victory .template-art__table {
-  right: 5px;
-  bottom: 7px;
-  left: 5px;
-  height: 20px;
-  color: #fff;
-  background: #a91f2b;
-  box-shadow: 0 -8px 18px rgba(0, 0, 0, 0.32);
-}
-
-.template-art--editorial {
-  background: #26351f;
-}
-
-.template-art--editorial .template-art__score {
-  top: 23px;
-  right: 8px;
-  font-size: 35px;
-}
-
-.template-art--editorial .template-art__subject {
+.template-art--template1 .template-art__subject {
   bottom: 0;
-  left: 8px;
-  width: 48px;
+  left: calc(50% - 19px);
+}
+
+.template-art--template1 .template-art__table {
+  top: 28px;
+  right: 23%;
+  bottom: auto;
+  left: 23%;
+  height: 20px;
+}
+
+.template-art--template2 {
+  background: linear-gradient(125deg, #122e22 0%, #315e44 100%);
+}
+
+.template-art--template2 .template-art__score {
+  top: 25px;
+  right: auto;
+  left: 8%;
+  width: 29%;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 31px;
+  text-align: center;
+}
+
+.template-art--template2 .template-art__subject {
+  bottom: 0;
+  left: 53%;
+  width: 44px;
   height: 82px;
 }
 
-.template-art--editorial .template-art__table {
-  top: 61px;
-  right: 8px;
-  bottom: 8px;
-  left: auto;
-  width: 35px;
+.template-art--template2 .template-art__table {
+  top: 46px;
+  right: auto;
+  bottom: 5px;
+  left: 8%;
+  width: 29%;
   height: auto;
-  border-right: 1px solid currentColor;
-  border-left: 1px solid currentColor;
-  background: rgba(8, 32, 16, 0.55);
+  border: 0;
+  border-right: 2px solid currentColor;
+  background: rgba(8, 32, 16, 0.62);
 }
 
 .poster-stage {
@@ -472,13 +439,9 @@ h1 {
 #posterCanvas {
   display: block;
   width: 100%;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 1000 / 1265;
   touch-action: pan-y;
   background: var(--navy-deep);
-}
-
-#posterCanvas.is-portrait {
-  aspect-ratio: 3 / 4;
 }
 
 #posterCanvas.is-layout-mode {
@@ -1121,10 +1084,6 @@ input[type="range"] {
     padding-inline: 12px;
   }
 
-  .template-switch {
-    grid-template-columns: repeat(2, 68px);
-  }
-
   .primary-actions {
     padding-inline: 12px;
   }
@@ -1185,41 +1144,29 @@ input[type="range"] {
               <span class="section-kicker">01 / TEMPLATE</span>
               <strong data-i18n="templateLibrary">选择模板</strong>
             </div>
-            <div class="template-switch" role="group" aria-label="海报版式" data-i18n-aria="posterFormat">
-              <button id="landscapeTemplate" class="is-active" type="button" aria-pressed="true" data-i18n="landscapeTemplate">横版</button>
-              <button id="portraitTemplate" type="button" aria-pressed="false" data-i18n="portraitTemplate">竖版</button>
-            </div>
           </div>
           <div class="template-gallery" aria-label="海报模板" data-i18n-aria="templateLibrary">
-            <button class="template-option is-active" type="button" data-template="tour" aria-pressed="true">
-              <span class="template-art template-art--tour" aria-hidden="true">
+            <button class="template-option is-active" type="button" data-template="template1" aria-pressed="true">
+              <span class="template-art template-art--template1" aria-hidden="true">
                 <i class="template-art__score">68</i>
                 <i class="template-art__subject"></i>
                 <i class="template-art__table"></i>
               </span>
-              <strong data-i18n="templateTour">赛事经典</strong>
+              <strong data-i18n="templateOne">模板 1</strong>
             </button>
-            <button class="template-option" type="button" data-template="victory" aria-pressed="false">
-              <span class="template-art template-art--victory" aria-hidden="true">
-                <i class="template-art__score">61</i>
-                <i class="template-art__subject"></i>
-                <i class="template-art__table"></i>
-              </span>
-              <strong data-i18n="templateVictory">冠军黑场</strong>
-            </button>
-            <button class="template-option" type="button" data-template="editorial" aria-pressed="false">
-              <span class="template-art template-art--editorial" aria-hidden="true">
+            <button class="template-option" type="button" data-template="template2" aria-pressed="false">
+              <span class="template-art template-art--template2" aria-hidden="true">
                 <i class="template-art__score">62</i>
                 <i class="template-art__subject"></i>
                 <i class="template-art__table"></i>
               </span>
-              <strong data-i18n="templateEditorial">杂志侧栏</strong>
+              <strong data-i18n="templateTwo">模板 2</strong>
             </button>
           </div>
         </div>
 
         <div class="poster-stage">
-          <canvas id="posterCanvas" class="is-layout-mode" width="1080" height="1080" aria-label="海报预览画布" data-i18n-aria="posterCanvas"></canvas>
+          <canvas id="posterCanvas" class="is-layout-mode" width="1000" height="1265" aria-label="海报预览画布" data-i18n-aria="posterCanvas"></canvas>
         </div>
 
         <div class="primary-actions">
@@ -1264,19 +1211,19 @@ input[type="range"] {
             </label>
           </div>
           <label class="field">
-            <span data-i18n="club">俱乐部</span>
+            <span data-i18n="club">球场信息 / 赛事名称</span>
             <input id="club" type="text" value="" maxlength="26" autocomplete="off">
           </label>
           <div class="style-row">
             <label class="field">
               <div class="field-heading">
-                <span data-i18n="clubSize">俱乐部字号</span>
+                <span data-i18n="clubSize">赛事信息字号</span>
                 <output id="clubFontSizeValue" for="clubFontSize">34px</output>
               </div>
               <input id="clubFontSize" type="range" min="18" max="54" value="34">
             </label>
             <label class="field color-field">
-              <span data-i18n="clubColor">俱乐部颜色</span>
+              <span data-i18n="clubColor">赛事信息颜色</span>
               <input id="clubColor" type="color" value="#ffffff">
             </label>
           </div>
@@ -1458,8 +1405,6 @@ const ctx = canvas.getContext("2d");
 const elements = {
   photoInput: document.getElementById("photoInput"),
   languageSelect: document.getElementById("languageSelect"),
-  landscapeTemplate: document.getElementById("landscapeTemplate"),
-  portraitTemplate: document.getElementById("portraitTemplate"),
   nickname: document.getElementById("nickname"),
   nicknameFontSize: document.getElementById("nicknameFontSize"),
   nicknameFontSizeValue: document.getElementById("nicknameFontSizeValue"),
@@ -1506,163 +1451,81 @@ const elements = {
   retrySegmentation: document.getElementById("retrySegmentation")
 };
 
-const posterSize = 1080;
-const topBarHeight = 72;
+const posterSize = 1000;
+const topBarHeight = 70;
 const posterTemplates = {
-  tour: {
-    defaultOrientation: "landscape",
-    scoreStyle: "solid",
+  template1: {
     preset: {
       scoreTableColor: "#006337",
       totalColor: "#083728",
       nicknameColor: "#ffffff",
       clubColor: "#ffffff",
       extraColor: "#ffffff",
-      englishFont: "arial",
-      numberFont: "arialBlack",
-      nicknameFontSize: "34",
-      clubFontSize: "34",
-      extraFontSize: "21",
-      totalFontSize: "335",
-      totalOpacity: "88"
-    },
-    layouts: {
-      landscape: {
-        width: 1080,
-        height: 1080,
-        totalY: 300,
-        scoreDirection: "horizontal",
-        scoreBox: { x: 128, y: 840, w: 824, h: 168 },
-        positions: {
-          total: { x: 540 },
-          nickname: { x: 140, y: 810 },
-          club: { x: 940, y: 810 },
-          extra: { x: 540, y: 1047 }
-        }
-      },
-      portrait: {
-        width: 1080,
-        height: 1440,
-        totalY: 850,
-        scoreDirection: "horizontal",
-        nicknameAlign: "center",
-        clubAlign: "center",
-        scoreBox: { x: 150, y: 190, w: 780, h: 180 },
-        positions: {
-          total: { x: 540 },
-          nickname: { x: 540, y: 158 },
-          club: { x: 540, y: 414 },
-          extra: { x: 540, y: 455 }
-        }
-      }
-    }
-  },
-  victory: {
-    defaultOrientation: "portrait",
-    scoreStyle: "solid",
-    preset: {
-      scoreTableColor: "#a91f2b",
-      totalColor: "#e23b46",
-      nicknameColor: "#ffffff",
-      clubColor: "#ffffff",
-      extraColor: "#e7e2dc",
       englishFont: "playfairDisplay",
       numberFont: "playfairDisplay",
-      nicknameFontSize: "42",
+      nicknameFontSize: "40",
       clubFontSize: "22",
-      extraFontSize: "18",
+      extraFontSize: "22",
       totalFontSize: "500",
-      totalOpacity: "94"
+      totalOpacity: "90"
     },
-    layouts: {
-      landscape: {
-        width: 1080,
-        height: 1080,
-        totalY: 320,
-        scoreDirection: "horizontal",
-        nicknameAlign: "center",
-        clubAlign: "center",
-        scoreBox: { x: 118, y: 802, w: 844, h: 176 },
-        positions: {
-          total: { x: 540 },
-          nickname: { x: 540, y: 770 },
-          club: { x: 540, y: 1020 },
-          extra: { x: 540, y: 1055 }
-        }
+    layout: {
+      width: 1000,
+      height: 1265,
+      scoreDirection: "horizontal",
+      logoRegion: { x: 0, y: 0, w: 1000, h: 70 },
+      nicknameRegion: { x: 230, y: 115, w: 540, h: 60, align: "center" },
+      scoreBox: { x: 230, y: 190, w: 540, h: 200 },
+      infoRegion: { x: 230, y: 400, w: 540, h: 40, align: "center" },
+      totalRegion: { x: 60, y: 540, w: 880, h: 580 },
+      positions: {
+        total: { x: 500 },
+        nickname: { x: 500, y: 145 },
+        club: { x: 500, y: 420 }
       },
-      portrait: {
-        width: 1080,
-        height: 1440,
-        totalY: 420,
-        scoreDirection: "horizontal",
-        nicknameAlign: "center",
-        clubAlign: "center",
-        scoreBox: { x: 118, y: 1088, w: 844, h: 192 },
-        positions: {
-          total: { x: 540 },
-          nickname: { x: 540, y: 1044 },
-          club: { x: 540, y: 1330 },
-          extra: { x: 540, y: 1372 }
-        }
-      }
+      totalY: 830
     }
   },
-  editorial: {
-    defaultOrientation: "portrait",
-    scoreStyle: "sidebar",
+  template2: {
     preset: {
-      scoreTableColor: "#1f351d",
+      scoreTableColor: "#173b2c",
       totalColor: "#ffffff",
       nicknameColor: "#ffffff",
       clubColor: "#ffffff",
-      extraColor: "#ef4d57",
+      extraColor: "#ffffff",
       englishFont: "playfairDisplay",
       numberFont: "playfairDisplay",
-      nicknameFontSize: "42",
-      clubFontSize: "24",
-      extraFontSize: "18",
-      totalFontSize: "335",
-      totalOpacity: "94"
+      nicknameFontSize: "40",
+      clubFontSize: "20",
+      extraFontSize: "20",
+      totalFontSize: "180",
+      totalOpacity: "92"
     },
-    layouts: {
-      landscape: {
-        width: 1080,
-        height: 1080,
-        totalY: 285,
-        scoreDirection: "vertical",
-        nicknameAlign: "center",
-        clubAlign: "center",
-        extraVertical: true,
-        scoreBox: { x: 760, y: 410, w: 250, h: 580 },
-        positions: {
-          total: { x: 840 },
-          nickname: { x: 835, y: 145 },
-          club: { x: 835, y: 198 },
-          extra: { x: 1040, y: 700 }
-        }
+    layout: {
+      width: 1000,
+      height: 1265,
+      scoreDirection: "vertical",
+      logoRegion: { x: 0, y: 0, w: 1000, h: 70 },
+      nicknameRegion: { x: 45, y: 150, w: 540, h: 60, align: "left" },
+      totalRegion: { x: 85, y: 235, w: 290, h: 200 },
+      scoreBox: { x: 85, y: 465, w: 290, h: 760 },
+      scoreDivider: { x: 227, y: 465, w: 6, h: 760 },
+      scoreColumns: [
+        { x: 130, y: 500, w: 82, h: 675 },
+        { x: 252, y: 500, w: 82, h: 675 }
+      ],
+      infoRegion: { x: 49, y: 465, w: 35, h: 750, align: "center", vertical: true },
+      positions: {
+        total: { x: 230 },
+        nickname: { x: 45, y: 180 },
+        club: { x: 66.5, y: 840 }
       },
-      portrait: {
-        width: 1080,
-        height: 1440,
-        totalY: 510,
-        scoreDirection: "vertical",
-        nicknameAlign: "center",
-        clubAlign: "center",
-        extraVertical: true,
-        scoreBox: { x: 690, y: 710, w: 276, h: 650 },
-        positions: {
-          total: { x: 820 },
-          nickname: { x: 825, y: 240 },
-          club: { x: 825, y: 310 },
-          extra: { x: 1025, y: 1040 }
-        }
-      }
+      totalY: 335
     }
   }
 };
-let activePosterTemplate = "tour";
-let templateOrientation = "landscape";
-const scoreBox = { ...posterTemplates.tour.layouts.landscape.scoreBox };
+let activePosterTemplate = "template1";
+const scoreBox = { ...posterTemplates.template1.layout.scoreBox };
 const fontStacks = {
   english: {
     arial: 'Arial, "Helvetica Neue", sans-serif',
@@ -1702,13 +1565,9 @@ const translations = {
     posterEditor: "海报编辑",
     editorSections: "编辑项目",
     resetPoster: "清空海报",
-    posterFormat: "海报版式",
     templateLibrary: "选择模板",
-    templateTour: "赛事经典",
-    templateVictory: "冠军黑场",
-    templateEditorial: "杂志侧栏",
-    landscapeTemplate: "横版",
-    portraitTemplate: "竖版",
+    templateOne: "模板 1",
+    templateTwo: "模板 2",
     uploadPhoto: "上传照片",
     downloadPoster: "下载海报",
     statusIdle: "上传照片后自动识别人像",
@@ -1723,9 +1582,9 @@ const translations = {
     nickname: "昵称",
     nicknameSize: "昵称字号",
     nicknameColor: "昵称颜色",
-    club: "俱乐部",
-    clubSize: "俱乐部字号",
-    clubColor: "俱乐部颜色",
+    club: "球场信息 / 赛事名称",
+    clubSize: "赛事信息字号",
+    clubColor: "赛事信息颜色",
     scoreTable: "成绩表",
     scorePlaceholder: "输入最多 18 洞成绩，用空格或逗号分隔",
     badge: "圆形标记",
@@ -1773,13 +1632,9 @@ const translations = {
     posterEditor: "Poster editor",
     editorSections: "Editor sections",
     resetPoster: "Clear poster",
-    posterFormat: "Poster format",
     templateLibrary: "Choose template",
-    templateTour: "Tournament",
-    templateVictory: "Dark Victory",
-    templateEditorial: "Editorial",
-    landscapeTemplate: "LANDSCAPE",
-    portraitTemplate: "PORTRAIT",
+    templateOne: "Template 1",
+    templateTwo: "Template 2",
     uploadPhoto: "UPLOAD PHOTO",
     downloadPoster: "DOWNLOAD",
     statusIdle: "Upload a photo to detect the subject",
@@ -1794,9 +1649,9 @@ const translations = {
     nickname: "Player name",
     nicknameSize: "Name size",
     nicknameColor: "Name color",
-    club: "Club",
-    clubSize: "Club size",
-    clubColor: "Club color",
+    club: "Course / event",
+    clubSize: "Info size",
+    clubColor: "Info color",
     scoreTable: "Scorecard",
     scorePlaceholder: "Enter up to 18 scores, separated by spaces or commas",
     badge: "Round badge",
@@ -1874,12 +1729,11 @@ let imageState = {
 };
 
 function getActiveTemplate() {
-  return posterTemplates[activePosterTemplate] || posterTemplates.tour;
+  return posterTemplates[activePosterTemplate] || posterTemplates.template1;
 }
 
-function getActiveLayout(orientation = templateOrientation) {
-  const template = getActiveTemplate();
-  return template.layouts[orientation] || template.layouts[template.defaultOrientation];
+function getActiveLayout() {
+  return getActiveTemplate().layout;
 }
 
 function createDefaultElementPositions() {
@@ -2058,25 +1912,6 @@ function getPosterHeight() {
   return canvas.height;
 }
 
-function setTemplateOrientation(orientation) {
-  const nextOrientation = orientation === "portrait" ? "portrait" : "landscape";
-  templateOrientation = nextOrientation;
-  const layout = getActiveLayout(nextOrientation);
-  canvas.width = layout.width;
-  canvas.height = layout.height;
-  canvas.classList.toggle("is-portrait", nextOrientation === "portrait");
-  elements.landscapeTemplate.classList.toggle("is-active", nextOrientation === "landscape");
-  elements.portraitTemplate.classList.toggle("is-active", nextOrientation === "portrait");
-  elements.landscapeTemplate.setAttribute("aria-pressed", String(nextOrientation === "landscape"));
-  elements.portraitTemplate.setAttribute("aria-pressed", String(nextOrientation === "portrait"));
-  imageState = { scale: 1, offsetX: 0, offsetY: 0 };
-  elements.zoomRange.value = "100";
-  resetElementPositions();
-  resetStickerPositions();
-  updateZoomOutput();
-  renderPoster();
-}
-
 function updateTemplateSelection() {
   document.querySelectorAll(".template-option").forEach((button) => {
     const active = button.dataset.template === activePosterTemplate;
@@ -2105,10 +1940,18 @@ function applyPosterTemplate(templateId) {
   elements.extraFontSize.value = preset.extraFontSize;
   elements.totalFontSize.value = preset.totalFontSize;
   elements.totalOpacity.value = preset.totalOpacity;
+  const layout = getActiveLayout();
+  canvas.width = layout.width;
+  canvas.height = layout.height;
   updateTemplateSelection();
   updateFontPreviews();
   updateStyleOutputs();
-  setTemplateOrientation(template.defaultOrientation);
+  imageState = { scale: 1, offsetX: 0, offsetY: 0 };
+  elements.zoomRange.value = "100";
+  resetElementPositions();
+  resetStickerPositions();
+  updateZoomOutput();
+  renderPoster();
 }
 
 function translate(key, params = {}) {
@@ -2188,17 +2031,6 @@ function updateStyleOutputs() {
   elements.clubFontSizeValue.textContent = `${elements.clubFontSize.value}px`;
   elements.totalFontSizeValue.textContent = `${elements.totalFontSize.value}px`;
   elements.extraFontSizeValue.textContent = `${elements.extraFontSize.value}px`;
-}
-
-function roundedRect(context, x, y, w, h, radius) {
-  const r = Math.min(radius, w / 2, h / 2);
-  context.beginPath();
-  context.moveTo(x + r, y);
-  context.arcTo(x + w, y, x + w, y + h, r);
-  context.arcTo(x + w, y + h, x, y + h, r);
-  context.arcTo(x, y + h, x, y, r);
-  context.arcTo(x, y, x + w, y, r);
-  context.closePath();
 }
 
 function parseScores() {
@@ -2291,111 +2123,60 @@ function drawBackgroundImage(context) {
   if (blur > 0) {
     filters.push(`blur(${blur}px)`);
   }
-  if (activePosterTemplate === "victory") {
-    filters.push("brightness(0.72)", "saturate(0.82)", "contrast(1.12)");
-  } else if (activePosterTemplate === "editorial") {
-    filters.push("brightness(0.78)", "saturate(0.82)");
+  if (activePosterTemplate === "template2") {
+    filters.push("brightness(0.82)", "saturate(0.88)");
   }
   if (filters.length) {
     context.filter = filters.join(" ");
   }
   drawCoverAsset(context, uploadedImage, 0, topBarHeight, posterSize, posterHeight - topBarHeight);
   context.restore();
-
-  if (activePosterTemplate === "victory") {
-    context.fillStyle = "rgba(2, 5, 3, 0.12)";
-    context.fillRect(0, topBarHeight, posterSize, posterHeight - topBarHeight);
-  }
 }
 
 function drawPlaceholder(context) {
   const posterHeight = getPosterHeight();
-  const horizonY = templateOrientation === "portrait" ? 860 : 660;
-  const backgrounds = {
-    tour: ["#082e4c", "#0d3c5e", "#ffd100"],
-    victory: ["#17221b", "#050706", "#e23b46"],
-    editorial: ["#26351f", "#172316", "#ef4d57"]
-  };
-  const [topColor, bottomColor, accent] = backgrounds[activePosterTemplate] || backgrounds.tour;
-  context.fillStyle = topColor;
+  const gradient = context.createLinearGradient(0, topBarHeight, 0, posterHeight);
+  if (activePosterTemplate === "template2") {
+    gradient.addColorStop(0, "#315e44");
+    gradient.addColorStop(1, "#122e22");
+  } else {
+    gradient.addColorStop(0, "#46785a");
+    gradient.addColorStop(1, "#173b2c");
+  }
+  context.fillStyle = gradient;
   context.fillRect(0, topBarHeight, posterSize, posterHeight - topBarHeight);
-
-  context.fillStyle = bottomColor;
-  context.fillRect(0, horizonY, posterSize, posterHeight - horizonY);
-  context.fillStyle = accent;
-  context.fillRect(74, horizonY - 42, 160, 7);
-  context.fillStyle = "rgba(255,255,255,0.12)";
-  context.fillRect(74, horizonY - 22, 330, 3);
 }
 
 function drawBrand(context) {
   const brand = elements.brandText.value.trim() || "GOLFBROTHERS";
-  const isVictory = activePosterTemplate === "victory";
-  const isEditorial = activePosterTemplate === "editorial";
   context.fillStyle = "#000";
   context.fillRect(0, 0, posterSize, topBarHeight);
 
-  if (activePosterTemplate === "tour") {
-    context.save();
-    context.translate(74, 20);
-    context.fillStyle = "#fff";
-    context.fillRect(0, -4, 5, 43);
-    context.fillStyle = "#c59c35";
-    context.beginPath();
-    context.moveTo(7, -2);
-    context.lineTo(52, 11);
-    context.lineTo(7, 24);
-    context.closePath();
-    context.fill();
-    context.restore();
-
-    const splitPoint = brand.toUpperCase().startsWith("GOLF")
-      ? 4
-      : Math.max(4, Math.floor(brand.length * 0.45));
-    const first = brand.slice(0, splitPoint).toUpperCase();
-    const second = brand.slice(splitPoint).toUpperCase();
-    context.textBaseline = "middle";
-    context.textAlign = "left";
-    context.font = "italic 900 40px Arial, sans-serif";
-    context.fillStyle = "#fff";
-    context.fillText(first, 146, 37);
-    context.fillStyle = "#c99c32";
-    context.fillText(second, 146 + context.measureText(first).width, 37);
-    return;
-  }
-
-  context.textBaseline = "middle";
-  context.fillStyle = "#ffffff";
-  context.font = `800 ${isVictory ? 31 : 28}px ${getEnglishFont()}`;
-
-  if (isVictory) {
-    context.textAlign = "center";
-    const width = context.measureText(brand).width;
-    context.fillText(brand, posterSize / 2, 38);
-    context.strokeStyle = "rgba(255,255,255,0.46)";
-    context.lineWidth = 2;
-    context.beginPath();
-    context.moveTo(68, 38);
-    context.lineTo(posterSize / 2 - width / 2 - 30, 38);
-    context.moveTo(posterSize / 2 + width / 2 + 30, 38);
-    context.lineTo(posterSize - 68, 38);
-    context.stroke();
-    context.fillStyle = "#e23b46";
-    context.fillRect(38, 34, 18, 8);
-    context.fillRect(posterSize - 56, 34, 18, 8);
-    return;
-  }
-
-  context.textAlign = "left";
-  const brandX = isEditorial ? 44 : 50;
-  context.fillText(brand, brandX, 38);
-  const brandWidth = context.measureText(brand).width;
-  context.strokeStyle = "rgba(255,255,255,0.62)";
-  context.lineWidth = 2;
+  context.save();
+  context.translate(56, 18);
+  context.fillStyle = "#fff";
+  context.fillRect(0, -3, 5, 40);
+  context.fillStyle = "#c59c35";
   context.beginPath();
-  context.moveTo(brandX + brandWidth + 28, 38);
-  context.lineTo(posterSize - 45, 38);
-  context.stroke();
+  context.moveTo(7, -1);
+  context.lineTo(49, 11);
+  context.lineTo(7, 23);
+  context.closePath();
+  context.fill();
+  context.restore();
+
+  const splitPoint = brand.toUpperCase().startsWith("GOLF")
+    ? 4
+    : Math.max(4, Math.floor(brand.length * 0.45));
+  const first = brand.slice(0, splitPoint).toUpperCase();
+  const second = brand.slice(splitPoint).toUpperCase();
+  context.textBaseline = "middle";
+  context.textAlign = "left";
+  context.font = "italic 900 38px Arial, sans-serif";
+  context.fillStyle = "#fff";
+  context.fillText(first, 124, 35);
+  context.fillStyle = "#c99c32";
+  context.fillText(second, 124 + context.measureText(first).width, 35);
 }
 
 function drawTotalScore(context) {
@@ -2415,22 +2196,13 @@ function drawTotalScore(context) {
   context.font = `950 ${fontSize}px ${getNumberFont()}`;
   context.textAlign = "center";
   context.textBaseline = "middle";
-  const textWidth = context.measureText(score).width;
-  if (activePosterTemplate === "victory") {
-    context.shadowColor = "rgba(0, 0, 0, 0.58)";
-    context.shadowBlur = 18;
-    context.shadowOffsetY = 10;
-    context.strokeStyle = "rgba(42, 0, 4, 0.46)";
-    context.lineWidth = Math.max(3, fontSize * 0.01);
-    context.lineJoin = "round";
-    context.strokeText(score, x, y);
-  }
   context.fillText(score, x, y);
+  const region = getActiveLayout().totalRegion;
   elementBounds.total = {
-    x: x - textWidth / 2 - 18,
-    y: y - fontSize * 0.52 - 18,
-    w: textWidth + 36,
-    h: fontSize * 1.04 + 36
+    x: x - region.w / 2,
+    y: y - region.h / 2,
+    w: region.w,
+    h: region.h
   };
   context.restore();
 }
@@ -2447,17 +2219,6 @@ function drawSubjectOverlay(context) {
   drawCoverAsset(layerCtx, uploadedImage, 0, topBarHeight, posterSize, getPosterHeight() - topBarHeight);
   layerCtx.globalCompositeOperation = "destination-in";
   drawCoverAsset(layerCtx, subjectMaskSource, 0, topBarHeight, posterSize, getPosterHeight() - topBarHeight);
-
-  if (activePosterTemplate === "victory") {
-    // A second mask pass suppresses bright low-confidence halos over the darkened original.
-    drawCoverAsset(layerCtx, subjectMaskSource, 0, topBarHeight, posterSize, getPosterHeight() - topBarHeight);
-    context.save();
-    context.globalAlpha = 0.94;
-    context.drawImage(layerCanvas, 0, 0);
-    context.restore();
-    return;
-  }
-
   context.drawImage(layerCanvas, 0, 0);
 }
 
@@ -2479,93 +2240,71 @@ function drawLabels(context) {
   const club = elements.club.value.trim();
   const extra = elements.extraInfo.value.trim();
   const layout = getActiveLayout();
-  const nicknameAlign = layout.nicknameAlign || (templateOrientation === "portrait" ? "center" : "left");
-  const clubAlign = layout.clubAlign || (templateOrientation === "portrait" ? "center" : "right");
-  const editorialName = activePosterTemplate === "editorial";
-  const serifItalic = activePosterTemplate === "victory";
 
   context.save();
-  context.shadowColor = "rgba(0,0,0,0.44)";
-  context.shadowBlur = activePosterTemplate === "victory" ? 14 : 10;
-  context.shadowOffsetY = activePosterTemplate === "victory" ? 4 : 2;
-  context.textBaseline = "alphabetic";
+  context.shadowColor = "rgba(0,0,0,0.38)";
+  context.shadowBlur = 10;
+  context.shadowOffsetY = 2;
+  context.textBaseline = "middle";
 
   if (nickname) {
     const position = elementPositions.nickname;
-    const text = editorialName ? nickname.toUpperCase() : nickname;
+    const region = layout.nicknameRegion;
     context.fillStyle = elements.nicknameColor.value;
-    context.textAlign = nicknameAlign;
-    const maxWidth = layout.nicknameMaxWidth || (nicknameAlign === "center" ? 500 : 460);
-    const fontSize = fitText(context, text, maxWidth, Number(elements.nicknameFontSize.value), 14, getEnglishFont());
-    if (serifItalic) {
-      context.font = `italic 800 ${fontSize}px ${getEnglishFont()}`;
-    }
-    const textWidth = context.measureText(text).width;
-    context.fillText(text, position.x, position.y);
-    const left = nicknameAlign === "center"
-      ? position.x - textWidth / 2
-      : nicknameAlign === "right"
-        ? position.x - textWidth
-        : position.x;
+    context.textAlign = region.align;
+    fitText(
+      context,
+      nickname,
+      region.w,
+      Math.min(Number(elements.nicknameFontSize.value), region.h),
+      14,
+      getEnglishFont()
+    );
+    context.fillText(nickname, position.x, position.y);
     elementBounds.nickname = {
-      x: left - 10,
-      y: position.y - fontSize - 10,
-      w: textWidth + 20,
-      h: fontSize + 20
+      x: region.align === "center" ? position.x - region.w / 2 : position.x,
+      y: position.y - region.h / 2,
+      w: region.w,
+      h: region.h
     };
   }
 
-  if (club) {
+  const info = [club, extra].filter(Boolean).join(" · ");
+  if (info) {
     const position = elementPositions.club;
-    context.fillStyle = elements.clubColor.value;
-    context.textAlign = clubAlign;
-    const maxWidth = layout.clubMaxWidth || (clubAlign === "center" ? 500 : 400);
-    const fontSize = fitText(context, club, maxWidth, Number(elements.clubFontSize.value), 14, getEnglishFont());
-    const textWidth = context.measureText(club).width;
-    context.fillText(club, position.x, position.y);
-    const left = clubAlign === "center"
-      ? position.x - textWidth / 2
-      : clubAlign === "right"
-        ? position.x - textWidth
-        : position.x;
-    elementBounds.club = {
-      x: left - 10,
-      y: position.y - fontSize - 10,
-      w: textWidth + 20,
-      h: fontSize + 20
-    };
-  }
-
-  if (extra) {
-    const position = elementPositions.extra;
-    const text = extra.toUpperCase();
-    context.fillStyle = elements.extraColor.value;
-    const maxWidth = layout.extraMaxWidth || (layout.extraVertical ? 560 : 860);
-    const fontSize = fitText(context, text, maxWidth, Number(elements.extraFontSize.value), 12, getEnglishFont());
-    const textWidth = context.measureText(text).width;
-    context.globalAlpha = 0.9;
+    const region = layout.infoRegion;
+    const infoColor = club ? elements.clubColor.value : elements.extraColor.value;
+    const requestedSize = club
+      ? Number(elements.clubFontSize.value)
+      : Number(elements.extraFontSize.value);
+    context.fillStyle = infoColor;
     context.textAlign = "center";
-    if (layout.extraVertical) {
+    const maxTextWidth = region.vertical ? region.h : region.w;
+    fitText(
+      context,
+      info,
+      maxTextWidth,
+      Math.min(requestedSize, region.vertical ? region.w : region.h),
+      12,
+      getEnglishFont()
+    );
+
+    if (region.vertical) {
       context.save();
       context.translate(position.x, position.y);
       context.rotate(Math.PI / 2);
-      context.fillText(text, 0, 0);
+      context.fillText(info, 0, 0);
       context.restore();
-      elementBounds.extra = {
-        x: position.x - fontSize / 2 - 10,
-        y: position.y - textWidth / 2 - 10,
-        w: fontSize + 20,
-        h: textWidth + 20
-      };
     } else {
-      context.fillText(text, position.x, position.y);
-      elementBounds.extra = {
-        x: position.x - textWidth / 2 - 10,
-        y: position.y - fontSize - 10,
-        w: textWidth + 20,
-        h: fontSize + 20
-      };
+      context.fillText(info, position.x, position.y);
     }
+
+    elementBounds.club = {
+      x: position.x - region.w / 2,
+      y: position.y - region.h / 2,
+      w: region.w,
+      h: region.h
+    };
   }
   context.restore();
 }
@@ -2575,10 +2314,8 @@ function drawScoreCard(context) {
   const highlights = parseHighlights();
   const badge = elements.badgeText.value.trim();
   const hasScoreContent = scores.some(Boolean) || Boolean(badge);
-  const template = getActiveTemplate();
   const layout = getActiveLayout();
   const vertical = layout.scoreDirection === "vertical";
-  const gridStyle = template.scoreStyle === "grid";
 
   if (!hasScoreContent) {
     return;
@@ -2592,80 +2329,35 @@ function drawScoreCard(context) {
   };
 
   context.save();
-  if (!gridStyle) {
-    if (activePosterTemplate === "victory") {
-      context.save();
-      context.globalAlpha = 0.96;
-      context.shadowColor = "rgba(0, 0, 0, 0.62)";
-      context.shadowBlur = 28;
-      context.shadowOffsetY = 12;
-      context.fillStyle = elements.scoreTableColor.value;
-      context.fillRect(scoreBox.x, scoreBox.y, scoreBox.w, scoreBox.h);
-      context.restore();
+  context.globalAlpha = 0.82;
+  context.fillStyle = elements.scoreTableColor.value;
+  context.fillRect(scoreBox.x, scoreBox.y, scoreBox.w, scoreBox.h);
+  context.globalAlpha = 1;
 
-      context.fillStyle = elements.scoreTableColor.value;
-      context.fillRect(scoreBox.x, scoreBox.y, scoreBox.w, scoreBox.h);
-      const scoreShade = context.createLinearGradient(
-        scoreBox.x,
-        scoreBox.y,
-        scoreBox.x + scoreBox.w,
-        scoreBox.y
-      );
-      scoreShade.addColorStop(0, "rgba(255,255,255,0.08)");
-      scoreShade.addColorStop(0.48, "rgba(255,255,255,0)");
-      scoreShade.addColorStop(1, "rgba(20,0,2,0.28)");
-      context.fillStyle = scoreShade;
-      context.fillRect(scoreBox.x, scoreBox.y, scoreBox.w, scoreBox.h);
-      context.strokeStyle = "rgba(255,255,255,0.22)";
-      context.lineWidth = 2;
-      context.strokeRect(scoreBox.x + 1, scoreBox.y + 1, scoreBox.w - 2, scoreBox.h - 2);
-    } else {
-      context.globalAlpha = template.scoreStyle === "sidebar" ? 0.68 : 0.88;
-      context.fillStyle = elements.scoreTableColor.value;
-      context.fillRect(scoreBox.x, scoreBox.y, scoreBox.w, scoreBox.h);
-      context.globalAlpha = 1;
-    }
-  }
-
-  const lineColor = gridStyle
-    ? elements.scoreTableColor.value
-    : activePosterTemplate === "tour"
-      ? "rgba(255, 209, 0, 0.9)"
-      : activePosterTemplate === "victory"
-        ? "rgba(255, 255, 255, 0.56)"
-        : "rgba(255, 255, 255, 0.9)";
-  context.strokeStyle = lineColor;
-  context.lineWidth = gridStyle ? 2 : 3;
-  context.beginPath();
+  const offsetX = scoreBox.x - layout.scoreBox.x;
+  const offsetY = scoreBox.y - layout.scoreBox.y;
   if (vertical) {
-    context.moveTo(scoreBox.x + scoreBox.w / 2, scoreBox.y);
-    context.lineTo(scoreBox.x + scoreBox.w / 2, scoreBox.y + scoreBox.h);
+    const divider = layout.scoreDivider;
+    context.fillStyle = "rgba(255,255,255,0.76)";
+    context.fillRect(
+      divider.x + offsetX,
+      divider.y + offsetY,
+      divider.w,
+      divider.h
+    );
   } else {
+    context.strokeStyle = "rgba(255,255,255,0.78)";
+    context.lineWidth = 3;
+    context.beginPath();
     context.moveTo(scoreBox.x, scoreBox.y + scoreBox.h / 2);
     context.lineTo(scoreBox.x + scoreBox.w, scoreBox.y + scoreBox.h / 2);
-  }
-  context.stroke();
-
-  if (gridStyle && !vertical) {
-    const columnWidth = scoreBox.w / 9;
-    for (let column = 1; column < 9; column += 1) {
-      const x = scoreBox.x + columnWidth * column;
-      context.beginPath();
-      context.moveTo(x, scoreBox.y);
-      context.lineTo(x, scoreBox.y + scoreBox.h);
-      context.stroke();
-    }
+    context.stroke();
   }
 
-  const cellW = vertical ? scoreBox.w / 2 : scoreBox.w / 9;
-  const cellH = vertical ? scoreBox.h / 9 : scoreBox.h / 2;
+  const cellW = vertical ? layout.scoreColumns[0].w : scoreBox.w / 9;
+  const cellH = vertical ? layout.scoreColumns[0].h / 9 : scoreBox.h / 2;
   const scoreFontSize = Math.floor(Math.min(vertical ? 48 : 44, cellH * 0.55, cellW * 0.58));
-  const highlightColor = activePosterTemplate === "editorial"
-    ? "#ef4d57"
-    : activePosterTemplate === "victory"
-      ? "#ffffff"
-      : "#ffd100";
-  const scoreColor = gridStyle ? elements.scoreTableColor.value : "#ffffff";
+  const highlightColor = activePosterTemplate === "template1" ? "#ffd100" : "#ffffff";
 
   context.textAlign = "center";
   context.textBaseline = "middle";
@@ -2674,23 +2366,23 @@ function drawScoreCard(context) {
   scores.forEach((score, index) => {
     const firstHalf = index < 9;
     const slot = index % 9;
-    const col = vertical ? (firstHalf ? 0 : 1) : slot;
-    const row = vertical ? slot : (firstHalf ? 0 : 1);
-    const x = scoreBox.x + cellW * col + cellW / 2;
-    const y = scoreBox.y + cellH * row + cellH / 2;
+    const row = firstHalf ? 0 : 1;
+    const column = vertical ? layout.scoreColumns[firstHalf ? 0 : 1] : null;
+    const x = vertical
+      ? column.x + offsetX + column.w / 2
+      : scoreBox.x + cellW * slot + cellW / 2;
+    const y = vertical
+      ? column.y + offsetY + cellH * slot + cellH / 2
+      : scoreBox.y + cellH * row + cellH / 2;
     const hole = index + 1;
     const markerRadius = Math.min(29, cellW * 0.34, cellH * 0.36);
 
     if (score && highlights.has(hole)) {
       context.strokeStyle = highlightColor;
       context.lineWidth = 3;
-      if (gridStyle || activePosterTemplate !== "tour" || vertical) {
-        context.beginPath();
-        context.arc(x, y, markerRadius, 0, Math.PI * 2);
-        context.stroke();
-      } else {
-        context.strokeRect(x - 28, y - 31, 56, 62);
-      }
+      context.beginPath();
+      context.arc(x, y, markerRadius, 0, Math.PI * 2);
+      context.stroke();
     }
 
     if (hole === 1 && badge) {
@@ -2702,7 +2394,7 @@ function drawScoreCard(context) {
       context.beginPath();
       context.arc(x, y, markerRadius * 0.68, 0, Math.PI * 2);
       context.stroke();
-      context.fillStyle = scoreColor;
+      context.fillStyle = "#ffffff";
       context.font = `900 ${Math.max(22, scoreFontSize - 10)}px ${getNumberFont()}`;
       context.fillText(badge, x, y + 1);
       context.font = `900 ${scoreFontSize}px ${getNumberFont()}`;
@@ -2710,7 +2402,7 @@ function drawScoreCard(context) {
     }
 
     if (score) {
-      context.fillStyle = scoreColor;
+      context.fillStyle = "#ffffff";
       context.fillText(score, x, y);
     }
   });
@@ -2751,66 +2443,28 @@ function drawSelectionGuide(context) {
 function drawTemplateAtmosphere(context) {
   const posterHeight = getPosterHeight();
 
-  if (activePosterTemplate === "victory") {
-    const topShade = context.createLinearGradient(0, topBarHeight, 0, posterHeight * 0.38);
-    topShade.addColorStop(0, "rgba(0,0,0,0.46)");
-    topShade.addColorStop(1, "rgba(0,0,0,0)");
-    context.fillStyle = topShade;
-    context.fillRect(0, topBarHeight, posterSize, posterHeight * 0.38 - topBarHeight);
-
-    const bottomShade = context.createLinearGradient(0, posterHeight * 0.44, 0, posterHeight);
-    bottomShade.addColorStop(0, "rgba(0,0,0,0)");
-    bottomShade.addColorStop(0.74, "rgba(0,0,0,0.42)");
-    bottomShade.addColorStop(1, "rgba(0,0,0,0.86)");
-    context.fillStyle = bottomShade;
-    context.fillRect(0, posterHeight * 0.44, posterSize, posterHeight * 0.56);
-
-    const vignetteRadius = Math.max(posterSize, posterHeight) * 0.72;
-    const vignette = context.createRadialGradient(
-      posterSize / 2,
-      posterHeight * 0.5,
-      posterSize * 0.2,
-      posterSize / 2,
-      posterHeight * 0.5,
-      vignetteRadius
-    );
-    vignette.addColorStop(0, "rgba(0,0,0,0)");
-    vignette.addColorStop(0.66, "rgba(0,0,0,0.08)");
-    vignette.addColorStop(1, "rgba(0,0,0,0.58)");
-    context.fillStyle = vignette;
-    context.fillRect(0, topBarHeight, posterSize, posterHeight - topBarHeight);
-
-    context.fillStyle = "#e23b46";
-    context.fillRect(46, topBarHeight + 42, 7, 96);
-    context.fillStyle = "rgba(255,255,255,0.52)";
-    context.fillRect(70, topBarHeight + 42, 178, 2);
-    context.fillStyle = "rgba(255,255,255,0.2)";
-    context.fillRect(70, topBarHeight + 54, 88, 2);
+  if (activePosterTemplate === "template2") {
+    const sideShade = context.createLinearGradient(0, 0, 430, 0);
+    sideShade.addColorStop(0, "rgba(0,0,0,0.48)");
+    sideShade.addColorStop(0.86, "rgba(0,0,0,0.12)");
+    sideShade.addColorStop(1, "rgba(0,0,0,0)");
+    context.fillStyle = sideShade;
+    context.fillRect(0, topBarHeight, 430, posterHeight - topBarHeight);
     return;
   }
 
-  const startRatio = activePosterTemplate === "editorial" ? 0.38 : 0.56;
-  const endAlpha = activePosterTemplate === "editorial" ? 0.58 : 0.44;
-  const gradientStart = posterHeight * startRatio;
+  const gradientStart = 500;
   const bottomGradient = context.createLinearGradient(0, gradientStart, 0, posterHeight);
   bottomGradient.addColorStop(0, "rgba(0,0,0,0)");
-  bottomGradient.addColorStop(1, `rgba(0,0,0,${endAlpha})`);
+  bottomGradient.addColorStop(1, "rgba(0,0,0,0.4)");
   context.fillStyle = bottomGradient;
   context.fillRect(0, gradientStart, posterSize, posterHeight - gradientStart);
-
-  if (activePosterTemplate === "editorial") {
-    context.fillStyle = "rgba(0,0,0,0.13)";
-    context.fillRect(scoreBox.x - 24, scoreBox.y - 22, scoreBox.w + 48, scoreBox.h + 44);
-  }
 }
 
 function renderPoster({ exporting = false } = {}) {
   const posterHeight = getPosterHeight();
   Object.keys(elementBounds).forEach((key) => delete elementBounds[key]);
   ctx.clearRect(0, 0, posterSize, posterHeight);
-  ctx.save();
-  roundedRect(ctx, 0, 0, posterSize, posterHeight, 26);
-  ctx.clip();
 
   if (uploadedImage) {
     drawBackgroundImage(ctx);
@@ -2827,21 +2481,9 @@ function renderPoster({ exporting = false } = {}) {
   drawBrand(ctx);
   drawStickers(ctx);
 
-  ctx.strokeStyle = activePosterTemplate === "victory"
-    ? "rgba(255,255,255,0.58)"
-    : "rgba(255,255,255,0.8)";
-  ctx.lineWidth = 4;
-  roundedRect(ctx, 2, 2, posterSize - 4, posterHeight - 4, 26);
-  ctx.stroke();
-  if (activePosterTemplate === "victory") {
-    ctx.fillStyle = "#e23b46";
-    ctx.fillRect(26, 2, 148, 6);
-    ctx.fillRect(posterSize - 174, posterHeight - 8, 148, 6);
-  }
   if (!exporting) {
     drawSelectionGuide(ctx);
   }
-  ctx.restore();
 }
 
 function refreshRecognitionText() {
@@ -3269,12 +2911,6 @@ elements.autoTotal.addEventListener("change", updateAutoTotal);
 elements.languageSelect.addEventListener("change", (event) => {
   applyLanguage(event.target.value);
 });
-elements.landscapeTemplate.addEventListener("click", () => {
-  setTemplateOrientation("landscape");
-});
-elements.portraitTemplate.addEventListener("click", () => {
-  setTemplateOrientation("portrait");
-});
 document.querySelectorAll(".template-option").forEach((button) => {
   button.addEventListener("click", () => {
     applyPosterTemplate(button.dataset.template);
@@ -3344,7 +2980,7 @@ canvas.addEventListener("pointerup", endPointer);
 canvas.addEventListener("pointercancel", endPointer);
 
 currentLanguage = loadLanguagePreference();
-applyPosterTemplate("tour");
+applyPosterTemplate("template1");
 updateAutoTotal();
 updateZoomOutput();
 updateBackgroundBlurOutput();
