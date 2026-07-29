@@ -32,6 +32,8 @@ const elements = {
   numberFont: document.getElementById("numberFont"),
   zoomRange: document.getElementById("zoomRange"),
   zoomValue: document.getElementById("zoomValue"),
+  backgroundBlur: document.getElementById("backgroundBlur"),
+  backgroundBlurValue: document.getElementById("backgroundBlurValue"),
   resetZoom: document.getElementById("resetZoom"),
   downloadPoster: document.getElementById("downloadPoster"),
   resetPoster: document.getElementById("resetPoster"),
@@ -42,7 +44,8 @@ const elements = {
 
 const posterSize = 1080;
 const topBarHeight = 72;
-const scoreBox = { x: 128, y: 840, w: 824, h: 168 };
+const defaultScoreBox = { x: 128, y: 840, w: 824, h: 168 };
+const scoreBox = { ...defaultScoreBox };
 const fontStacks = {
   english: {
     clean: '"Trebuchet MS", ui-sans-serif, system-ui, Arial, sans-serif',
@@ -78,11 +81,33 @@ let segmentationLibraryPromise = null;
 let pendingSegmentationResolve = null;
 let segmentationQueue = Promise.resolve();
 let dragState = null;
+let elementDragState = null;
+let selectedElement = null;
+let activeEditorTab = "profile";
+let elementPositions = createDefaultElementPositions();
+const elementBounds = {};
 let imageState = {
   scale: 1,
   offsetX: 0,
   offsetY: 0
 };
+
+function createDefaultElementPositions() {
+  return {
+    total: { x: posterSize / 2 },
+    nickname: { x: defaultScoreBox.x + 12, y: defaultScoreBox.y - 30 },
+    club: { x: defaultScoreBox.x + defaultScoreBox.w - 12, y: defaultScoreBox.y - 30 },
+    extra: { x: posterSize / 2, y: defaultScoreBox.y + defaultScoreBox.h + 39 }
+  };
+}
+
+function resetElementPositions() {
+  elementPositions = createDefaultElementPositions();
+  scoreBox.x = defaultScoreBox.x;
+  scoreBox.y = defaultScoreBox.y;
+  elements.totalY.value = "300";
+  selectedElement = null;
+}
 
 function getEnglishFont() {
   return fontStacks.english[elements.englishFont.value] || fontStacks.english.clean;
@@ -113,6 +138,10 @@ function roundedRect(context, x, y, w, h, radius) {
   context.arcTo(x, y + h, x, y, r);
   context.arcTo(x, y, x + w, y, r);
   context.closePath();
+}
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
 }
 
 function parseScores() {
@@ -160,6 +189,10 @@ function updateZoomOutput() {
   elements.zoomValue.textContent = `${elements.zoomRange.value}%`;
 }
 
+function updateBackgroundBlurOutput() {
+  elements.backgroundBlurValue.textContent = `${elements.backgroundBlur.value}px`;
+}
+
 function parseHighlights() {
   return new Set(
     elements.highlightInput.value
@@ -178,6 +211,16 @@ function drawCoverAsset(context, asset, x, y, w, h) {
   const drawX = x + (w - drawW) / 2 + imageState.offsetX;
   const drawY = y + (h - drawH) / 2 + imageState.offsetY;
   context.drawImage(asset, drawX, drawY, drawW, drawH);
+}
+
+function drawBackgroundImage(context) {
+  const blur = Number(elements.backgroundBlur.value);
+  context.save();
+  if (blur > 0) {
+    context.filter = `blur(${blur}px)`;
+  }
+  drawCoverAsset(context, uploadedImage, 0, topBarHeight, posterSize, posterSize - topBarHeight);
+  context.restore();
 }
 
 function drawPlaceholder(context) {
@@ -230,6 +273,7 @@ function drawTotalScore(context) {
   }
 
   const opacity = Number(elements.totalOpacity.value) / 100;
+  const x = elementPositions.total.x;
   const y = Number(elements.totalY.value);
   let fontSize = Number(elements.totalFontSize.value);
 
@@ -243,7 +287,14 @@ function drawTotalScore(context) {
     fontSize -= 4;
     context.font = `950 ${fontSize}px ${getNumberFont()}`;
   }
-  context.fillText(score, posterSize / 2, y);
+  const textWidth = context.measureText(score).width;
+  context.fillText(score, x, y);
+  elementBounds.total = {
+    x: x - textWidth / 2 - 18,
+    y: y - fontSize * 0.52 - 18,
+    w: textWidth + 36,
+    h: fontSize * 1.04 + 36
+  };
   context.restore();
 }
 
@@ -279,7 +330,6 @@ function drawLabels(context) {
   const nickname = elements.nickname.value.trim();
   const club = elements.club.value.trim();
   const extra = elements.extraInfo.value.trim();
-  const labelY = scoreBox.y - 30;
 
   context.save();
   context.shadowColor = "rgba(0,0,0,0.38)";
@@ -288,25 +338,50 @@ function drawLabels(context) {
   context.textBaseline = "alphabetic";
 
   if (nickname) {
+    const position = elementPositions.nickname;
     context.fillStyle = elements.nicknameColor.value;
     context.textAlign = "left";
-    fitText(context, nickname, 270, Number(elements.nicknameFontSize.value), 14, getEnglishFont());
-    context.fillText(nickname, scoreBox.x + 12, labelY);
+    const fontSize = fitText(context, nickname, 270, Number(elements.nicknameFontSize.value), 14, getEnglishFont());
+    const textWidth = context.measureText(nickname).width;
+    context.fillText(nickname, position.x, position.y);
+    elementBounds.nickname = {
+      x: position.x - 10,
+      y: position.y - fontSize - 10,
+      w: textWidth + 20,
+      h: fontSize + 20
+    };
   }
 
   if (club) {
+    const position = elementPositions.club;
     context.fillStyle = elements.clubColor.value;
     context.textAlign = "right";
-    fitText(context, club, 460, Number(elements.clubFontSize.value), 14, getEnglishFont());
-    context.fillText(club, scoreBox.x + scoreBox.w - 12, labelY);
+    const fontSize = fitText(context, club, 460, Number(elements.clubFontSize.value), 14, getEnglishFont());
+    const textWidth = context.measureText(club).width;
+    context.fillText(club, position.x, position.y);
+    elementBounds.club = {
+      x: position.x - textWidth - 10,
+      y: position.y - fontSize - 10,
+      w: textWidth + 20,
+      h: fontSize + 20
+    };
   }
 
   if (extra) {
+    const position = elementPositions.extra;
+    const text = extra.toUpperCase();
     context.fillStyle = elements.extraColor.value;
-    fitText(context, extra.toUpperCase(), 860, Number(elements.extraFontSize.value), 12, getEnglishFont());
+    const fontSize = fitText(context, text, 860, Number(elements.extraFontSize.value), 12, getEnglishFont());
+    const textWidth = context.measureText(text).width;
     context.globalAlpha = 0.9;
     context.textAlign = "center";
-    context.fillText(extra.toUpperCase(), posterSize / 2, scoreBox.y + scoreBox.h + 39);
+    context.fillText(text, position.x, position.y);
+    elementBounds.extra = {
+      x: position.x - textWidth / 2 - 10,
+      y: position.y - fontSize - 10,
+      w: textWidth + 20,
+      h: fontSize + 20
+    };
   }
   context.restore();
 }
@@ -320,6 +395,13 @@ function drawScoreCard(context) {
   if (!hasScoreContent) {
     return;
   }
+
+  elementBounds.scoreCard = {
+    x: scoreBox.x,
+    y: scoreBox.y,
+    w: scoreBox.w,
+    h: scoreBox.h
+  };
 
   context.save();
   context.globalAlpha = 0.84;
@@ -378,14 +460,37 @@ function drawScoreCard(context) {
   context.restore();
 }
 
-function renderPoster() {
+function drawSelectionGuide(context) {
+  if (activeEditorTab !== "photo" || !selectedElement || !elementBounds[selectedElement]) {
+    return;
+  }
+
+  const bounds = elementBounds[selectedElement];
+  const x = Math.max(5, bounds.x - 5);
+  const y = Math.max(topBarHeight + 5, bounds.y - 5);
+  const w = Math.min(posterSize - x - 5, bounds.w + 10);
+  const h = Math.min(posterSize - y - 5, bounds.h + 10);
+
+  context.save();
+  context.strokeStyle = "rgba(0,29,55,0.88)";
+  context.lineWidth = 8;
+  context.strokeRect(x, y, w, h);
+  context.setLineDash([16, 10]);
+  context.strokeStyle = "#ffd100";
+  context.lineWidth = 4;
+  context.strokeRect(x, y, w, h);
+  context.restore();
+}
+
+function renderPoster({ exporting = false } = {}) {
+  Object.keys(elementBounds).forEach((key) => delete elementBounds[key]);
   ctx.clearRect(0, 0, posterSize, posterSize);
   ctx.save();
   roundedRect(ctx, 0, 0, posterSize, posterSize, 26);
   ctx.clip();
 
   if (uploadedImage) {
-    drawCoverAsset(ctx, uploadedImage, 0, topBarHeight, posterSize, posterSize - topBarHeight);
+    drawBackgroundImage(ctx);
   } else {
     drawPlaceholder(ctx);
   }
@@ -406,6 +511,9 @@ function renderPoster() {
   ctx.lineWidth = 4;
   roundedRect(ctx, 2, 2, posterSize - 4, posterSize - 4, 26);
   ctx.stroke();
+  if (!exporting) {
+    drawSelectionGuide(ctx);
+  }
   ctx.restore();
 }
 
@@ -593,12 +701,73 @@ function canvasPoint(event) {
   };
 }
 
-function startPointer(event) {
-  if (!uploadedImage) {
+function pointInsideBounds(point, bounds) {
+  return (
+    point.x >= bounds.x &&
+    point.x <= bounds.x + bounds.w &&
+    point.y >= bounds.y &&
+    point.y <= bounds.y + bounds.h
+  );
+}
+
+function hitTestElement(point) {
+  const hitOrder = ["nickname", "club", "extra", "scoreCard", "total"];
+  return hitOrder.find((key) => elementBounds[key] && pointInsideBounds(point, elementBounds[key])) || null;
+}
+
+function getElementAnchor(key) {
+  if (key === "scoreCard") {
+    return { x: scoreBox.x, y: scoreBox.y };
+  }
+  if (key === "total") {
+    return { x: elementPositions.total.x, y: Number(elements.totalY.value) };
+  }
+  return { ...elementPositions[key] };
+}
+
+function setElementAnchor(key, x, y) {
+  if (key === "scoreCard") {
+    scoreBox.x = x;
+    scoreBox.y = y;
     return;
   }
-  canvas.setPointerCapture(event.pointerId);
+  if (key === "total") {
+    elementPositions.total.x = x;
+    elements.totalY.value = String(Math.round(y));
+    return;
+  }
+  elementPositions[key].x = x;
+  elementPositions[key].y = y;
+}
+
+function startPointer(event) {
   const point = canvasPoint(event);
+
+  if (activeEditorTab === "photo") {
+    const target = hitTestElement(point);
+    if (target) {
+      canvas.setPointerCapture(event.pointerId);
+      selectedElement = target;
+      elementDragState = {
+        target,
+        x: point.x,
+        y: point.y,
+        anchor: getElementAnchor(target),
+        bounds: { ...elementBounds[target] }
+      };
+      dragState = null;
+      renderPoster();
+      return;
+    }
+    selectedElement = null;
+  }
+
+  if (!uploadedImage) {
+    renderPoster();
+    return;
+  }
+
+  canvas.setPointerCapture(event.pointerId);
   dragState = {
     x: point.x,
     y: point.y,
@@ -608,6 +777,22 @@ function startPointer(event) {
 }
 
 function movePointer(event) {
+  if (elementDragState) {
+    const point = canvasPoint(event);
+    const bounds = elementDragState.bounds;
+    const rawX = point.x - elementDragState.x;
+    const rawY = point.y - elementDragState.y;
+    const deltaX = clamp(rawX, 8 - bounds.x, posterSize - 8 - bounds.x - bounds.w);
+    const deltaY = clamp(rawY, topBarHeight + 8 - bounds.y, posterSize - 8 - bounds.y - bounds.h);
+    setElementAnchor(
+      elementDragState.target,
+      elementDragState.anchor.x + deltaX,
+      elementDragState.anchor.y + deltaY
+    );
+    renderPoster();
+    return;
+  }
+
   if (!dragState) {
     return;
   }
@@ -620,6 +805,7 @@ function movePointer(event) {
 
 function endPointer() {
   dragState = null;
+  elementDragState = null;
 }
 
 function loadImage(file) {
@@ -646,12 +832,25 @@ function loadImage(file) {
 }
 
 function downloadPoster() {
-  renderPoster();
+  renderPoster({ exporting: true });
   const link = document.createElement("a");
   const safeName = (elements.nickname.value.trim() || "golf").replace(/[^\w\u4e00-\u9fa5-]+/g, "-");
   link.download = `${safeName}-golf-poster.png`;
   link.href = canvas.toDataURL("image/png");
+  renderPoster();
   link.click();
+}
+
+function resetCanvasLayout({ render = true } = {}) {
+  elements.zoomRange.value = "100";
+  elements.backgroundBlur.value = "0";
+  imageState = { scale: 1, offsetX: 0, offsetY: 0 };
+  resetElementPositions();
+  updateZoomOutput();
+  updateBackgroundBlurOutput();
+  if (render) {
+    renderPoster();
+  }
 }
 
 function resetPoster() {
@@ -662,12 +861,9 @@ function resetPoster() {
   Object.entries(emptyValues).forEach(([key, value]) => {
     elements[key].value = value;
   });
-  elements.zoomRange.value = "100";
   elements.totalOpacity.value = "88";
-  elements.totalY.value = "300";
   elements.autoTotal.checked = true;
-  imageState = { scale: 1, offsetX: 0, offsetY: 0 };
-  updateZoomOutput();
+  resetCanvasLayout({ render: false });
   updateAutoTotal();
   updateRecognitionStatus("idle", "等待上传照片");
 }
@@ -675,10 +871,16 @@ function resetPoster() {
 document.querySelectorAll(".tab").forEach((tab) => {
   tab.addEventListener("click", () => {
     const target = tab.dataset.tab;
+    activeEditorTab = target;
+    if (target !== "photo") {
+      selectedElement = null;
+    }
+    canvas.classList.toggle("is-layout-mode", target === "photo");
     document.querySelectorAll(".tab").forEach((item) => item.classList.toggle("is-active", item === tab));
     document.querySelectorAll(".tab-panel").forEach((panel) => {
       panel.classList.toggle("is-active", panel.dataset.panel === target);
     });
+    renderPoster();
   });
 });
 
@@ -731,11 +933,12 @@ elements.zoomRange.addEventListener("input", () => {
   updateZoomOutput();
   renderPoster();
 });
-elements.resetZoom.addEventListener("click", () => {
-  elements.zoomRange.value = "100";
-  imageState.scale = 1;
-  updateZoomOutput();
+elements.backgroundBlur.addEventListener("input", () => {
+  updateBackgroundBlurOutput();
   renderPoster();
+});
+elements.resetZoom.addEventListener("click", () => {
+  resetCanvasLayout();
 });
 
 elements.photoInput.addEventListener("change", (event) => loadImage(event.target.files[0]));
@@ -749,6 +952,7 @@ canvas.addEventListener("pointercancel", endPointer);
 
 updateAutoTotal();
 updateZoomOutput();
+updateBackgroundBlurOutput();
 updateFontPreviews();
 updateStyleOutputs();
 renderPoster();

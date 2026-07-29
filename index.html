@@ -144,7 +144,7 @@
           </label>
           <label class="field">
             <span>总成绩高度</span>
-            <input id="totalY" type="range" min="130" max="430" value="300">
+            <input id="totalY" type="range" min="100" max="1000" value="300">
           </label>
         </div>
 
@@ -197,14 +197,21 @@
         <div class="tab-panel" data-panel="photo">
           <div class="field">
             <div class="field-heading">
-              <label for="zoomRange">图片缩放</label>
+              <label for="zoomRange">背景大小</label>
               <output id="zoomValue" for="zoomRange">100%</output>
             </div>
             <div class="range-row">
               <input id="zoomRange" type="range" min="80" max="220" value="100">
-              <button id="resetZoom" class="range-reset" type="button" aria-label="图片缩放复位" title="图片缩放复位">↺</button>
+              <button id="resetZoom" class="range-reset" type="button" aria-label="复位背景与海报元素" title="复位背景与海报元素">↺</button>
             </div>
           </div>
+          <label class="field">
+            <div class="field-heading">
+              <span>背景模糊</span>
+              <output id="backgroundBlurValue" for="backgroundBlur">0px</output>
+            </div>
+            <input id="backgroundBlur" type="range" min="0" max="30" value="0">
+          </label>
           <div class="photo-tools">
             <div>
               <strong>人物景深</strong>
