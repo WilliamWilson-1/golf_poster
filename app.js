@@ -77,7 +77,6 @@ const posterTemplates = {
         width: 1080,
         height: 1080,
         totalY: 300,
-        totalMaxWidth: 940,
         scoreDirection: "horizontal",
         scoreBox: { x: 128, y: 840, w: 824, h: 168 },
         positions: {
@@ -91,7 +90,6 @@ const posterTemplates = {
         width: 1080,
         height: 1440,
         totalY: 850,
-        totalMaxWidth: 990,
         scoreDirection: "horizontal",
         nicknameAlign: "center",
         clubAlign: "center",
@@ -127,7 +125,6 @@ const posterTemplates = {
         width: 1080,
         height: 1080,
         totalY: 340,
-        totalMaxWidth: 900,
         scoreDirection: "horizontal",
         nicknameAlign: "left",
         clubAlign: "left",
@@ -143,7 +140,6 @@ const posterTemplates = {
         width: 1080,
         height: 1440,
         totalY: 420,
-        totalMaxWidth: 900,
         scoreDirection: "horizontal",
         nicknameAlign: "left",
         clubAlign: "left",
@@ -179,7 +175,6 @@ const posterTemplates = {
         width: 1080,
         height: 1080,
         totalY: 305,
-        totalMaxWidth: 940,
         scoreDirection: "horizontal",
         nicknameAlign: "center",
         clubAlign: "center",
@@ -195,7 +190,6 @@ const posterTemplates = {
         width: 1080,
         height: 1440,
         totalY: 400,
-        totalMaxWidth: 930,
         scoreDirection: "horizontal",
         nicknameAlign: "center",
         clubAlign: "center",
@@ -231,7 +225,6 @@ const posterTemplates = {
         width: 1080,
         height: 1080,
         totalY: 285,
-        totalMaxWidth: 420,
         scoreDirection: "vertical",
         nicknameAlign: "center",
         clubAlign: "center",
@@ -248,7 +241,6 @@ const posterTemplates = {
         width: 1080,
         height: 1440,
         totalY: 510,
-        totalMaxWidth: 470,
         scoreDirection: "vertical",
         nicknameAlign: "center",
         clubAlign: "center",
@@ -1040,7 +1032,7 @@ function drawTotalScore(context) {
   const opacity = Number(elements.totalOpacity.value) / 100;
   const x = elementPositions.total.x;
   const y = Number(elements.totalY.value);
-  let fontSize = Number(elements.totalFontSize.value);
+  const fontSize = Number(elements.totalFontSize.value);
 
   context.save();
   context.globalAlpha = opacity;
@@ -1048,11 +1040,6 @@ function drawTotalScore(context) {
   context.font = `950 ${fontSize}px ${getNumberFont()}`;
   context.textAlign = "center";
   context.textBaseline = "middle";
-  const maxWidth = getActiveLayout().totalMaxWidth || posterSize - 140;
-  while (fontSize > 120 && context.measureText(score).width > maxWidth) {
-    fontSize -= 4;
-    context.font = `950 ${fontSize}px ${getNumberFont()}`;
-  }
   const textWidth = context.measureText(score).width;
   context.fillText(score, x, y);
   elementBounds.total = {
