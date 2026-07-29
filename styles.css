@@ -228,18 +228,36 @@ h1 {
   text-align: right;
 }
 
-.template-toolbar {
-  display: flex;
-  min-height: 58px;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 10px 18px 0;
+.template-library {
+  display: grid;
+  gap: 12px;
+  padding: 14px 18px 16px;
+  background: var(--white);
+  border-bottom: 1px solid var(--line);
 }
 
-.template-toolbar__label {
+.template-library__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.template-library__header > div:first-child {
+  display: grid;
+  gap: 3px;
+}
+
+.section-kicker {
+  color: var(--yellow-deep);
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: 10px;
+  font-weight: 950;
+}
+
+.template-library__header strong {
   color: var(--navy);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 950;
 }
 
@@ -271,10 +289,185 @@ h1 {
   outline-offset: 2px;
 }
 
+.template-gallery {
+  display: grid;
+  grid-auto-columns: 104px;
+  grid-auto-flow: column;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 3px;
+  scrollbar-width: none;
+  scroll-snap-type: x proximity;
+  touch-action: pan-x;
+}
+
+.template-gallery::-webkit-scrollbar {
+  display: none;
+}
+
+.template-option {
+  display: grid;
+  min-width: 0;
+  gap: 7px;
+  padding: 0;
+  color: var(--muted);
+  background: transparent;
+  scroll-snap-align: start;
+  text-align: left;
+}
+
+.template-option > strong {
+  overflow: hidden;
+  font-size: 11px;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.template-option.is-active {
+  color: var(--navy);
+}
+
+.template-art {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  height: 118px;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  background: #163f2e;
+}
+
+.template-option.is-active .template-art {
+  border-color: var(--yellow);
+  box-shadow: 0 0 0 2px var(--navy);
+}
+
+.template-art::before {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 13px;
+  background: #050505;
+  content: "";
+}
+
+.template-art__score {
+  position: absolute;
+  top: 18px;
+  right: 7px;
+  color: rgba(255, 255, 255, 0.75);
+  font-family: Georgia, serif;
+  font-size: 43px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.template-art__subject {
+  position: absolute;
+  bottom: 21px;
+  left: 16px;
+  width: 38px;
+  height: 68px;
+  border-radius: 18px 18px 3px 3px;
+  background: #d7dce0;
+}
+
+.template-art__subject::before {
+  position: absolute;
+  top: -11px;
+  left: 9px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #edf0f2;
+  content: "";
+}
+
+.template-art__table {
+  position: absolute;
+  right: 7px;
+  bottom: 8px;
+  left: 7px;
+  height: 18px;
+  border-top: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  color: #ffd100;
+  background: rgba(0, 43, 80, 0.72);
+}
+
+.template-art--heritage {
+  background: #f2f1ec;
+}
+
+.template-art--heritage::before {
+  background: #f2f1ec;
+  border-bottom: 1px solid #0b6b45;
+}
+
+.template-art--heritage .template-art__score {
+  color: #08754b;
+}
+
+.template-art--heritage .template-art__subject {
+  background: #173f65;
+}
+
+.template-art--heritage .template-art__subject::before {
+  background: #c9a781;
+}
+
+.template-art--heritage .template-art__table {
+  color: #08754b;
+  background: transparent;
+}
+
+.template-art--victory {
+  background: #111713;
+}
+
+.template-art--victory .template-art__score {
+  color: #d43842;
+}
+
+.template-art--victory .template-art__table {
+  color: #fff;
+  background: #a9252d;
+}
+
+.template-art--editorial {
+  background: #26351f;
+}
+
+.template-art--editorial .template-art__score {
+  top: 23px;
+  right: 8px;
+  font-size: 35px;
+}
+
+.template-art--editorial .template-art__subject {
+  bottom: 0;
+  left: 8px;
+  width: 48px;
+  height: 82px;
+}
+
+.template-art--editorial .template-art__table {
+  top: 61px;
+  right: 8px;
+  bottom: 8px;
+  left: auto;
+  width: 35px;
+  height: auto;
+  border-right: 1px solid currentColor;
+  border-left: 1px solid currentColor;
+  background: rgba(8, 32, 16, 0.55);
+}
+
 .poster-stage {
   position: relative;
   overflow: hidden;
-  margin: 10px 18px 14px;
+  margin: 16px 18px 14px;
   border: 2px solid var(--navy);
   border-radius: 6px;
   background: var(--navy-deep);
@@ -929,7 +1122,7 @@ input[type="range"] {
     margin-inline: 12px;
   }
 
-  .template-toolbar {
+  .template-library {
     padding-inline: 12px;
   }
 

@@ -54,34 +54,219 @@ const elements = {
 
 const posterSize = 1080;
 const topBarHeight = 72;
-const templateLayouts = {
-  landscape: {
-    width: 1080,
-    height: 1080,
-    totalY: 300,
-    scoreBox: { x: 128, y: 840, w: 824, h: 168 },
-    positions: {
-      total: { x: 540 },
-      nickname: { x: 140, y: 810 },
-      club: { x: 940, y: 810 },
-      extra: { x: 540, y: 1047 }
+const posterTemplates = {
+  tour: {
+    defaultOrientation: "landscape",
+    scoreStyle: "solid",
+    preset: {
+      scoreTableColor: "#006337",
+      totalColor: "#083728",
+      nicknameColor: "#ffffff",
+      clubColor: "#ffffff",
+      extraColor: "#ffffff",
+      englishFont: "arial",
+      numberFont: "arialBlack",
+      nicknameFontSize: "34",
+      clubFontSize: "34",
+      extraFontSize: "21",
+      totalFontSize: "335",
+      totalOpacity: "88"
+    },
+    layouts: {
+      landscape: {
+        width: 1080,
+        height: 1080,
+        totalY: 300,
+        totalMaxWidth: 940,
+        scoreDirection: "horizontal",
+        scoreBox: { x: 128, y: 840, w: 824, h: 168 },
+        positions: {
+          total: { x: 540 },
+          nickname: { x: 140, y: 810 },
+          club: { x: 940, y: 810 },
+          extra: { x: 540, y: 1047 }
+        }
+      },
+      portrait: {
+        width: 1080,
+        height: 1440,
+        totalY: 850,
+        totalMaxWidth: 990,
+        scoreDirection: "horizontal",
+        nicknameAlign: "center",
+        clubAlign: "center",
+        scoreBox: { x: 150, y: 190, w: 780, h: 180 },
+        positions: {
+          total: { x: 540 },
+          nickname: { x: 540, y: 158 },
+          club: { x: 540, y: 414 },
+          extra: { x: 540, y: 455 }
+        }
+      }
     }
   },
-  portrait: {
-    width: 1080,
-    height: 1440,
-    totalY: 510,
-    scoreBox: { x: 690, y: 710, w: 276, h: 650 },
-    positions: {
-      total: { x: 820 },
-      nickname: { x: 825, y: 240 },
-      club: { x: 825, y: 310 },
-      extra: { x: 1025, y: 1040 }
+  heritage: {
+    defaultOrientation: "portrait",
+    scoreStyle: "grid",
+    preset: {
+      scoreTableColor: "#08754b",
+      totalColor: "#08754b",
+      nicknameColor: "#08754b",
+      clubColor: "#08754b",
+      extraColor: "#08754b",
+      englishFont: "playfairDisplay",
+      numberFont: "playfairDisplay",
+      nicknameFontSize: "48",
+      clubFontSize: "25",
+      extraFontSize: "19",
+      totalFontSize: "390",
+      totalOpacity: "94"
+    },
+    layouts: {
+      landscape: {
+        width: 1080,
+        height: 1080,
+        totalY: 340,
+        totalMaxWidth: 900,
+        scoreDirection: "horizontal",
+        nicknameAlign: "left",
+        clubAlign: "left",
+        scoreBox: { x: 115, y: 655, w: 850, h: 170 },
+        positions: {
+          total: { x: 540 },
+          nickname: { x: 120, y: 900 },
+          club: { x: 690, y: 895 },
+          extra: { x: 760, y: 945 }
+        }
+      },
+      portrait: {
+        width: 1080,
+        height: 1440,
+        totalY: 420,
+        totalMaxWidth: 900,
+        scoreDirection: "horizontal",
+        nicknameAlign: "left",
+        clubAlign: "left",
+        scoreBox: { x: 145, y: 690, w: 790, h: 190 },
+        positions: {
+          total: { x: 540 },
+          nickname: { x: 80, y: 970 },
+          club: { x: 665, y: 965 },
+          extra: { x: 775, y: 1015 }
+        }
+      }
+    }
+  },
+  victory: {
+    defaultOrientation: "portrait",
+    scoreStyle: "solid",
+    preset: {
+      scoreTableColor: "#a9252d",
+      totalColor: "#d43842",
+      nicknameColor: "#ffffff",
+      clubColor: "#ffffff",
+      extraColor: "#ffffff",
+      englishFont: "playfairDisplay",
+      numberFont: "playfairDisplay",
+      nicknameFontSize: "38",
+      clubFontSize: "22",
+      extraFontSize: "18",
+      totalFontSize: "410",
+      totalOpacity: "92"
+    },
+    layouts: {
+      landscape: {
+        width: 1080,
+        height: 1080,
+        totalY: 305,
+        totalMaxWidth: 940,
+        scoreDirection: "horizontal",
+        nicknameAlign: "center",
+        clubAlign: "center",
+        scoreBox: { x: 145, y: 805, w: 790, h: 170 },
+        positions: {
+          total: { x: 540 },
+          nickname: { x: 540, y: 775 },
+          club: { x: 540, y: 1018 },
+          extra: { x: 540, y: 1055 }
+        }
+      },
+      portrait: {
+        width: 1080,
+        height: 1440,
+        totalY: 400,
+        totalMaxWidth: 930,
+        scoreDirection: "horizontal",
+        nicknameAlign: "center",
+        clubAlign: "center",
+        scoreBox: { x: 145, y: 1090, w: 790, h: 185 },
+        positions: {
+          total: { x: 540 },
+          nickname: { x: 540, y: 1050 },
+          club: { x: 540, y: 1335 },
+          extra: { x: 540, y: 1380 }
+        }
+      }
+    }
+  },
+  editorial: {
+    defaultOrientation: "portrait",
+    scoreStyle: "sidebar",
+    preset: {
+      scoreTableColor: "#1f351d",
+      totalColor: "#ffffff",
+      nicknameColor: "#ffffff",
+      clubColor: "#ffffff",
+      extraColor: "#ef4d57",
+      englishFont: "playfairDisplay",
+      numberFont: "playfairDisplay",
+      nicknameFontSize: "42",
+      clubFontSize: "24",
+      extraFontSize: "18",
+      totalFontSize: "335",
+      totalOpacity: "94"
+    },
+    layouts: {
+      landscape: {
+        width: 1080,
+        height: 1080,
+        totalY: 285,
+        totalMaxWidth: 420,
+        scoreDirection: "vertical",
+        nicknameAlign: "center",
+        clubAlign: "center",
+        extraVertical: true,
+        scoreBox: { x: 760, y: 410, w: 250, h: 580 },
+        positions: {
+          total: { x: 840 },
+          nickname: { x: 835, y: 145 },
+          club: { x: 835, y: 198 },
+          extra: { x: 1040, y: 700 }
+        }
+      },
+      portrait: {
+        width: 1080,
+        height: 1440,
+        totalY: 510,
+        totalMaxWidth: 470,
+        scoreDirection: "vertical",
+        nicknameAlign: "center",
+        clubAlign: "center",
+        extraVertical: true,
+        scoreBox: { x: 690, y: 710, w: 276, h: 650 },
+        positions: {
+          total: { x: 820 },
+          nickname: { x: 825, y: 240 },
+          club: { x: 825, y: 310 },
+          extra: { x: 1025, y: 1040 }
+        }
+      }
     }
   }
 };
+let activePosterTemplate = "tour";
 let templateOrientation = "landscape";
-const scoreBox = { ...templateLayouts.landscape.scoreBox };
+const scoreBox = { ...posterTemplates.tour.layouts.landscape.scoreBox };
 const fontStacks = {
   english: {
     arial: 'Arial, "Helvetica Neue", sans-serif',
@@ -122,6 +307,11 @@ const translations = {
     editorSections: "编辑项目",
     resetPoster: "清空海报",
     posterFormat: "海报版式",
+    templateLibrary: "选择模板",
+    templateTour: "赛事经典",
+    templateHeritage: "白场纪念",
+    templateVictory: "暗场夺冠",
+    templateEditorial: "杂志侧栏",
     landscapeTemplate: "横版",
     portraitTemplate: "竖版",
     uploadPhoto: "上传照片",
@@ -146,7 +336,7 @@ const translations = {
     badge: "圆形标记",
     highlightHoles: "高亮洞号",
     highlightPlaceholder: "例如 3,6",
-    scoreTableColor: "成绩表底色",
+    scoreTableColor: "成绩表颜色",
     totalScore: "总成绩",
     autoTotal: "自动统计",
     totalHintEmpty: "录入成绩后自动合计",
@@ -189,6 +379,11 @@ const translations = {
     editorSections: "Editor sections",
     resetPoster: "Clear poster",
     posterFormat: "Poster format",
+    templateLibrary: "Choose template",
+    templateTour: "Tournament",
+    templateHeritage: "Heritage",
+    templateVictory: "Victory",
+    templateEditorial: "Editorial",
     landscapeTemplate: "LANDSCAPE",
     portraitTemplate: "PORTRAIT",
     uploadPhoto: "UPLOAD PHOTO",
@@ -268,7 +463,7 @@ let segmentationQueue = Promise.resolve();
 let dragState = null;
 let elementDragState = null;
 let selectedElement = null;
-let activeEditorTab = "profile";
+let activeEditorTab = "photo";
 let currentLanguage = "zh";
 let recognitionDetailState = { key: "waitingPhoto", params: {} };
 let elementPositions = createDefaultElementPositions();
@@ -284,15 +479,24 @@ let imageState = {
   offsetY: 0
 };
 
+function getActiveTemplate() {
+  return posterTemplates[activePosterTemplate] || posterTemplates.tour;
+}
+
+function getActiveLayout(orientation = templateOrientation) {
+  const template = getActiveTemplate();
+  return template.layouts[orientation] || template.layouts[template.defaultOrientation];
+}
+
 function createDefaultElementPositions() {
-  const positions = templateLayouts[templateOrientation].positions;
+  const positions = getActiveLayout().positions;
   return Object.fromEntries(
     Object.entries(positions).map(([key, value]) => [key, { ...value }])
   );
 }
 
 function resetElementPositions() {
-  const layout = templateLayouts[templateOrientation];
+  const layout = getActiveLayout();
   elementPositions = createDefaultElementPositions();
   Object.assign(scoreBox, layout.scoreBox);
   elements.totalY.value = String(layout.totalY);
@@ -462,8 +666,8 @@ function getPosterHeight() {
 
 function setTemplateOrientation(orientation) {
   const nextOrientation = orientation === "portrait" ? "portrait" : "landscape";
-  const layout = templateLayouts[nextOrientation];
   templateOrientation = nextOrientation;
+  const layout = getActiveLayout(nextOrientation);
   canvas.width = layout.width;
   canvas.height = layout.height;
   canvas.classList.toggle("is-portrait", nextOrientation === "portrait");
@@ -477,6 +681,40 @@ function setTemplateOrientation(orientation) {
   resetStickerPositions();
   updateZoomOutput();
   renderPoster();
+}
+
+function updateTemplateSelection() {
+  document.querySelectorAll(".template-option").forEach((button) => {
+    const active = button.dataset.template === activePosterTemplate;
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+}
+
+function applyPosterTemplate(templateId) {
+  if (!posterTemplates[templateId]) {
+    return;
+  }
+
+  activePosterTemplate = templateId;
+  const template = getActiveTemplate();
+  const preset = template.preset;
+  elements.scoreTableColor.value = preset.scoreTableColor;
+  elements.totalColor.value = preset.totalColor;
+  elements.nicknameColor.value = preset.nicknameColor;
+  elements.clubColor.value = preset.clubColor;
+  elements.extraColor.value = preset.extraColor;
+  elements.englishFont.value = preset.englishFont;
+  elements.numberFont.value = preset.numberFont;
+  elements.nicknameFontSize.value = preset.nicknameFontSize;
+  elements.clubFontSize.value = preset.clubFontSize;
+  elements.extraFontSize.value = preset.extraFontSize;
+  elements.totalFontSize.value = preset.totalFontSize;
+  elements.totalOpacity.value = preset.totalOpacity;
+  updateTemplateSelection();
+  updateFontPreviews();
+  updateStyleOutputs();
+  setTemplateOrientation(template.defaultOrientation);
 }
 
 function translate(key, params = {}) {
@@ -653,57 +891,144 @@ function drawCoverAsset(context, asset, x, y, w, h) {
 function drawBackgroundImage(context) {
   const posterHeight = getPosterHeight();
   const blur = Number(elements.backgroundBlur.value);
+  const isolatedHeritage =
+    activePosterTemplate === "heritage" &&
+    segmentationState === "person" &&
+    subjectMaskSource;
+
+  if (isolatedHeritage) {
+    context.fillStyle = "#f3f2ed";
+    context.fillRect(0, topBarHeight, posterSize, posterHeight - topBarHeight);
+    context.save();
+    context.strokeStyle = "rgba(8, 117, 75, 0.045)";
+    context.lineWidth = 2;
+    for (let y = topBarHeight + 70; y < posterHeight; y += 92) {
+      context.beginPath();
+      context.moveTo(0, y);
+      context.lineTo(posterSize, y);
+      context.stroke();
+    }
+    context.restore();
+    return;
+  }
+
   context.save();
+  const filters = [];
   if (blur > 0) {
-    context.filter = `blur(${blur}px)`;
+    filters.push(`blur(${blur}px)`);
+  }
+  if (activePosterTemplate === "heritage") {
+    filters.push("brightness(1.16)", "saturate(0.65)");
+  } else if (activePosterTemplate === "victory") {
+    filters.push("brightness(0.64)", "saturate(0.88)");
+  } else if (activePosterTemplate === "editorial") {
+    filters.push("brightness(0.78)", "saturate(0.82)");
+  }
+  if (filters.length) {
+    context.filter = filters.join(" ");
   }
   drawCoverAsset(context, uploadedImage, 0, topBarHeight, posterSize, posterHeight - topBarHeight);
   context.restore();
+
+  if (activePosterTemplate === "heritage") {
+    context.fillStyle = "rgba(247, 246, 241, 0.58)";
+    context.fillRect(0, topBarHeight, posterSize, posterHeight - topBarHeight);
+  } else if (activePosterTemplate === "victory") {
+    context.fillStyle = "rgba(0, 0, 0, 0.18)";
+    context.fillRect(0, topBarHeight, posterSize, posterHeight - topBarHeight);
+  }
 }
 
 function drawPlaceholder(context) {
   const posterHeight = getPosterHeight();
   const horizonY = templateOrientation === "portrait" ? 860 : 660;
-  context.fillStyle = "#082e4c";
+  const backgrounds = {
+    tour: ["#082e4c", "#0d3c5e", "#ffd100"],
+    heritage: ["#f3f2ed", "#e9e7df", "#08754b"],
+    victory: ["#111713", "#080b09", "#d43842"],
+    editorial: ["#26351f", "#172316", "#ef4d57"]
+  };
+  const [topColor, bottomColor, accent] = backgrounds[activePosterTemplate] || backgrounds.tour;
+  context.fillStyle = topColor;
   context.fillRect(0, topBarHeight, posterSize, posterHeight - topBarHeight);
 
-  context.fillStyle = "#0d3c5e";
+  context.fillStyle = bottomColor;
   context.fillRect(0, horizonY, posterSize, posterHeight - horizonY);
-  context.fillStyle = "#ffd100";
+  context.fillStyle = accent;
   context.fillRect(74, horizonY - 42, 160, 7);
-  context.fillStyle = "rgba(255,255,255,0.12)";
+  context.fillStyle = activePosterTemplate === "heritage"
+    ? "rgba(8,117,75,0.18)"
+    : "rgba(255,255,255,0.12)";
   context.fillRect(74, horizonY - 22, 330, 3);
 }
 
 function drawBrand(context) {
-  context.fillStyle = "#000";
+  const brand = elements.brandText.value.trim() || "GOLFBROTHERS";
+  const isHeritage = activePosterTemplate === "heritage";
+  const isVictory = activePosterTemplate === "victory";
+  const isEditorial = activePosterTemplate === "editorial";
+  context.fillStyle = isHeritage ? "#f3f2ed" : "#000";
   context.fillRect(0, 0, posterSize, topBarHeight);
 
-  context.save();
-  context.translate(74, 20);
-  context.fillStyle = "#fff";
-  context.fillRect(0, -4, 5, 43);
-  context.fillStyle = "#c59c35";
-  context.beginPath();
-  context.moveTo(7, -2);
-  context.lineTo(52, 11);
-  context.lineTo(7, 24);
-  context.closePath();
-  context.fill();
-  context.restore();
+  if (activePosterTemplate === "tour") {
+    context.save();
+    context.translate(74, 20);
+    context.fillStyle = "#fff";
+    context.fillRect(0, -4, 5, 43);
+    context.fillStyle = "#c59c35";
+    context.beginPath();
+    context.moveTo(7, -2);
+    context.lineTo(52, 11);
+    context.lineTo(7, 24);
+    context.closePath();
+    context.fill();
+    context.restore();
 
-  const brand = elements.brandText.value.trim() || "GOLFBROTHERS";
-  const splitPoint = brand.toUpperCase().startsWith("GOLF") ? 4 : Math.max(4, Math.floor(brand.length * 0.45));
-  const first = brand.slice(0, splitPoint).toUpperCase();
-  const second = brand.slice(splitPoint).toUpperCase();
+    const splitPoint = brand.toUpperCase().startsWith("GOLF")
+      ? 4
+      : Math.max(4, Math.floor(brand.length * 0.45));
+    const first = brand.slice(0, splitPoint).toUpperCase();
+    const second = brand.slice(splitPoint).toUpperCase();
+    context.textBaseline = "middle";
+    context.textAlign = "left";
+    context.font = "italic 900 40px Arial, sans-serif";
+    context.fillStyle = "#fff";
+    context.fillText(first, 146, 37);
+    context.fillStyle = "#c99c32";
+    context.fillText(second, 146 + context.measureText(first).width, 37);
+    return;
+  }
 
+  const brandColor = isHeritage ? "#08754b" : "#ffffff";
   context.textBaseline = "middle";
+  context.fillStyle = brandColor;
+  context.font = `800 ${isVictory ? 31 : 28}px ${getEnglishFont()}`;
+
+  if (isVictory) {
+    context.textAlign = "center";
+    const width = context.measureText(brand).width;
+    context.fillText(brand, posterSize / 2, 38);
+    context.strokeStyle = "rgba(255,255,255,0.6)";
+    context.lineWidth = 2;
+    context.beginPath();
+    context.moveTo(38, 38);
+    context.lineTo(posterSize / 2 - width / 2 - 30, 38);
+    context.moveTo(posterSize / 2 + width / 2 + 30, 38);
+    context.lineTo(posterSize - 38, 38);
+    context.stroke();
+    return;
+  }
+
   context.textAlign = "left";
-  context.font = "italic 900 40px Arial, sans-serif";
-  context.fillStyle = "#fff";
-  context.fillText(first, 146, 37);
-  context.fillStyle = "#c99c32";
-  context.fillText(second, 146 + context.measureText(first).width, 37);
+  const brandX = isEditorial ? 44 : 50;
+  context.fillText(brand, brandX, 38);
+  const brandWidth = context.measureText(brand).width;
+  context.strokeStyle = isHeritage ? "rgba(8,117,75,0.55)" : "rgba(255,255,255,0.62)";
+  context.lineWidth = 2;
+  context.beginPath();
+  context.moveTo(brandX + brandWidth + 28, 38);
+  context.lineTo(posterSize - 45, 38);
+  context.stroke();
 }
 
 function drawTotalScore(context) {
@@ -723,7 +1048,7 @@ function drawTotalScore(context) {
   context.font = `950 ${fontSize}px ${getNumberFont()}`;
   context.textAlign = "center";
   context.textBaseline = "middle";
-  const maxWidth = templateOrientation === "portrait" ? 470 : posterSize - 140;
+  const maxWidth = getActiveLayout().totalMaxWidth || posterSize - 140;
   while (fontSize > 120 && context.measureText(score).width > maxWidth) {
     fontSize -= 4;
     context.font = `950 ${fontSize}px ${getNumberFont()}`;
@@ -771,23 +1096,39 @@ function drawLabels(context) {
   const nickname = elements.nickname.value.trim();
   const club = elements.club.value.trim();
   const extra = elements.extraInfo.value.trim();
+  const layout = getActiveLayout();
+  const nicknameAlign = layout.nicknameAlign || (templateOrientation === "portrait" ? "center" : "left");
+  const clubAlign = layout.clubAlign || (templateOrientation === "portrait" ? "center" : "right");
+  const editorialName = activePosterTemplate === "editorial";
+  const serifItalic = activePosterTemplate === "heritage" || activePosterTemplate === "victory";
 
   context.save();
-  context.shadowColor = "rgba(0,0,0,0.38)";
-  context.shadowBlur = 10;
-  context.shadowOffsetY = 2;
+  if (activePosterTemplate !== "heritage") {
+    context.shadowColor = "rgba(0,0,0,0.38)";
+    context.shadowBlur = 10;
+    context.shadowOffsetY = 2;
+  }
   context.textBaseline = "alphabetic";
 
   if (nickname) {
     const position = elementPositions.nickname;
+    const text = editorialName ? nickname.toUpperCase() : nickname;
     context.fillStyle = elements.nicknameColor.value;
-    context.textAlign = templateOrientation === "portrait" ? "center" : "left";
-    const maxWidth = templateOrientation === "portrait" ? 370 : 270;
-    const fontSize = fitText(context, nickname, maxWidth, Number(elements.nicknameFontSize.value), 14, getEnglishFont());
-    const textWidth = context.measureText(nickname).width;
-    context.fillText(nickname, position.x, position.y);
+    context.textAlign = nicknameAlign;
+    const maxWidth = layout.nicknameMaxWidth || (nicknameAlign === "center" ? 500 : 460);
+    const fontSize = fitText(context, text, maxWidth, Number(elements.nicknameFontSize.value), 14, getEnglishFont());
+    if (serifItalic) {
+      context.font = `italic 800 ${fontSize}px ${getEnglishFont()}`;
+    }
+    const textWidth = context.measureText(text).width;
+    context.fillText(text, position.x, position.y);
+    const left = nicknameAlign === "center"
+      ? position.x - textWidth / 2
+      : nicknameAlign === "right"
+        ? position.x - textWidth
+        : position.x;
     elementBounds.nickname = {
-      x: position.x - (templateOrientation === "portrait" ? textWidth / 2 : 0) - 10,
+      x: left - 10,
       y: position.y - fontSize - 10,
       w: textWidth + 20,
       h: fontSize + 20
@@ -797,13 +1138,18 @@ function drawLabels(context) {
   if (club) {
     const position = elementPositions.club;
     context.fillStyle = elements.clubColor.value;
-    context.textAlign = templateOrientation === "portrait" ? "center" : "right";
-    const maxWidth = templateOrientation === "portrait" ? 370 : 460;
+    context.textAlign = clubAlign;
+    const maxWidth = layout.clubMaxWidth || (clubAlign === "center" ? 500 : 400);
     const fontSize = fitText(context, club, maxWidth, Number(elements.clubFontSize.value), 14, getEnglishFont());
     const textWidth = context.measureText(club).width;
     context.fillText(club, position.x, position.y);
+    const left = clubAlign === "center"
+      ? position.x - textWidth / 2
+      : clubAlign === "right"
+        ? position.x - textWidth
+        : position.x;
     elementBounds.club = {
-      x: position.x - (templateOrientation === "portrait" ? textWidth / 2 : textWidth) - 10,
+      x: left - 10,
       y: position.y - fontSize - 10,
       w: textWidth + 20,
       h: fontSize + 20
@@ -814,12 +1160,12 @@ function drawLabels(context) {
     const position = elementPositions.extra;
     const text = extra.toUpperCase();
     context.fillStyle = elements.extraColor.value;
-    const maxWidth = templateOrientation === "portrait" ? 560 : 860;
+    const maxWidth = layout.extraMaxWidth || (layout.extraVertical ? 560 : 860);
     const fontSize = fitText(context, text, maxWidth, Number(elements.extraFontSize.value), 12, getEnglishFont());
     const textWidth = context.measureText(text).width;
     context.globalAlpha = 0.9;
     context.textAlign = "center";
-    if (templateOrientation === "portrait") {
+    if (layout.extraVertical) {
       context.save();
       context.translate(position.x, position.y);
       context.rotate(Math.PI / 2);
@@ -849,6 +1195,10 @@ function drawScoreCard(context) {
   const highlights = parseHighlights();
   const badge = elements.badgeText.value.trim();
   const hasScoreContent = scores.some(Boolean) || Boolean(badge);
+  const template = getActiveTemplate();
+  const layout = getActiveLayout();
+  const vertical = layout.scoreDirection === "vertical";
+  const gridStyle = template.scoreStyle === "grid";
 
   if (!hasScoreContent) {
     return;
@@ -862,17 +1212,22 @@ function drawScoreCard(context) {
   };
 
   context.save();
-  context.globalAlpha = 0.84;
-  context.fillStyle = elements.scoreTableColor.value;
-  context.fillRect(scoreBox.x, scoreBox.y, scoreBox.w, scoreBox.h);
-  context.globalAlpha = 1;
+  if (!gridStyle) {
+    context.globalAlpha = template.scoreStyle === "sidebar" ? 0.68 : 0.88;
+    context.fillStyle = elements.scoreTableColor.value;
+    context.fillRect(scoreBox.x, scoreBox.y, scoreBox.w, scoreBox.h);
+    context.globalAlpha = 1;
+  }
 
-  context.strokeStyle = templateOrientation === "portrait"
-    ? "rgba(255, 255, 255, 0.9)"
-    : "rgba(215, 197, 75, 0.92)";
-  context.lineWidth = 3;
+  const lineColor = gridStyle
+    ? elements.scoreTableColor.value
+    : activePosterTemplate === "tour"
+      ? "rgba(255, 209, 0, 0.9)"
+      : "rgba(255, 255, 255, 0.9)";
+  context.strokeStyle = lineColor;
+  context.lineWidth = gridStyle ? 2 : 3;
   context.beginPath();
-  if (templateOrientation === "portrait") {
+  if (vertical) {
     context.moveTo(scoreBox.x + scoreBox.w / 2, scoreBox.y);
     context.lineTo(scoreBox.x + scoreBox.w / 2, scoreBox.y + scoreBox.h);
   } else {
@@ -881,27 +1236,49 @@ function drawScoreCard(context) {
   }
   context.stroke();
 
+  if (gridStyle && !vertical) {
+    const columnWidth = scoreBox.w / 9;
+    for (let column = 1; column < 9; column += 1) {
+      const x = scoreBox.x + columnWidth * column;
+      context.beginPath();
+      context.moveTo(x, scoreBox.y);
+      context.lineTo(x, scoreBox.y + scoreBox.h);
+      context.stroke();
+    }
+  }
+
+  const cellW = vertical ? scoreBox.w / 2 : scoreBox.w / 9;
+  const cellH = vertical ? scoreBox.h / 9 : scoreBox.h / 2;
+  const scoreFontSize = Math.floor(Math.min(vertical ? 48 : 44, cellH * 0.55, cellW * 0.58));
+  const highlightColor = activePosterTemplate === "heritage"
+    ? elements.scoreTableColor.value
+    : activePosterTemplate === "editorial"
+      ? "#ef4d57"
+      : activePosterTemplate === "victory"
+        ? "#ffffff"
+        : "#ffd100";
+  const scoreColor = gridStyle ? elements.scoreTableColor.value : "#ffffff";
+
   context.textAlign = "center";
   context.textBaseline = "middle";
-  context.font = `900 ${templateOrientation === "portrait" ? 49 : 42}px ${getNumberFont()}`;
+  context.font = `900 ${scoreFontSize}px ${getNumberFont()}`;
 
   scores.forEach((score, index) => {
     const firstHalf = index < 9;
     const slot = index % 9;
-    const cellW = templateOrientation === "portrait" ? scoreBox.w / 2 : scoreBox.w / 9;
-    const cellH = templateOrientation === "portrait" ? scoreBox.h / 9 : scoreBox.h / 2;
-    const col = templateOrientation === "portrait" ? (firstHalf ? 0 : 1) : slot;
-    const row = templateOrientation === "portrait" ? slot : (firstHalf ? 0 : 1);
+    const col = vertical ? (firstHalf ? 0 : 1) : slot;
+    const row = vertical ? slot : (firstHalf ? 0 : 1);
     const x = scoreBox.x + cellW * col + cellW / 2;
     const y = scoreBox.y + cellH * row + cellH / 2;
     const hole = index + 1;
+    const markerRadius = Math.min(29, cellW * 0.34, cellH * 0.36);
 
     if (score && highlights.has(hole)) {
-      context.strokeStyle = "rgba(255, 209, 0, 0.96)";
+      context.strokeStyle = highlightColor;
       context.lineWidth = 3;
-      if (templateOrientation === "portrait") {
+      if (gridStyle || activePosterTemplate !== "tour" || vertical) {
         context.beginPath();
-        context.arc(x, y, 29, 0, Math.PI * 2);
+        context.arc(x, y, markerRadius, 0, Math.PI * 2);
         context.stroke();
       } else {
         context.strokeRect(x - 28, y - 31, 56, 62);
@@ -909,23 +1286,23 @@ function drawScoreCard(context) {
     }
 
     if (hole === 1 && badge) {
-      context.strokeStyle = "rgba(221, 226, 78, 0.95)";
+      context.strokeStyle = highlightColor;
       context.lineWidth = 3;
       context.beginPath();
-      context.arc(x, y, 29, 0, Math.PI * 2);
+      context.arc(x, y, markerRadius, 0, Math.PI * 2);
       context.stroke();
       context.beginPath();
-      context.arc(x, y, 20, 0, Math.PI * 2);
+      context.arc(x, y, markerRadius * 0.68, 0, Math.PI * 2);
       context.stroke();
-      context.fillStyle = "#fff";
-      context.font = `900 30px ${getNumberFont()}`;
+      context.fillStyle = scoreColor;
+      context.font = `900 ${Math.max(22, scoreFontSize - 10)}px ${getNumberFont()}`;
       context.fillText(badge, x, y + 1);
-      context.font = `900 ${templateOrientation === "portrait" ? 49 : 42}px ${getNumberFont()}`;
+      context.font = `900 ${scoreFontSize}px ${getNumberFont()}`;
       return;
     }
 
     if (score) {
-      context.fillStyle = "#fff";
+      context.fillStyle = scoreColor;
       context.fillText(score, x, y);
     }
   });
@@ -963,6 +1340,41 @@ function drawSelectionGuide(context) {
   context.restore();
 }
 
+function drawTemplateAtmosphere(context) {
+  const posterHeight = getPosterHeight();
+
+  if (activePosterTemplate === "heritage") {
+    context.save();
+    context.strokeStyle = "rgba(8,117,75,0.22)";
+    context.lineWidth = 2;
+    context.strokeRect(28, topBarHeight + 28, posterSize - 56, posterHeight - topBarHeight - 56);
+    context.restore();
+    return;
+  }
+
+  const startRatio = activePosterTemplate === "victory"
+    ? 0.46
+    : activePosterTemplate === "editorial"
+      ? 0.38
+      : 0.56;
+  const endAlpha = activePosterTemplate === "victory"
+    ? 0.72
+    : activePosterTemplate === "editorial"
+      ? 0.58
+      : 0.44;
+  const gradientStart = posterHeight * startRatio;
+  const bottomGradient = context.createLinearGradient(0, gradientStart, 0, posterHeight);
+  bottomGradient.addColorStop(0, "rgba(0,0,0,0)");
+  bottomGradient.addColorStop(1, `rgba(0,0,0,${endAlpha})`);
+  context.fillStyle = bottomGradient;
+  context.fillRect(0, gradientStart, posterSize, posterHeight - gradientStart);
+
+  if (activePosterTemplate === "editorial") {
+    context.fillStyle = "rgba(0,0,0,0.13)";
+    context.fillRect(scoreBox.x - 24, scoreBox.y - 22, scoreBox.w + 48, scoreBox.h + 44);
+  }
+}
+
 function renderPoster({ exporting = false } = {}) {
   const posterHeight = getPosterHeight();
   Object.keys(elementBounds).forEach((key) => delete elementBounds[key]);
@@ -977,12 +1389,7 @@ function renderPoster({ exporting = false } = {}) {
     drawPlaceholder(ctx);
   }
 
-  const gradientStart = templateOrientation === "portrait" ? 700 : 610;
-  const bottomGradient = ctx.createLinearGradient(0, gradientStart, 0, posterHeight);
-  bottomGradient.addColorStop(0, "rgba(0,0,0,0)");
-  bottomGradient.addColorStop(1, "rgba(0,0,0,0.44)");
-  ctx.fillStyle = bottomGradient;
-  ctx.fillRect(0, gradientStart, posterSize, posterHeight - gradientStart);
+  drawTemplateAtmosphere(ctx);
 
   drawTotalScore(ctx);
   drawSubjectOverlay(ctx);
@@ -991,7 +1398,9 @@ function renderPoster({ exporting = false } = {}) {
   drawBrand(ctx);
   drawStickers(ctx);
 
-  ctx.strokeStyle = "rgba(255,255,255,0.8)";
+  ctx.strokeStyle = activePosterTemplate === "heritage"
+    ? "rgba(8,117,75,0.55)"
+    : "rgba(255,255,255,0.8)";
   ctx.lineWidth = 4;
   roundedRect(ctx, 2, 2, posterSize - 4, posterHeight - 4, 26);
   ctx.stroke();
@@ -1432,6 +1841,11 @@ elements.landscapeTemplate.addEventListener("click", () => {
 elements.portraitTemplate.addEventListener("click", () => {
   setTemplateOrientation("portrait");
 });
+document.querySelectorAll(".template-option").forEach((button) => {
+  button.addEventListener("click", () => {
+    applyPosterTemplate(button.dataset.template);
+  });
+});
 elements.englishFont.addEventListener("change", () => {
   updateFontPreviews();
   renderPoster();
@@ -1496,7 +1910,7 @@ canvas.addEventListener("pointerup", endPointer);
 canvas.addEventListener("pointercancel", endPointer);
 
 currentLanguage = loadLanguagePreference();
-setTemplateOrientation("landscape");
+applyPosterTemplate("tour");
 updateAutoTotal();
 updateZoomOutput();
 updateBackgroundBlurOutput();

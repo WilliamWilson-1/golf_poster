@@ -33,16 +33,55 @@
           <span>TOURNAMENT GRAPHICS / 01</span>
         </div>
 
-        <div class="template-toolbar">
-          <span class="template-toolbar__label" data-i18n="posterFormat">海报版式</span>
-          <div class="template-switch" role="group" aria-label="海报版式" data-i18n-aria="posterFormat">
-            <button id="landscapeTemplate" class="is-active" type="button" aria-pressed="true" data-i18n="landscapeTemplate">横版</button>
-            <button id="portraitTemplate" type="button" aria-pressed="false" data-i18n="portraitTemplate">竖版</button>
+        <div class="template-library">
+          <div class="template-library__header">
+            <div>
+              <span class="section-kicker">01 / TEMPLATE</span>
+              <strong data-i18n="templateLibrary">选择模板</strong>
+            </div>
+            <div class="template-switch" role="group" aria-label="海报版式" data-i18n-aria="posterFormat">
+              <button id="landscapeTemplate" class="is-active" type="button" aria-pressed="true" data-i18n="landscapeTemplate">横版</button>
+              <button id="portraitTemplate" type="button" aria-pressed="false" data-i18n="portraitTemplate">竖版</button>
+            </div>
+          </div>
+          <div class="template-gallery" aria-label="海报模板" data-i18n-aria="templateLibrary">
+            <button class="template-option is-active" type="button" data-template="tour" aria-pressed="true">
+              <span class="template-art template-art--tour" aria-hidden="true">
+                <i class="template-art__score">68</i>
+                <i class="template-art__subject"></i>
+                <i class="template-art__table"></i>
+              </span>
+              <strong data-i18n="templateTour">赛事经典</strong>
+            </button>
+            <button class="template-option" type="button" data-template="heritage" aria-pressed="false">
+              <span class="template-art template-art--heritage" aria-hidden="true">
+                <i class="template-art__score">67</i>
+                <i class="template-art__subject"></i>
+                <i class="template-art__table"></i>
+              </span>
+              <strong data-i18n="templateHeritage">白场纪念</strong>
+            </button>
+            <button class="template-option" type="button" data-template="victory" aria-pressed="false">
+              <span class="template-art template-art--victory" aria-hidden="true">
+                <i class="template-art__score">61</i>
+                <i class="template-art__subject"></i>
+                <i class="template-art__table"></i>
+              </span>
+              <strong data-i18n="templateVictory">暗场夺冠</strong>
+            </button>
+            <button class="template-option" type="button" data-template="editorial" aria-pressed="false">
+              <span class="template-art template-art--editorial" aria-hidden="true">
+                <i class="template-art__score">62</i>
+                <i class="template-art__subject"></i>
+                <i class="template-art__table"></i>
+              </span>
+              <strong data-i18n="templateEditorial">杂志侧栏</strong>
+            </button>
           </div>
         </div>
 
         <div class="poster-stage">
-          <canvas id="posterCanvas" width="1080" height="1080" aria-label="海报预览画布" data-i18n-aria="posterCanvas"></canvas>
+          <canvas id="posterCanvas" class="is-layout-mode" width="1080" height="1080" aria-label="海报预览画布" data-i18n-aria="posterCanvas"></canvas>
         </div>
 
         <div class="primary-actions">
@@ -61,14 +100,14 @@
 
       <section class="controls-panel" aria-label="海报编辑" data-i18n-aria="posterEditor">
         <div class="tabs" role="tablist" aria-label="编辑项目" data-i18n-aria="editorSections">
-          <button class="tab is-active" type="button" data-tab="profile" role="tab" data-i18n="tabProfile">昵称</button>
+          <button class="tab is-active" type="button" data-tab="photo" role="tab" data-i18n="tabPhoto">图片</button>
           <button class="tab" type="button" data-tab="scores" role="tab" data-i18n="tabScores">成绩表</button>
           <button class="tab" type="button" data-tab="total" role="tab" data-i18n="tabTotal">总成绩</button>
+          <button class="tab" type="button" data-tab="profile" role="tab" data-i18n="tabProfile">昵称</button>
           <button class="tab" type="button" data-tab="extra" role="tab" data-i18n="tabExtra">额外信息</button>
-          <button class="tab" type="button" data-tab="photo" role="tab" data-i18n="tabPhoto">图片</button>
         </div>
 
-        <div class="tab-panel is-active" data-panel="profile">
+        <div class="tab-panel" data-panel="profile">
           <label class="field">
             <span data-i18n="nickname">昵称</span>
             <input id="nickname" type="text" value="" maxlength="18" autocomplete="off">
@@ -121,7 +160,7 @@
             </label>
           </div>
           <div class="color-line">
-            <label for="scoreTableColor" data-i18n="scoreTableColor">成绩表底色</label>
+            <label for="scoreTableColor" data-i18n="scoreTableColor">成绩表颜色</label>
             <input id="scoreTableColor" type="color" value="#006337">
           </div>
         </div>
@@ -245,7 +284,7 @@
           </div>
         </div>
 
-        <div class="tab-panel" data-panel="photo">
+        <div class="tab-panel is-active" data-panel="photo">
           <div class="field">
             <div class="field-heading">
               <label for="zoomRange" data-i18n="backgroundSize">背景大小</label>
