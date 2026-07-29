@@ -1166,8 +1166,7 @@ input[type="range"] {
     border: 1px solid rgba(0, 43, 80, 0.16);
   }
 }
-
-    </style>
+</style>
   </head>
   <body>
     <main class="app-shell">
@@ -1923,6 +1922,7 @@ const emptyValues = {
 
 let uploadedImage = null;
 let subjectMaskSource = null;
+let subjectCutoutMaskSource = null;
 let segmentationState = "idle";
 let segmentationToken = 0;
 let selfieSegmenter = null;
@@ -2363,11 +2363,21 @@ function drawBackgroundImage(context) {
   const isolatedHeritage =
     activePosterTemplate === "heritage" &&
     segmentationState === "person" &&
-    subjectMaskSource;
+    (subjectCutoutMaskSource || subjectMaskSource);
 
   if (isolatedHeritage) {
     context.fillStyle = "#f3f2ed";
     context.fillRect(0, topBarHeight, posterSize, posterHeight - topBarHeight);
+
+    context.save();
+    context.globalAlpha = 0.1;
+    context.filter = `blur(${Math.max(18, blur)}px) brightness(1.2) saturate(0.32)`;
+    drawCoverAsset(context, uploadedImage, 0, topBarHeight, posterSize, posterHeight - topBarHeight);
+    context.restore();
+
+    context.fillStyle = "rgba(247, 246, 241, 0.64)";
+    context.fillRect(0, topBarHeight, posterSize, posterHeight - topBarHeight);
+
     context.save();
     context.strokeStyle = "rgba(8, 117, 75, 0.045)";
     context.lineWidth = 2;
@@ -2533,13 +2543,28 @@ function drawSubjectOverlay(context) {
     return;
   }
 
+  const maskSource =
+    activePosterTemplate === "heritage"
+      ? subjectCutoutMaskSource || subjectMaskSource
+      : subjectMaskSource;
   const layerCanvas = document.createElement("canvas");
   layerCanvas.width = posterSize;
   layerCanvas.height = getPosterHeight();
   const layerCtx = layerCanvas.getContext("2d");
   drawCoverAsset(layerCtx, uploadedImage, 0, topBarHeight, posterSize, getPosterHeight() - topBarHeight);
   layerCtx.globalCompositeOperation = "destination-in";
-  drawCoverAsset(layerCtx, subjectMaskSource, 0, topBarHeight, posterSize, getPosterHeight() - topBarHeight);
+  drawCoverAsset(layerCtx, maskSource, 0, topBarHeight, posterSize, getPosterHeight() - topBarHeight);
+
+  if (activePosterTemplate === "heritage") {
+    context.save();
+    context.shadowColor = "rgba(13, 47, 34, 0.14)";
+    context.shadowBlur = 18;
+    context.shadowOffsetY = 7;
+    context.drawImage(layerCanvas, 0, 0);
+    context.restore();
+    return;
+  }
+
   context.drawImage(layerCanvas, 0, 0);
 }
 
@@ -2905,6 +2930,48 @@ function copySegmentationMask(mask) {
   return source;
 }
 
+function createCutoutMask(maskCanvas) {
+  const maxSide = 720;
+  const scale = Math.min(1, maxSide / Math.max(maskCanvas.width, maskCanvas.height));
+  const width = Math.max(1, Math.round(maskCanvas.width * scale));
+  const height = Math.max(1, Math.round(maskCanvas.height * scale));
+  const sample = document.createElement("canvas");
+  sample.width = width;
+  sample.height = height;
+  const sampleCtx = sample.getContext("2d", { willReadFrequently: true });
+  sampleCtx.drawImage(maskCanvas, 0, 0, width, height);
+  const imageData = sampleCtx.getImageData(0, 0, width, height);
+  const pixels = imageData.data;
+
+  let varyingAlpha = false;
+  for (let i = 3; i < pixels.length; i += 4) {
+    if (pixels[i] < 250) {
+      varyingAlpha = true;
+      break;
+    }
+  }
+
+  const lowConfidence = 0.48;
+  const highConfidence = 0.76;
+  for (let i = 0; i < pixels.length; i += 4) {
+    const confidence = varyingAlpha
+      ? pixels[i + 3] / 255
+      : (pixels[i] + pixels[i + 1] + pixels[i + 2]) / (255 * 3);
+    const normalized = Math.max(
+      0,
+      Math.min(1, (confidence - lowConfidence) / (highConfidence - lowConfidence))
+    );
+    const feathered = normalized * normalized * (3 - 2 * normalized);
+    pixels[i] = 255;
+    pixels[i + 1] = 255;
+    pixels[i + 2] = 255;
+    pixels[i + 3] = Math.round(feathered * 255);
+  }
+
+  sampleCtx.putImageData(imageData, 0, 0);
+  return sample;
+}
+
 function measureMask(maskCanvas) {
   const sample = document.createElement("canvas");
   sample.width = 160;
@@ -2984,7 +3051,7 @@ function getSelfieSegmenter() {
     locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation@0.1/${file}`
   });
   selfieSegmenter.setOptions({
-    modelSelection: 1,
+    modelSelection: 0,
     selfieMode: false
   });
   selfieSegmenter.onResults((results) => {
@@ -3029,11 +3096,13 @@ async function runSegmentation(token) {
 
     if (looksLikePerson) {
       subjectMaskSource = mask;
+      subjectCutoutMaskSource = createCutoutMask(mask);
       updateRecognitionStatus("person", "personRatio", {
         percent: Math.round(metrics.strongRatio * 100)
       });
     } else {
       subjectMaskSource = null;
+      subjectCutoutMaskSource = null;
       updateRecognitionStatus("fallback", "noClearPerson");
     }
   } catch (error) {
@@ -3046,6 +3115,7 @@ async function runSegmentation(token) {
     }
     selfieSegmenter = null;
     subjectMaskSource = null;
+    subjectCutoutMaskSource = null;
     updateRecognitionStatus("fallback", "recognitionUnavailable");
   }
 }
@@ -3053,6 +3123,7 @@ async function runSegmentation(token) {
 function requestSegmentation() {
   const token = ++segmentationToken;
   subjectMaskSource = null;
+  subjectCutoutMaskSource = null;
   segmentationQueue = segmentationQueue
     .catch(() => undefined)
     .then(() => runSegmentation(token));
@@ -3245,6 +3316,7 @@ function resetPoster() {
   stickerLoadToken += 1;
   uploadedImage = null;
   subjectMaskSource = null;
+  subjectCutoutMaskSource = null;
   stickers = [];
   selectedStickerId = null;
   elements.photoInput.value = "";
@@ -3384,7 +3456,6 @@ applyLanguage(currentLanguage, false);
 if (document.fonts && document.fonts.ready) {
   document.fonts.ready.then(renderPoster);
 }
-
-    </script>
+</script>
   </body>
 </html>
