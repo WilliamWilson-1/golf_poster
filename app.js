@@ -272,7 +272,8 @@ function resetElementPositions() {
   elementPositions = createDefaultElementPositions();
   Object.assign(scoreBox, layout.scoreBox);
   elements.totalY.value = String(layout.totalY);
-  elements.totalY.max = String(layout.height - 80);
+  elements.totalY.min = "-420";
+  elements.totalY.max = String(layout.height + 420);
   selectedElement = null;
 }
 
@@ -385,10 +386,6 @@ function roundedRect(context, x, y, w, h, radius) {
   context.arcTo(x, y + h, x, y, r);
   context.arcTo(x, y, x + w, y, r);
   context.closePath();
-}
-
-function clamp(value, min, max) {
-  return Math.max(min, Math.min(max, value));
 }
 
 function parseScores() {
@@ -761,10 +758,10 @@ function drawSelectionGuide(context) {
   }
 
   const bounds = elementBounds[selectedElement];
-  const x = Math.max(5, bounds.x - 5);
-  const y = Math.max(topBarHeight + 5, bounds.y - 5);
-  const w = Math.min(posterSize - x - 5, bounds.w + 10);
-  const h = Math.min(getPosterHeight() - y - 5, bounds.h + 10);
+  const x = bounds.x - 5;
+  const y = bounds.y - 5;
+  const w = bounds.w + 10;
+  const h = bounds.h + 10;
 
   context.save();
   context.strokeStyle = "rgba(0,29,55,0.88)";
@@ -1060,8 +1057,7 @@ function startPointer(event) {
       target,
       x: point.x,
       y: point.y,
-      anchor: getElementAnchor(target),
-      bounds: { ...elementBounds[target] }
+      anchor: getElementAnchor(target)
     };
     dragState = null;
     renderPoster();
@@ -1090,11 +1086,8 @@ function movePointer(event) {
 
   if (elementDragState) {
     const point = canvasPoint(event);
-    const bounds = elementDragState.bounds;
-    const rawX = point.x - elementDragState.x;
-    const rawY = point.y - elementDragState.y;
-    const deltaX = clamp(rawX, 8 - bounds.x, posterSize - 8 - bounds.x - bounds.w);
-    const deltaY = clamp(rawY, topBarHeight + 8 - bounds.y, getPosterHeight() - 8 - bounds.y - bounds.h);
+    const deltaX = point.x - elementDragState.x;
+    const deltaY = point.y - elementDragState.y;
     setElementAnchor(
       elementDragState.target,
       elementDragState.anchor.x + deltaX,
