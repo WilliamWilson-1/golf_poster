@@ -33,6 +33,14 @@
           <span>TOURNAMENT GRAPHICS / 01</span>
         </div>
 
+        <div class="template-toolbar">
+          <span class="template-toolbar__label" data-i18n="posterFormat">海报版式</span>
+          <div class="template-switch" role="group" aria-label="海报版式" data-i18n-aria="posterFormat">
+            <button id="landscapeTemplate" class="is-active" type="button" aria-pressed="true" data-i18n="landscapeTemplate">横版</button>
+            <button id="portraitTemplate" type="button" aria-pressed="false" data-i18n="portraitTemplate">竖版</button>
+          </div>
+        </div>
+
         <div class="poster-stage">
           <canvas id="posterCanvas" width="1080" height="1080" aria-label="海报预览画布" data-i18n-aria="posterCanvas"></canvas>
         </div>
@@ -180,21 +188,34 @@
             <label class="field">
               <span data-i18n="englishFont">英文字体</span>
               <select id="englishFont">
-                <option value="clean" data-i18n="fontClean">清晰无衬线</option>
-                <option value="sport" data-i18n="fontSport">竞技窄体</option>
-                <option value="rounded" data-i18n="fontRounded">轻快圆体</option>
-                <option value="classic" data-i18n="fontClassic">经典衬线</option>
-                <option value="mono" data-i18n="fontMono">等宽字形</option>
+                <option value="arial">Arial</option>
+                <option value="impact">Impact</option>
+                <option value="arialBlack">Arial Black</option>
+                <option value="bebasNeue">Bebas Neue</option>
+                <option value="oswald">Oswald</option>
+                <option value="montserrat">Montserrat</option>
+                <option value="playfairDisplay">Playfair Display</option>
+                <option value="georgia">Georgia</option>
+                <option value="timesNewRoman">Times New Roman</option>
+                <option value="franklinGothic">Franklin Gothic Medium</option>
+                <option value="arialRounded">Arial Rounded MT Bold</option>
+                <option value="spaceMono">Space Mono</option>
+                <option value="courierNew">Courier New</option>
               </select>
             </label>
             <label class="field">
               <span data-i18n="numberFont">数字字体</span>
               <select id="numberFont">
-                <option value="power" data-i18n="numberPower">力量黑体</option>
-                <option value="condensed" data-i18n="numberCondensed">紧凑比分</option>
-                <option value="geometric" data-i18n="numberGeometric">几何数字</option>
-                <option value="classic" data-i18n="numberClassic">经典数字</option>
-                <option value="mono" data-i18n="numberMono">等宽记分</option>
+                <option value="arialBlack">Arial Black</option>
+                <option value="impact">Impact</option>
+                <option value="bebasNeue">Bebas Neue</option>
+                <option value="oswald">Oswald</option>
+                <option value="montserrat">Montserrat</option>
+                <option value="playfairDisplay">Playfair Display</option>
+                <option value="georgia">Georgia</option>
+                <option value="timesNewRoman">Times New Roman</option>
+                <option value="spaceMono">Space Mono</option>
+                <option value="courierNew">Courier New</option>
               </select>
             </label>
           </div>

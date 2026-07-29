@@ -7,6 +7,38 @@
     <title>GOLFBROTHERS Poster Studio</title>
     <meta name="description" content="上传照片并生成可下载的高尔夫成绩海报">
     <style>
+@font-face {
+  font-family: "Bebas Neue";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/@fontsource/bebas-neue@5.3.0/files/bebas-neue-latin-400-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Oswald";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/@fontsource/oswald@5.2.8/files/oswald-latin-700-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Playfair Display";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/@fontsource/playfair-display@5.3.0/files/playfair-display-latin-700-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Space Mono";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/@fontsource/space-mono@5.3.0/files/space-mono-latin-700-normal.woff2") format("woff2");
+}
+
 :root {
   color-scheme: light;
   --navy: #002b50;
@@ -205,10 +237,53 @@ h1 {
   text-align: right;
 }
 
+.template-toolbar {
+  display: flex;
+  min-height: 58px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 18px 0;
+}
+
+.template-toolbar__label {
+  color: var(--navy);
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.template-switch {
+  display: grid;
+  grid-template-columns: repeat(2, 78px);
+  padding: 3px;
+  border: 1px solid var(--navy);
+  border-radius: 4px;
+  background: var(--white);
+}
+
+.template-switch button {
+  min-height: 34px;
+  border-radius: 2px;
+  color: var(--navy);
+  background: transparent;
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.template-switch button.is-active {
+  color: var(--navy-deep);
+  background: var(--yellow);
+}
+
+.template-switch button:focus-visible {
+  outline: 3px solid rgba(0, 43, 80, 0.24);
+  outline-offset: 2px;
+}
+
 .poster-stage {
   position: relative;
   overflow: hidden;
-  margin: 18px 18px 14px;
+  margin: 10px 18px 14px;
   border: 2px solid var(--navy);
   border-radius: 6px;
   background: var(--navy-deep);
@@ -221,6 +296,10 @@ h1 {
   aspect-ratio: 1 / 1;
   touch-action: none;
   background: var(--navy-deep);
+}
+
+#posterCanvas.is-portrait {
+  aspect-ratio: 3 / 4;
 }
 
 #posterCanvas.is-layout-mode {
@@ -726,6 +805,14 @@ input[type="range"] {
     margin-inline: 12px;
   }
 
+  .template-toolbar {
+    padding-inline: 12px;
+  }
+
+  .template-switch {
+    grid-template-columns: repeat(2, 68px);
+  }
+
   .primary-actions {
     padding-inline: 12px;
   }
@@ -779,6 +866,14 @@ input[type="range"] {
         <div class="tournament-strip">
           <strong>GB INTERNATIONAL</strong>
           <span>TOURNAMENT GRAPHICS / 01</span>
+        </div>
+
+        <div class="template-toolbar">
+          <span class="template-toolbar__label" data-i18n="posterFormat">海报版式</span>
+          <div class="template-switch" role="group" aria-label="海报版式" data-i18n-aria="posterFormat">
+            <button id="landscapeTemplate" class="is-active" type="button" aria-pressed="true" data-i18n="landscapeTemplate">横版</button>
+            <button id="portraitTemplate" type="button" aria-pressed="false" data-i18n="portraitTemplate">竖版</button>
+          </div>
         </div>
 
         <div class="poster-stage">
@@ -928,21 +1023,34 @@ input[type="range"] {
             <label class="field">
               <span data-i18n="englishFont">英文字体</span>
               <select id="englishFont">
-                <option value="clean" data-i18n="fontClean">清晰无衬线</option>
-                <option value="sport" data-i18n="fontSport">竞技窄体</option>
-                <option value="rounded" data-i18n="fontRounded">轻快圆体</option>
-                <option value="classic" data-i18n="fontClassic">经典衬线</option>
-                <option value="mono" data-i18n="fontMono">等宽字形</option>
+                <option value="arial">Arial</option>
+                <option value="impact">Impact</option>
+                <option value="arialBlack">Arial Black</option>
+                <option value="bebasNeue">Bebas Neue</option>
+                <option value="oswald">Oswald</option>
+                <option value="montserrat">Montserrat</option>
+                <option value="playfairDisplay">Playfair Display</option>
+                <option value="georgia">Georgia</option>
+                <option value="timesNewRoman">Times New Roman</option>
+                <option value="franklinGothic">Franklin Gothic Medium</option>
+                <option value="arialRounded">Arial Rounded MT Bold</option>
+                <option value="spaceMono">Space Mono</option>
+                <option value="courierNew">Courier New</option>
               </select>
             </label>
             <label class="field">
               <span data-i18n="numberFont">数字字体</span>
               <select id="numberFont">
-                <option value="power" data-i18n="numberPower">力量黑体</option>
-                <option value="condensed" data-i18n="numberCondensed">紧凑比分</option>
-                <option value="geometric" data-i18n="numberGeometric">几何数字</option>
-                <option value="classic" data-i18n="numberClassic">经典数字</option>
-                <option value="mono" data-i18n="numberMono">等宽记分</option>
+                <option value="arialBlack">Arial Black</option>
+                <option value="impact">Impact</option>
+                <option value="bebasNeue">Bebas Neue</option>
+                <option value="oswald">Oswald</option>
+                <option value="montserrat">Montserrat</option>
+                <option value="playfairDisplay">Playfair Display</option>
+                <option value="georgia">Georgia</option>
+                <option value="timesNewRoman">Times New Roman</option>
+                <option value="spaceMono">Space Mono</option>
+                <option value="courierNew">Courier New</option>
               </select>
             </label>
           </div>
@@ -984,6 +1092,8 @@ const ctx = canvas.getContext("2d");
 const elements = {
   photoInput: document.getElementById("photoInput"),
   languageSelect: document.getElementById("languageSelect"),
+  landscapeTemplate: document.getElementById("landscapeTemplate"),
+  portraitTemplate: document.getElementById("portraitTemplate"),
   nickname: document.getElementById("nickname"),
   nicknameFontSize: document.getElementById("nicknameFontSize"),
   nicknameFontSizeValue: document.getElementById("nicknameFontSizeValue"),
@@ -1025,22 +1135,61 @@ const elements = {
 
 const posterSize = 1080;
 const topBarHeight = 72;
-const defaultScoreBox = { x: 128, y: 840, w: 824, h: 168 };
-const scoreBox = { ...defaultScoreBox };
+const templateLayouts = {
+  landscape: {
+    width: 1080,
+    height: 1080,
+    totalY: 300,
+    scoreBox: { x: 128, y: 840, w: 824, h: 168 },
+    positions: {
+      total: { x: 540 },
+      nickname: { x: 140, y: 810 },
+      club: { x: 940, y: 810 },
+      extra: { x: 540, y: 1047 }
+    }
+  },
+  portrait: {
+    width: 1080,
+    height: 1440,
+    totalY: 510,
+    scoreBox: { x: 690, y: 710, w: 276, h: 650 },
+    positions: {
+      total: { x: 820 },
+      nickname: { x: 825, y: 240 },
+      club: { x: 825, y: 310 },
+      extra: { x: 1025, y: 1040 }
+    }
+  }
+};
+let templateOrientation = "landscape";
+const scoreBox = { ...templateLayouts.landscape.scoreBox };
 const fontStacks = {
   english: {
-    clean: '"Trebuchet MS", ui-sans-serif, system-ui, Arial, sans-serif',
-    sport: 'Impact, Haettenschweiler, "Arial Narrow Bold", fantasy',
-    rounded: '"Arial Rounded MT Bold", ui-rounded, "Trebuchet MS", sans-serif',
-    classic: 'Georgia, "Times New Roman", ui-serif, serif',
-    mono: 'Consolas, "Courier New", ui-monospace, monospace'
+    arial: 'Arial, "Helvetica Neue", sans-serif',
+    impact: 'Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif',
+    arialBlack: '"Arial Black", Impact, sans-serif',
+    bebasNeue: '"Bebas Neue", Impact, "Arial Narrow", sans-serif',
+    oswald: 'Oswald, "Arial Narrow", Impact, sans-serif',
+    montserrat: 'Montserrat, "Helvetica Neue", Arial, sans-serif',
+    playfairDisplay: '"Playfair Display", Georgia, "Times New Roman", serif',
+    georgia: 'Georgia, "Times New Roman", serif',
+    timesNewRoman: '"Times New Roman", Times, serif',
+    franklinGothic: '"Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif',
+    arialRounded: '"Arial Rounded MT Bold", "Trebuchet MS", sans-serif',
+    spaceMono: '"Space Mono", Consolas, "Courier New", monospace',
+    courierNew: '"Courier New", Courier, monospace'
   },
   number: {
-    power: '"Arial Black", Impact, ui-sans-serif, sans-serif',
-    condensed: 'Impact, Haettenschweiler, "Arial Narrow Bold", fantasy',
-    geometric: '"Trebuchet MS", ui-rounded, ui-sans-serif, sans-serif',
-    classic: 'Georgia, "Times New Roman", ui-serif, serif',
-    mono: 'Consolas, "Courier New", ui-monospace, monospace'
+    arialBlack: '"Arial Black", Impact, sans-serif',
+    impact: 'Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif',
+    bebasNeue: '"Bebas Neue", Impact, "Arial Narrow", sans-serif',
+    oswald: 'Oswald, "Arial Narrow", Impact, sans-serif',
+    montserrat: 'Montserrat, "Helvetica Neue", Arial, sans-serif',
+    playfairDisplay: '"Playfair Display", Georgia, "Times New Roman", serif',
+    georgia: 'Georgia, "Times New Roman", serif',
+    timesNewRoman: '"Times New Roman", Times, serif',
+    spaceMono: '"Space Mono", Consolas, "Courier New", monospace',
+    courierNew: '"Courier New", Courier, monospace'
   }
 };
 const translations = {
@@ -1053,6 +1202,9 @@ const translations = {
     posterEditor: "海报编辑",
     editorSections: "编辑项目",
     resetPoster: "清空海报",
+    posterFormat: "海报版式",
+    landscapeTemplate: "横版",
+    portraitTemplate: "竖版",
     uploadPhoto: "上传照片",
     downloadPoster: "下载海报",
     statusIdle: "上传照片后自动识别人像",
@@ -1090,17 +1242,7 @@ const translations = {
     extraColor: "信息颜色",
     brandText: "品牌文字",
     englishFont: "英文字体",
-    fontClean: "清晰无衬线",
-    fontSport: "竞技窄体",
-    fontRounded: "轻快圆体",
-    fontClassic: "经典衬线",
-    fontMono: "等宽字形",
     numberFont: "数字字体",
-    numberPower: "力量黑体",
-    numberCondensed: "紧凑比分",
-    numberGeometric: "几何数字",
-    numberClassic: "经典数字",
-    numberMono: "等宽记分",
     backgroundSize: "背景大小",
     resetLayout: "复位背景与海报元素",
     backgroundBlur: "背景模糊",
@@ -1121,6 +1263,9 @@ const translations = {
     posterEditor: "Poster editor",
     editorSections: "Editor sections",
     resetPoster: "Clear poster",
+    posterFormat: "Poster format",
+    landscapeTemplate: "LANDSCAPE",
+    portraitTemplate: "PORTRAIT",
     uploadPhoto: "UPLOAD PHOTO",
     downloadPoster: "DOWNLOAD",
     statusIdle: "Upload a photo to detect the subject",
@@ -1158,17 +1303,7 @@ const translations = {
     extraColor: "Info color",
     brandText: "Brand text",
     englishFont: "Text font",
-    fontClean: "Clean Sans",
-    fontSport: "Sport Condensed",
-    fontRounded: "Rounded",
-    fontClassic: "Classic Serif",
-    fontMono: "Monospace",
     numberFont: "Number font",
-    numberPower: "Power Black",
-    numberCondensed: "Condensed Score",
-    numberGeometric: "Geometric",
-    numberClassic: "Classic Numerals",
-    numberMono: "Monospace Score",
     backgroundSize: "Background size",
     resetLayout: "Reset background and poster elements",
     backgroundBlur: "Background blur",
@@ -1214,20 +1349,41 @@ let imageState = {
 };
 
 function createDefaultElementPositions() {
-  return {
-    total: { x: posterSize / 2 },
-    nickname: { x: defaultScoreBox.x + 12, y: defaultScoreBox.y - 30 },
-    club: { x: defaultScoreBox.x + defaultScoreBox.w - 12, y: defaultScoreBox.y - 30 },
-    extra: { x: posterSize / 2, y: defaultScoreBox.y + defaultScoreBox.h + 39 }
-  };
+  const positions = templateLayouts[templateOrientation].positions;
+  return Object.fromEntries(
+    Object.entries(positions).map(([key, value]) => [key, { ...value }])
+  );
 }
 
 function resetElementPositions() {
+  const layout = templateLayouts[templateOrientation];
   elementPositions = createDefaultElementPositions();
-  scoreBox.x = defaultScoreBox.x;
-  scoreBox.y = defaultScoreBox.y;
-  elements.totalY.value = "300";
+  Object.assign(scoreBox, layout.scoreBox);
+  elements.totalY.value = String(layout.totalY);
+  elements.totalY.max = String(layout.height - 80);
   selectedElement = null;
+}
+
+function getPosterHeight() {
+  return canvas.height;
+}
+
+function setTemplateOrientation(orientation) {
+  const nextOrientation = orientation === "portrait" ? "portrait" : "landscape";
+  const layout = templateLayouts[nextOrientation];
+  templateOrientation = nextOrientation;
+  canvas.width = layout.width;
+  canvas.height = layout.height;
+  canvas.classList.toggle("is-portrait", nextOrientation === "portrait");
+  elements.landscapeTemplate.classList.toggle("is-active", nextOrientation === "landscape");
+  elements.portraitTemplate.classList.toggle("is-active", nextOrientation === "portrait");
+  elements.landscapeTemplate.setAttribute("aria-pressed", String(nextOrientation === "landscape"));
+  elements.portraitTemplate.setAttribute("aria-pressed", String(nextOrientation === "portrait"));
+  imageState = { scale: 1, offsetX: 0, offsetY: 0 };
+  elements.zoomRange.value = "100";
+  resetElementPositions();
+  updateZoomOutput();
+  renderPoster();
 }
 
 function translate(key, params = {}) {
@@ -1289,11 +1445,11 @@ function applyLanguage(language, persist = true) {
 }
 
 function getEnglishFont() {
-  return fontStacks.english[elements.englishFont.value] || fontStacks.english.clean;
+  return fontStacks.english[elements.englishFont.value] || fontStacks.english.arial;
 }
 
 function getNumberFont() {
-  return fontStacks.number[elements.numberFont.value] || fontStacks.number.power;
+  return fontStacks.number[elements.numberFont.value] || fontStacks.number.arialBlack;
 }
 
 function updateFontPreviews() {
@@ -1405,25 +1561,28 @@ function drawCoverAsset(context, asset, x, y, w, h) {
 }
 
 function drawBackgroundImage(context) {
+  const posterHeight = getPosterHeight();
   const blur = Number(elements.backgroundBlur.value);
   context.save();
   if (blur > 0) {
     context.filter = `blur(${blur}px)`;
   }
-  drawCoverAsset(context, uploadedImage, 0, topBarHeight, posterSize, posterSize - topBarHeight);
+  drawCoverAsset(context, uploadedImage, 0, topBarHeight, posterSize, posterHeight - topBarHeight);
   context.restore();
 }
 
 function drawPlaceholder(context) {
+  const posterHeight = getPosterHeight();
+  const horizonY = templateOrientation === "portrait" ? 860 : 660;
   context.fillStyle = "#082e4c";
-  context.fillRect(0, topBarHeight, posterSize, posterSize - topBarHeight);
+  context.fillRect(0, topBarHeight, posterSize, posterHeight - topBarHeight);
 
   context.fillStyle = "#0d3c5e";
-  context.fillRect(0, 660, posterSize, posterSize - 660);
+  context.fillRect(0, horizonY, posterSize, posterHeight - horizonY);
   context.fillStyle = "#ffd100";
-  context.fillRect(74, 618, 160, 7);
+  context.fillRect(74, horizonY - 42, 160, 7);
   context.fillStyle = "rgba(255,255,255,0.12)";
-  context.fillRect(74, 638, 330, 3);
+  context.fillRect(74, horizonY - 22, 330, 3);
 }
 
 function drawBrand(context) {
@@ -1474,7 +1633,8 @@ function drawTotalScore(context) {
   context.font = `950 ${fontSize}px ${getNumberFont()}`;
   context.textAlign = "center";
   context.textBaseline = "middle";
-  while (fontSize > 120 && context.measureText(score).width > posterSize - 140) {
+  const maxWidth = templateOrientation === "portrait" ? 470 : posterSize - 140;
+  while (fontSize > 120 && context.measureText(score).width > maxWidth) {
     fontSize -= 4;
     context.font = `950 ${fontSize}px ${getNumberFont()}`;
   }
@@ -1496,11 +1656,11 @@ function drawSubjectOverlay(context) {
 
   const layerCanvas = document.createElement("canvas");
   layerCanvas.width = posterSize;
-  layerCanvas.height = posterSize;
+  layerCanvas.height = getPosterHeight();
   const layerCtx = layerCanvas.getContext("2d");
-  drawCoverAsset(layerCtx, uploadedImage, 0, topBarHeight, posterSize, posterSize - topBarHeight);
+  drawCoverAsset(layerCtx, uploadedImage, 0, topBarHeight, posterSize, getPosterHeight() - topBarHeight);
   layerCtx.globalCompositeOperation = "destination-in";
-  drawCoverAsset(layerCtx, subjectMaskSource, 0, topBarHeight, posterSize, posterSize - topBarHeight);
+  drawCoverAsset(layerCtx, subjectMaskSource, 0, topBarHeight, posterSize, getPosterHeight() - topBarHeight);
   context.drawImage(layerCanvas, 0, 0);
 }
 
@@ -1531,12 +1691,13 @@ function drawLabels(context) {
   if (nickname) {
     const position = elementPositions.nickname;
     context.fillStyle = elements.nicknameColor.value;
-    context.textAlign = "left";
-    const fontSize = fitText(context, nickname, 270, Number(elements.nicknameFontSize.value), 14, getEnglishFont());
+    context.textAlign = templateOrientation === "portrait" ? "center" : "left";
+    const maxWidth = templateOrientation === "portrait" ? 370 : 270;
+    const fontSize = fitText(context, nickname, maxWidth, Number(elements.nicknameFontSize.value), 14, getEnglishFont());
     const textWidth = context.measureText(nickname).width;
     context.fillText(nickname, position.x, position.y);
     elementBounds.nickname = {
-      x: position.x - 10,
+      x: position.x - (templateOrientation === "portrait" ? textWidth / 2 : 0) - 10,
       y: position.y - fontSize - 10,
       w: textWidth + 20,
       h: fontSize + 20
@@ -1546,12 +1707,13 @@ function drawLabels(context) {
   if (club) {
     const position = elementPositions.club;
     context.fillStyle = elements.clubColor.value;
-    context.textAlign = "right";
-    const fontSize = fitText(context, club, 460, Number(elements.clubFontSize.value), 14, getEnglishFont());
+    context.textAlign = templateOrientation === "portrait" ? "center" : "right";
+    const maxWidth = templateOrientation === "portrait" ? 370 : 460;
+    const fontSize = fitText(context, club, maxWidth, Number(elements.clubFontSize.value), 14, getEnglishFont());
     const textWidth = context.measureText(club).width;
     context.fillText(club, position.x, position.y);
     elementBounds.club = {
-      x: position.x - textWidth - 10,
+      x: position.x - (templateOrientation === "portrait" ? textWidth / 2 : textWidth) - 10,
       y: position.y - fontSize - 10,
       w: textWidth + 20,
       h: fontSize + 20
@@ -1562,17 +1724,32 @@ function drawLabels(context) {
     const position = elementPositions.extra;
     const text = extra.toUpperCase();
     context.fillStyle = elements.extraColor.value;
-    const fontSize = fitText(context, text, 860, Number(elements.extraFontSize.value), 12, getEnglishFont());
+    const maxWidth = templateOrientation === "portrait" ? 560 : 860;
+    const fontSize = fitText(context, text, maxWidth, Number(elements.extraFontSize.value), 12, getEnglishFont());
     const textWidth = context.measureText(text).width;
     context.globalAlpha = 0.9;
     context.textAlign = "center";
-    context.fillText(text, position.x, position.y);
-    elementBounds.extra = {
-      x: position.x - textWidth / 2 - 10,
-      y: position.y - fontSize - 10,
-      w: textWidth + 20,
-      h: fontSize + 20
-    };
+    if (templateOrientation === "portrait") {
+      context.save();
+      context.translate(position.x, position.y);
+      context.rotate(Math.PI / 2);
+      context.fillText(text, 0, 0);
+      context.restore();
+      elementBounds.extra = {
+        x: position.x - fontSize / 2 - 10,
+        y: position.y - textWidth / 2 - 10,
+        w: fontSize + 20,
+        h: textWidth + 20
+      };
+    } else {
+      context.fillText(text, position.x, position.y);
+      elementBounds.extra = {
+        x: position.x - textWidth / 2 - 10,
+        y: position.y - fontSize - 10,
+        w: textWidth + 20,
+        h: fontSize + 20
+      };
+    }
   }
   context.restore();
 }
@@ -1600,30 +1777,45 @@ function drawScoreCard(context) {
   context.fillRect(scoreBox.x, scoreBox.y, scoreBox.w, scoreBox.h);
   context.globalAlpha = 1;
 
-  context.strokeStyle = "rgba(215, 197, 75, 0.92)";
+  context.strokeStyle = templateOrientation === "portrait"
+    ? "rgba(255, 255, 255, 0.9)"
+    : "rgba(215, 197, 75, 0.92)";
   context.lineWidth = 3;
   context.beginPath();
-  context.moveTo(scoreBox.x, scoreBox.y + scoreBox.h / 2);
-  context.lineTo(scoreBox.x + scoreBox.w, scoreBox.y + scoreBox.h / 2);
+  if (templateOrientation === "portrait") {
+    context.moveTo(scoreBox.x + scoreBox.w / 2, scoreBox.y);
+    context.lineTo(scoreBox.x + scoreBox.w / 2, scoreBox.y + scoreBox.h);
+  } else {
+    context.moveTo(scoreBox.x, scoreBox.y + scoreBox.h / 2);
+    context.lineTo(scoreBox.x + scoreBox.w, scoreBox.y + scoreBox.h / 2);
+  }
   context.stroke();
 
-  const cellW = scoreBox.w / 9;
-  const rowYs = [scoreBox.y + 55, scoreBox.y + 136];
   context.textAlign = "center";
   context.textBaseline = "middle";
-  context.font = `900 42px ${getNumberFont()}`;
+  context.font = `900 ${templateOrientation === "portrait" ? 49 : 42}px ${getNumberFont()}`;
 
   scores.forEach((score, index) => {
-    const row = index < 9 ? 0 : 1;
-    const col = index % 9;
+    const firstHalf = index < 9;
+    const slot = index % 9;
+    const cellW = templateOrientation === "portrait" ? scoreBox.w / 2 : scoreBox.w / 9;
+    const cellH = templateOrientation === "portrait" ? scoreBox.h / 9 : scoreBox.h / 2;
+    const col = templateOrientation === "portrait" ? (firstHalf ? 0 : 1) : slot;
+    const row = templateOrientation === "portrait" ? slot : (firstHalf ? 0 : 1);
     const x = scoreBox.x + cellW * col + cellW / 2;
-    const y = rowYs[row];
+    const y = scoreBox.y + cellH * row + cellH / 2;
     const hole = index + 1;
 
     if (score && highlights.has(hole)) {
-      context.strokeStyle = "rgba(215, 197, 75, 0.95)";
+      context.strokeStyle = "rgba(255, 209, 0, 0.96)";
       context.lineWidth = 3;
-      context.strokeRect(x - 28, y - 31, 56, 62);
+      if (templateOrientation === "portrait") {
+        context.beginPath();
+        context.arc(x, y, 29, 0, Math.PI * 2);
+        context.stroke();
+      } else {
+        context.strokeRect(x - 28, y - 31, 56, 62);
+      }
     }
 
     if (hole === 1 && badge) {
@@ -1638,7 +1830,7 @@ function drawScoreCard(context) {
       context.fillStyle = "#fff";
       context.font = `900 30px ${getNumberFont()}`;
       context.fillText(badge, x, y + 1);
-      context.font = `900 42px ${getNumberFont()}`;
+      context.font = `900 ${templateOrientation === "portrait" ? 49 : 42}px ${getNumberFont()}`;
       return;
     }
 
@@ -1660,7 +1852,7 @@ function drawSelectionGuide(context) {
   const x = Math.max(5, bounds.x - 5);
   const y = Math.max(topBarHeight + 5, bounds.y - 5);
   const w = Math.min(posterSize - x - 5, bounds.w + 10);
-  const h = Math.min(posterSize - y - 5, bounds.h + 10);
+  const h = Math.min(getPosterHeight() - y - 5, bounds.h + 10);
 
   context.save();
   context.strokeStyle = "rgba(0,29,55,0.88)";
@@ -1674,10 +1866,11 @@ function drawSelectionGuide(context) {
 }
 
 function renderPoster({ exporting = false } = {}) {
+  const posterHeight = getPosterHeight();
   Object.keys(elementBounds).forEach((key) => delete elementBounds[key]);
-  ctx.clearRect(0, 0, posterSize, posterSize);
+  ctx.clearRect(0, 0, posterSize, posterHeight);
   ctx.save();
-  roundedRect(ctx, 0, 0, posterSize, posterSize, 26);
+  roundedRect(ctx, 0, 0, posterSize, posterHeight, 26);
   ctx.clip();
 
   if (uploadedImage) {
@@ -1686,11 +1879,12 @@ function renderPoster({ exporting = false } = {}) {
     drawPlaceholder(ctx);
   }
 
-  const bottomGradient = ctx.createLinearGradient(0, 610, 0, posterSize);
+  const gradientStart = templateOrientation === "portrait" ? 700 : 610;
+  const bottomGradient = ctx.createLinearGradient(0, gradientStart, 0, posterHeight);
   bottomGradient.addColorStop(0, "rgba(0,0,0,0)");
   bottomGradient.addColorStop(1, "rgba(0,0,0,0.44)");
   ctx.fillStyle = bottomGradient;
-  ctx.fillRect(0, 610, posterSize, 470);
+  ctx.fillRect(0, gradientStart, posterSize, posterHeight - gradientStart);
 
   drawTotalScore(ctx);
   drawSubjectOverlay(ctx);
@@ -1700,7 +1894,7 @@ function renderPoster({ exporting = false } = {}) {
 
   ctx.strokeStyle = "rgba(255,255,255,0.8)";
   ctx.lineWidth = 4;
-  roundedRect(ctx, 2, 2, posterSize - 4, posterSize - 4, 26);
+  roundedRect(ctx, 2, 2, posterSize - 4, posterHeight - 4, 26);
   ctx.stroke();
   if (!exporting) {
     drawSelectionGuide(ctx);
@@ -1896,7 +2090,7 @@ function canvasPoint(event) {
   const rect = canvas.getBoundingClientRect();
   return {
     x: ((event.clientX - rect.left) / rect.width) * posterSize,
-    y: ((event.clientY - rect.top) / rect.height) * posterSize
+    y: ((event.clientY - rect.top) / rect.height) * getPosterHeight()
   };
 }
 
@@ -1982,7 +2176,7 @@ function movePointer(event) {
     const rawX = point.x - elementDragState.x;
     const rawY = point.y - elementDragState.y;
     const deltaX = clamp(rawX, 8 - bounds.x, posterSize - 8 - bounds.x - bounds.w);
-    const deltaY = clamp(rawY, topBarHeight + 8 - bounds.y, posterSize - 8 - bounds.y - bounds.h);
+    const deltaY = clamp(rawY, topBarHeight + 8 - bounds.y, getPosterHeight() - 8 - bounds.y - bounds.h);
     setElementAnchor(
       elementDragState.target,
       elementDragState.anchor.x + deltaX,
@@ -2102,6 +2296,12 @@ elements.autoTotal.addEventListener("change", updateAutoTotal);
 elements.languageSelect.addEventListener("change", (event) => {
   applyLanguage(event.target.value);
 });
+elements.landscapeTemplate.addEventListener("click", () => {
+  setTemplateOrientation("landscape");
+});
+elements.portraitTemplate.addEventListener("click", () => {
+  setTemplateOrientation("portrait");
+});
 elements.englishFont.addEventListener("change", () => {
   updateFontPreviews();
   renderPoster();
@@ -2153,13 +2353,16 @@ canvas.addEventListener("pointerup", endPointer);
 canvas.addEventListener("pointercancel", endPointer);
 
 currentLanguage = loadLanguagePreference();
+setTemplateOrientation("landscape");
 updateAutoTotal();
 updateZoomOutput();
 updateBackgroundBlurOutput();
 updateStyleOutputs();
 applyLanguage(currentLanguage, false);
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(renderPoster);
+}
 
     </script>
   </body>
 </html>
-
