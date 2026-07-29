@@ -24,6 +24,7 @@ const elements = {
   totalHint: document.getElementById("totalHint"),
   totalOpacity: document.getElementById("totalOpacity"),
   totalY: document.getElementById("totalY"),
+  totalAboveSubject: document.getElementById("totalAboveSubject"),
   extraInfo: document.getElementById("extraInfo"),
   extraFontSize: document.getElementById("extraFontSize"),
   extraFontSizeValue: document.getElementById("extraFontSizeValue"),
@@ -199,6 +200,7 @@ const translations = {
     totalColor: "总分颜色",
     totalOpacity: "总成绩透明度",
     totalHeight: "总成绩高度",
+    totalAboveSubject: "总成绩置于人物上方",
     extraInfo: "额外信息",
     extraSize: "额外信息字号",
     extraColor: "信息颜色",
@@ -218,7 +220,7 @@ const translations = {
     waitingPhoto: "等待上传照片",
     retryRecognition: "重新识别",
     analyzingPhoto: "正在分析照片中的人物主体",
-    personRatio: "人物占画面约 {percent}%",
+    personRatio: "人物占画面约 {percent}%，可切换总成绩前后层级",
     noClearPerson: "画面中没有足够清晰的人物主体",
     recognitionUnavailable: "自动识别不可用，已切换为普通叠加"
   },
@@ -266,6 +268,7 @@ const translations = {
     totalColor: "Total color",
     totalOpacity: "Total opacity",
     totalHeight: "Total position",
+    totalAboveSubject: "Total above player",
     extraInfo: "Additional info",
     extraSize: "Info size",
     extraColor: "Info color",
@@ -285,7 +288,7 @@ const translations = {
     waitingPhoto: "Waiting for a photo",
     retryRecognition: "RETRY",
     analyzingPhoto: "Analyzing the subject in this photo",
-    personRatio: "Subject covers about {percent}% of the frame",
+    personRatio: "Subject covers about {percent}% of the frame; total layer can be switched",
     noClearPerson: "No clear person was found in the frame",
     recognitionUnavailable: "Subject detection unavailable; using standard overlay"
   }
@@ -1073,8 +1076,13 @@ function renderPoster({ exporting = false } = {}) {
 
   drawTemplateAtmosphere(ctx);
 
-  drawTotalScore(ctx);
-  drawSubjectOverlay(ctx);
+  if (elements.totalAboveSubject.checked) {
+    drawSubjectOverlay(ctx);
+    drawTotalScore(ctx);
+  } else {
+    drawTotalScore(ctx);
+    drawSubjectOverlay(ctx);
+  }
   drawLabels(ctx);
   drawScoreCard(ctx);
   drawBrand(ctx);
@@ -1465,6 +1473,7 @@ function resetPoster() {
   });
   elements.totalOpacity.value = "88";
   elements.autoTotal.checked = true;
+  elements.totalAboveSubject.checked = false;
   resetCanvasLayout({ render: false });
   updateStickerControls();
   updateAutoTotal();
@@ -1507,6 +1516,7 @@ document.querySelectorAll(".tab").forEach((tab) => {
 
 elements.scoreInput.addEventListener("input", updateAutoTotal);
 elements.autoTotal.addEventListener("change", updateAutoTotal);
+elements.totalAboveSubject.addEventListener("change", renderPoster);
 elements.languageSelect.addEventListener("change", (event) => {
   applyLanguage(event.target.value);
 });
