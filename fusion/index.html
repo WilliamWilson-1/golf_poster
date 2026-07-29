@@ -130,6 +130,38 @@ h1 {
   letter-spacing: 0;
 }
 
+.top-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.language-menu {
+  width: 62px;
+  height: 46px;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  border-radius: 4px;
+  padding: 0 8px;
+  color: var(--white);
+  background: var(--navy-deep);
+  outline: none;
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.language-menu:focus {
+  border-color: var(--yellow);
+  box-shadow: 0 0 0 3px rgba(255, 209, 0, 0.28);
+}
+
+.language-menu option {
+  color: var(--ink);
+  background: var(--white);
+}
+
 .icon-button {
   flex: 0 0 auto;
   width: 46px;
@@ -651,11 +683,39 @@ input[type="range"] {
 
 @media (max-width: 380px) {
   .topbar {
+    gap: 10px;
     padding-inline: 16px;
   }
 
+  .brand-lockup {
+    gap: 9px;
+  }
+
+  .club-mark {
+    width: 27px;
+  }
+
+  .eyebrow {
+    font-size: 11px;
+  }
+
   h1 {
-    font-size: 25px;
+    font-size: 22px;
+  }
+
+  .top-actions {
+    gap: 6px;
+  }
+
+  .language-menu {
+    width: 54px;
+    height: 42px;
+    padding-inline: 5px;
+  }
+
+  .icon-button {
+    width: 42px;
+    height: 42px;
   }
 
   .tournament-strip {
@@ -698,7 +758,7 @@ input[type="range"] {
   </head>
   <body>
     <main class="app-shell">
-      <section class="hero-panel" aria-label="海报预览">
+      <section class="hero-panel" aria-label="海报预览" data-i18n-aria="posterPreview">
         <div class="topbar">
           <div class="brand-lockup">
             <span class="club-mark" aria-hidden="true"></span>
@@ -707,7 +767,13 @@ input[type="range"] {
               <h1>POSTER STUDIO</h1>
             </div>
           </div>
-          <button class="icon-button" id="resetPoster" type="button" aria-label="清空海报" title="清空海报">↻</button>
+          <div class="top-actions">
+            <select id="languageSelect" class="language-menu" aria-label="界面语言" data-i18n-aria="languageLabel">
+              <option value="zh">中</option>
+              <option value="en">EN</option>
+            </select>
+            <button class="icon-button" id="resetPoster" type="button" aria-label="清空海报" title="清空海报" data-i18n-title="resetPoster">↻</button>
+          </div>
         </div>
 
         <div class="tournament-strip">
@@ -716,64 +782,64 @@ input[type="range"] {
         </div>
 
         <div class="poster-stage">
-          <canvas id="posterCanvas" width="1080" height="1080" aria-label="海报预览画布"></canvas>
+          <canvas id="posterCanvas" width="1080" height="1080" aria-label="海报预览画布" data-i18n-aria="posterCanvas"></canvas>
         </div>
 
         <div class="primary-actions">
           <label class="file-button">
             <input id="photoInput" type="file" accept="image/*">
             <span class="action-icon" aria-hidden="true">＋</span>
-            <span>上传照片</span>
+            <span data-i18n="uploadPhoto">上传照片</span>
           </label>
           <button id="downloadPoster" class="download-button" type="button">
             <span class="download-icon" aria-hidden="true"></span>
-            <span>下载海报</span>
+            <span data-i18n="downloadPoster">下载海报</span>
           </button>
         </div>
-        <p id="segmentationStatus" class="recognition-status" data-state="idle" aria-live="polite">上传照片后自动识别人像</p>
+        <p id="segmentationStatus" class="recognition-status" data-state="idle" aria-live="polite" data-i18n="statusIdle">上传照片后自动识别人像</p>
       </section>
 
-      <section class="controls-panel" aria-label="海报编辑">
-        <div class="tabs" role="tablist" aria-label="编辑项目">
-          <button class="tab is-active" type="button" data-tab="profile" role="tab">昵称</button>
-          <button class="tab" type="button" data-tab="scores" role="tab">成绩表</button>
-          <button class="tab" type="button" data-tab="total" role="tab">总成绩</button>
-          <button class="tab" type="button" data-tab="extra" role="tab">额外信息</button>
-          <button class="tab" type="button" data-tab="photo" role="tab">图片</button>
+      <section class="controls-panel" aria-label="海报编辑" data-i18n-aria="posterEditor">
+        <div class="tabs" role="tablist" aria-label="编辑项目" data-i18n-aria="editorSections">
+          <button class="tab is-active" type="button" data-tab="profile" role="tab" data-i18n="tabProfile">昵称</button>
+          <button class="tab" type="button" data-tab="scores" role="tab" data-i18n="tabScores">成绩表</button>
+          <button class="tab" type="button" data-tab="total" role="tab" data-i18n="tabTotal">总成绩</button>
+          <button class="tab" type="button" data-tab="extra" role="tab" data-i18n="tabExtra">额外信息</button>
+          <button class="tab" type="button" data-tab="photo" role="tab" data-i18n="tabPhoto">图片</button>
         </div>
 
         <div class="tab-panel is-active" data-panel="profile">
           <label class="field">
-            <span>昵称</span>
+            <span data-i18n="nickname">昵称</span>
             <input id="nickname" type="text" value="" maxlength="18" autocomplete="off">
           </label>
           <div class="style-row">
             <label class="field">
               <div class="field-heading">
-                <span>昵称字号</span>
+                <span data-i18n="nicknameSize">昵称字号</span>
                 <output id="nicknameFontSizeValue" for="nicknameFontSize">34px</output>
               </div>
               <input id="nicknameFontSize" type="range" min="18" max="54" value="34">
             </label>
             <label class="field color-field">
-              <span>昵称颜色</span>
+              <span data-i18n="nicknameColor">昵称颜色</span>
               <input id="nicknameColor" type="color" value="#ffffff">
             </label>
           </div>
           <label class="field">
-            <span>俱乐部</span>
+            <span data-i18n="club">俱乐部</span>
             <input id="club" type="text" value="" maxlength="26" autocomplete="off">
           </label>
           <div class="style-row">
             <label class="field">
               <div class="field-heading">
-                <span>俱乐部字号</span>
+                <span data-i18n="clubSize">俱乐部字号</span>
                 <output id="clubFontSizeValue" for="clubFontSize">34px</output>
               </div>
               <input id="clubFontSize" type="range" min="18" max="54" value="34">
             </label>
             <label class="field color-field">
-              <span>俱乐部颜色</span>
+              <span data-i18n="clubColor">俱乐部颜色</span>
               <input id="clubColor" type="color" value="#ffffff">
             </label>
           </div>
@@ -781,21 +847,21 @@ input[type="range"] {
 
         <div class="tab-panel" data-panel="scores">
           <label class="field">
-            <span>成绩表</span>
-            <textarea id="scoreInput" rows="4" spellcheck="false" placeholder="输入最多 18 洞成绩，用空格或逗号分隔"></textarea>
+            <span data-i18n="scoreTable">成绩表</span>
+            <textarea id="scoreInput" rows="4" spellcheck="false" placeholder="输入最多 18 洞成绩，用空格或逗号分隔" data-i18n-placeholder="scorePlaceholder"></textarea>
           </label>
           <div class="field-grid">
             <label class="field">
-              <span>圆形标记</span>
+              <span data-i18n="badge">圆形标记</span>
               <input id="badgeText" type="text" value="" maxlength="2" inputmode="numeric">
             </label>
             <label class="field">
-              <span>高亮洞号</span>
-              <input id="highlightInput" type="text" value="" placeholder="例如 3,6" inputmode="numeric">
+              <span data-i18n="highlightHoles">高亮洞号</span>
+              <input id="highlightInput" type="text" value="" placeholder="例如 3,6" inputmode="numeric" data-i18n-placeholder="highlightPlaceholder">
             </label>
           </div>
           <div class="color-line">
-            <label for="scoreTableColor">成绩表底色</label>
+            <label for="scoreTableColor" data-i18n="scoreTableColor">成绩表底色</label>
             <input id="scoreTableColor" type="color" value="#006337">
           </div>
         </div>
@@ -803,80 +869,80 @@ input[type="range"] {
         <div class="tab-panel" data-panel="total">
           <div class="field total-field">
             <div class="field-heading">
-              <label for="totalScore">总成绩</label>
+              <label for="totalScore" data-i18n="totalScore">总成绩</label>
               <label class="toggle-control">
-                <span>自动统计</span>
+                <span data-i18n="autoTotal">自动统计</span>
                 <input id="autoTotal" type="checkbox" role="switch" checked>
                 <i aria-hidden="true"></i>
               </label>
             </div>
             <input id="totalScore" type="text" value="" maxlength="4" inputmode="numeric" readonly>
-            <small id="totalHint">录入成绩后自动合计</small>
+            <small id="totalHint" data-i18n="totalHintEmpty">录入成绩后自动合计</small>
           </div>
           <div class="style-row">
             <label class="field">
               <div class="field-heading">
-                <span>总分字号</span>
+                <span data-i18n="totalSize">总分字号</span>
                 <output id="totalFontSizeValue" for="totalFontSize">335px</output>
               </div>
               <input id="totalFontSize" type="range" min="160" max="420" value="335">
             </label>
             <label class="field color-field">
-              <span>总分颜色</span>
+              <span data-i18n="totalColor">总分颜色</span>
               <input id="totalColor" type="color" value="#083728">
             </label>
           </div>
           <label class="field">
-            <span>总成绩透明度</span>
+            <span data-i18n="totalOpacity">总成绩透明度</span>
             <input id="totalOpacity" type="range" min="45" max="95" value="88">
           </label>
           <label class="field">
-            <span>总成绩高度</span>
+            <span data-i18n="totalHeight">总成绩高度</span>
             <input id="totalY" type="range" min="100" max="1000" value="300">
           </label>
         </div>
 
         <div class="tab-panel" data-panel="extra">
           <label class="field">
-            <span>额外信息</span>
+            <span data-i18n="extraInfo">额外信息</span>
             <textarea id="extraInfo" rows="3" maxlength="56"></textarea>
           </label>
           <div class="style-row">
             <label class="field">
               <div class="field-heading">
-                <span>额外信息字号</span>
+                <span data-i18n="extraSize">额外信息字号</span>
                 <output id="extraFontSizeValue" for="extraFontSize">21px</output>
               </div>
               <input id="extraFontSize" type="range" min="14" max="36" value="21">
             </label>
             <label class="field color-field">
-              <span>信息颜色</span>
+              <span data-i18n="extraColor">信息颜色</span>
               <input id="extraColor" type="color" value="#ffffff">
             </label>
           </div>
           <label class="field">
-            <span>品牌文字</span>
+            <span data-i18n="brandText">品牌文字</span>
             <input id="brandText" type="text" value="GOLFBROTHERS" maxlength="22" autocomplete="off">
           </label>
           <div class="font-grid">
             <label class="field">
-              <span>英文字体</span>
+              <span data-i18n="englishFont">英文字体</span>
               <select id="englishFont">
-                <option value="clean">清晰无衬线</option>
-                <option value="sport">竞技窄体</option>
-                <option value="rounded">轻快圆体</option>
-                <option value="classic">经典衬线</option>
-                <option value="mono">等宽字形</option>
+                <option value="clean" data-i18n="fontClean">清晰无衬线</option>
+                <option value="sport" data-i18n="fontSport">竞技窄体</option>
+                <option value="rounded" data-i18n="fontRounded">轻快圆体</option>
+                <option value="classic" data-i18n="fontClassic">经典衬线</option>
+                <option value="mono" data-i18n="fontMono">等宽字形</option>
               </select>
             </label>
             <label class="field">
-              <span>数字字体</span>
+              <span data-i18n="numberFont">数字字体</span>
               <select id="numberFont">
-                <option value="power">力量黑体</option>
-                <option value="condensed">紧凑比分</option>
-                <option value="geometric">几何数字</option>
-                <option value="classic">经典数字</option>
-                <option value="mono">等宽记分</option>
+                <option value="power" data-i18n="numberPower">力量黑体</option>
+                <option value="condensed" data-i18n="numberCondensed">紧凑比分</option>
+                <option value="geometric" data-i18n="numberGeometric">几何数字</option>
+                <option value="classic" data-i18n="numberClassic">经典数字</option>
+                <option value="mono" data-i18n="numberMono">等宽记分</option>
               </select>
             </label>
           </div>
@@ -885,27 +951,27 @@ input[type="range"] {
         <div class="tab-panel" data-panel="photo">
           <div class="field">
             <div class="field-heading">
-              <label for="zoomRange">背景大小</label>
+              <label for="zoomRange" data-i18n="backgroundSize">背景大小</label>
               <output id="zoomValue" for="zoomRange">100%</output>
             </div>
             <div class="range-row">
               <input id="zoomRange" type="range" min="80" max="220" value="100">
-              <button id="resetZoom" class="range-reset" type="button" aria-label="复位背景与海报元素" title="复位背景与海报元素">↺</button>
+              <button id="resetZoom" class="range-reset" type="button" aria-label="复位背景与海报元素" title="复位背景与海报元素" data-i18n-title="resetLayout">↺</button>
             </div>
           </div>
           <label class="field">
             <div class="field-heading">
-              <span>背景模糊</span>
+              <span data-i18n="backgroundBlur">背景模糊</span>
               <output id="backgroundBlurValue" for="backgroundBlur">0px</output>
             </div>
             <input id="backgroundBlur" type="range" min="0" max="30" value="0">
           </label>
           <div class="photo-tools">
             <div>
-              <strong>人物景深</strong>
-              <span id="recognitionDetail">等待上传照片</span>
+              <strong data-i18n="subjectDepth">人物景深</strong>
+              <span id="recognitionDetail" data-i18n="waitingPhoto">等待上传照片</span>
             </div>
-            <button id="retrySegmentation" type="button" disabled>重新识别</button>
+            <button id="retrySegmentation" type="button" disabled data-i18n="retryRecognition">重新识别</button>
           </div>
         </div>
       </section>
@@ -917,6 +983,7 @@ const ctx = canvas.getContext("2d");
 
 const elements = {
   photoInput: document.getElementById("photoInput"),
+  languageSelect: document.getElementById("languageSelect"),
   nickname: document.getElementById("nickname"),
   nicknameFontSize: document.getElementById("nicknameFontSize"),
   nicknameFontSizeValue: document.getElementById("nicknameFontSizeValue"),
@@ -976,6 +1043,144 @@ const fontStacks = {
     mono: 'Consolas, "Courier New", ui-monospace, monospace'
   }
 };
+const translations = {
+  zh: {
+    pageTitle: "GOLFBROTHERS 海报工作室",
+    pageDescription: "上传照片并生成可下载的高尔夫成绩海报",
+    languageLabel: "界面语言",
+    posterPreview: "海报预览",
+    posterCanvas: "海报预览画布",
+    posterEditor: "海报编辑",
+    editorSections: "编辑项目",
+    resetPoster: "清空海报",
+    uploadPhoto: "上传照片",
+    downloadPoster: "下载海报",
+    statusIdle: "上传照片后自动识别人像",
+    statusLoading: "正在自动识别人像…",
+    statusPerson: "已识别人像，总成绩将置于人物后方",
+    statusFallback: "未识别到人物，总成绩将直接覆盖照片",
+    tabProfile: "昵称",
+    tabScores: "成绩表",
+    tabTotal: "总成绩",
+    tabExtra: "额外信息",
+    tabPhoto: "图片",
+    nickname: "昵称",
+    nicknameSize: "昵称字号",
+    nicknameColor: "昵称颜色",
+    club: "俱乐部",
+    clubSize: "俱乐部字号",
+    clubColor: "俱乐部颜色",
+    scoreTable: "成绩表",
+    scorePlaceholder: "输入最多 18 洞成绩，用空格或逗号分隔",
+    badge: "圆形标记",
+    highlightHoles: "高亮洞号",
+    highlightPlaceholder: "例如 3,6",
+    scoreTableColor: "成绩表底色",
+    totalScore: "总成绩",
+    autoTotal: "自动统计",
+    totalHintEmpty: "录入成绩后自动合计",
+    totalHintManual: "自动统计已关闭，可手动输入",
+    totalHintCount: "已统计 {count} 洞",
+    totalSize: "总分字号",
+    totalColor: "总分颜色",
+    totalOpacity: "总成绩透明度",
+    totalHeight: "总成绩高度",
+    extraInfo: "额外信息",
+    extraSize: "额外信息字号",
+    extraColor: "信息颜色",
+    brandText: "品牌文字",
+    englishFont: "英文字体",
+    fontClean: "清晰无衬线",
+    fontSport: "竞技窄体",
+    fontRounded: "轻快圆体",
+    fontClassic: "经典衬线",
+    fontMono: "等宽字形",
+    numberFont: "数字字体",
+    numberPower: "力量黑体",
+    numberCondensed: "紧凑比分",
+    numberGeometric: "几何数字",
+    numberClassic: "经典数字",
+    numberMono: "等宽记分",
+    backgroundSize: "背景大小",
+    resetLayout: "复位背景与海报元素",
+    backgroundBlur: "背景模糊",
+    subjectDepth: "人物景深",
+    waitingPhoto: "等待上传照片",
+    retryRecognition: "重新识别",
+    analyzingPhoto: "正在分析照片中的人物主体",
+    personRatio: "人物占画面约 {percent}%",
+    noClearPerson: "画面中没有足够清晰的人物主体",
+    recognitionUnavailable: "自动识别不可用，已切换为普通叠加"
+  },
+  en: {
+    pageTitle: "GOLFBROTHERS Poster Studio",
+    pageDescription: "Upload a photo and create a downloadable golf score poster",
+    languageLabel: "Interface language",
+    posterPreview: "Poster preview",
+    posterCanvas: "Poster preview canvas",
+    posterEditor: "Poster editor",
+    editorSections: "Editor sections",
+    resetPoster: "Clear poster",
+    uploadPhoto: "UPLOAD PHOTO",
+    downloadPoster: "DOWNLOAD",
+    statusIdle: "Upload a photo to detect the subject",
+    statusLoading: "Detecting subject…",
+    statusPerson: "Subject detected; total score will sit behind the player",
+    statusFallback: "No subject detected; total score will overlay the photo",
+    tabProfile: "PLAYER",
+    tabScores: "SCORES",
+    tabTotal: "TOTAL",
+    tabExtra: "DETAILS",
+    tabPhoto: "IMAGE",
+    nickname: "Player name",
+    nicknameSize: "Name size",
+    nicknameColor: "Name color",
+    club: "Club",
+    clubSize: "Club size",
+    clubColor: "Club color",
+    scoreTable: "Scorecard",
+    scorePlaceholder: "Enter up to 18 scores, separated by spaces or commas",
+    badge: "Round badge",
+    highlightHoles: "Highlight holes",
+    highlightPlaceholder: "e.g. 3,6",
+    scoreTableColor: "Scorecard color",
+    totalScore: "Total score",
+    autoTotal: "Auto total",
+    totalHintEmpty: "Scores will be totaled automatically",
+    totalHintManual: "Auto total is off; enter a total manually",
+    totalHintCount: "{count} holes counted",
+    totalSize: "Total size",
+    totalColor: "Total color",
+    totalOpacity: "Total opacity",
+    totalHeight: "Total position",
+    extraInfo: "Additional info",
+    extraSize: "Info size",
+    extraColor: "Info color",
+    brandText: "Brand text",
+    englishFont: "Text font",
+    fontClean: "Clean Sans",
+    fontSport: "Sport Condensed",
+    fontRounded: "Rounded",
+    fontClassic: "Classic Serif",
+    fontMono: "Monospace",
+    numberFont: "Number font",
+    numberPower: "Power Black",
+    numberCondensed: "Condensed Score",
+    numberGeometric: "Geometric",
+    numberClassic: "Classic Numerals",
+    numberMono: "Monospace Score",
+    backgroundSize: "Background size",
+    resetLayout: "Reset background and poster elements",
+    backgroundBlur: "Background blur",
+    subjectDepth: "Subject depth",
+    waitingPhoto: "Waiting for a photo",
+    retryRecognition: "RETRY",
+    analyzingPhoto: "Analyzing the subject in this photo",
+    personRatio: "Subject covers about {percent}% of the frame",
+    noClearPerson: "No clear person was found in the frame",
+    recognitionUnavailable: "Subject detection unavailable; using standard overlay"
+  }
+};
 const emptyValues = {
   nickname: "",
   club: "",
@@ -998,6 +1203,8 @@ let dragState = null;
 let elementDragState = null;
 let selectedElement = null;
 let activeEditorTab = "profile";
+let currentLanguage = "zh";
+let recognitionDetailState = { key: "waitingPhoto", params: {} };
 let elementPositions = createDefaultElementPositions();
 const elementBounds = {};
 let imageState = {
@@ -1021,6 +1228,64 @@ function resetElementPositions() {
   scoreBox.y = defaultScoreBox.y;
   elements.totalY.value = "300";
   selectedElement = null;
+}
+
+function translate(key, params = {}) {
+  const dictionary = translations[currentLanguage] || translations.zh;
+  let value = dictionary[key] || translations.zh[key] || key;
+  Object.entries(params).forEach(([name, replacement]) => {
+    value = value.split(`{${name}}`).join(String(replacement));
+  });
+  return value;
+}
+
+function loadLanguagePreference() {
+  try {
+    const stored = window.localStorage.getItem("golf-poster-language");
+    return stored === "en" ? "en" : "zh";
+  } catch (error) {
+    return "zh";
+  }
+}
+
+function applyLanguage(language, persist = true) {
+  currentLanguage = language === "en" ? "en" : "zh";
+  document.documentElement.lang = currentLanguage === "en" ? "en" : "zh-CN";
+  elements.languageSelect.value = currentLanguage;
+
+  document.querySelectorAll("[data-i18n]").forEach((element) => {
+    element.textContent = translate(element.dataset.i18n);
+  });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
+    element.placeholder = translate(element.dataset.i18nPlaceholder);
+  });
+  document.querySelectorAll("[data-i18n-title]").forEach((element) => {
+    const value = translate(element.dataset.i18nTitle);
+    element.title = value;
+    element.setAttribute("aria-label", value);
+  });
+  document.querySelectorAll("[data-i18n-aria]").forEach((element) => {
+    element.setAttribute("aria-label", translate(element.dataset.i18nAria));
+  });
+
+  document.title = translate("pageTitle");
+  const description = document.querySelector('meta[name="description"]');
+  if (description) {
+    description.content = translate("pageDescription");
+  }
+
+  if (persist) {
+    try {
+      window.localStorage.setItem("golf-poster-language", currentLanguage);
+    } catch (error) {
+      // Language switching still works when local storage is unavailable.
+    }
+  }
+
+  updateTotalHintText();
+  refreshRecognitionText();
+  updateFontPreviews();
+  renderPoster();
 }
 
 function getEnglishFont() {
@@ -1072,30 +1337,42 @@ function parseScores() {
   return values;
 }
 
-function updateAutoTotal() {
-  const automatic = elements.autoTotal.checked;
-  elements.totalScore.readOnly = automatic;
-  elements.totalScore.classList.toggle("is-auto", automatic);
-
-  if (!automatic) {
-    elements.totalHint.textContent = "自动统计已关闭，可手动输入";
-    renderPoster();
-    return;
-  }
-
-  const numericScores = elements.scoreInput.value
+function getNumericScores() {
+  return elements.scoreInput.value
     .split(/[\s,，、|]+/)
     .map((item) => item.trim())
     .filter(Boolean)
     .slice(0, 18)
     .map((item) => Number(item))
     .filter((score) => Number.isFinite(score));
+}
 
+function updateTotalHintText() {
+  if (!elements.autoTotal.checked) {
+    elements.totalHint.textContent = translate("totalHintManual");
+    return;
+  }
+  const count = getNumericScores().length;
+  elements.totalHint.textContent = count
+    ? translate("totalHintCount", { count })
+    : translate("totalHintEmpty");
+}
+
+function updateAutoTotal() {
+  const automatic = elements.autoTotal.checked;
+  elements.totalScore.readOnly = automatic;
+  elements.totalScore.classList.toggle("is-auto", automatic);
+
+  if (!automatic) {
+    updateTotalHintText();
+    renderPoster();
+    return;
+  }
+
+  const numericScores = getNumericScores();
   const total = numericScores.reduce((sum, score) => sum + score, 0);
   elements.totalScore.value = numericScores.length ? String(Math.round(total * 10) / 10) : "";
-  elements.totalHint.textContent = numericScores.length
-    ? `已统计 ${numericScores.length} 洞`
-    : "录入成绩后自动合计";
+  updateTotalHintText();
   renderPoster();
 }
 
@@ -1431,19 +1708,25 @@ function renderPoster({ exporting = false } = {}) {
   ctx.restore();
 }
 
-function updateRecognitionStatus(state, detail) {
-  segmentationState = state;
-  elements.segmentationStatus.dataset.state = state;
-  elements.recognitionDetail.textContent = detail;
-
-  const statusText = {
-    idle: "上传照片后自动识别人像",
-    loading: "正在自动识别人像…",
-    person: "已识别人像，总成绩将置于人物后方",
-    fallback: "未识别到人物，总成绩将直接覆盖照片"
+function refreshRecognitionText() {
+  const statusKeys = {
+    idle: "statusIdle",
+    loading: "statusLoading",
+    person: "statusPerson",
+    fallback: "statusFallback"
   };
+  elements.segmentationStatus.textContent = translate(statusKeys[segmentationState]);
+  elements.recognitionDetail.textContent = translate(
+    recognitionDetailState.key,
+    recognitionDetailState.params
+  );
+}
 
-  elements.segmentationStatus.textContent = statusText[state];
+function updateRecognitionStatus(state, detailKey, params = {}) {
+  segmentationState = state;
+  recognitionDetailState = { key: detailKey, params };
+  elements.segmentationStatus.dataset.state = state;
+  refreshRecognitionText();
   elements.retrySegmentation.disabled = !uploadedImage || state === "loading";
   renderPoster();
 }
@@ -1553,7 +1836,7 @@ async function runSegmentation(token) {
     return;
   }
 
-  updateRecognitionStatus("loading", "正在分析照片中的人物主体");
+  updateRecognitionStatus("loading", "analyzingPhoto");
 
   try {
     await ensureSegmentationLibrary();
@@ -1580,10 +1863,12 @@ async function runSegmentation(token) {
 
     if (looksLikePerson) {
       subjectMaskSource = mask;
-      updateRecognitionStatus("person", `人物占画面约 ${Math.round(metrics.strongRatio * 100)}%`);
+      updateRecognitionStatus("person", "personRatio", {
+        percent: Math.round(metrics.strongRatio * 100)
+      });
     } else {
       subjectMaskSource = null;
-      updateRecognitionStatus("fallback", "画面中没有足够清晰的人物主体");
+      updateRecognitionStatus("fallback", "noClearPerson");
     }
   } catch (error) {
     if (token !== segmentationToken) {
@@ -1595,7 +1880,7 @@ async function runSegmentation(token) {
     }
     selfieSegmenter = null;
     subjectMaskSource = null;
-    updateRecognitionStatus("fallback", "自动识别不可用，已切换为普通叠加");
+    updateRecognitionStatus("fallback", "recognitionUnavailable");
   }
 }
 
@@ -1779,7 +2064,7 @@ function resetPoster() {
   elements.autoTotal.checked = true;
   resetCanvasLayout({ render: false });
   updateAutoTotal();
-  updateRecognitionStatus("idle", "等待上传照片");
+  updateRecognitionStatus("idle", "waitingPhoto");
 }
 
 document.querySelectorAll(".tab").forEach((tab) => {
@@ -1814,6 +2099,9 @@ document.querySelectorAll(".tab").forEach((tab) => {
 
 elements.scoreInput.addEventListener("input", updateAutoTotal);
 elements.autoTotal.addEventListener("change", updateAutoTotal);
+elements.languageSelect.addEventListener("change", (event) => {
+  applyLanguage(event.target.value);
+});
 elements.englishFont.addEventListener("change", () => {
   updateFontPreviews();
   renderPoster();
@@ -1864,12 +2152,12 @@ canvas.addEventListener("pointermove", movePointer);
 canvas.addEventListener("pointerup", endPointer);
 canvas.addEventListener("pointercancel", endPointer);
 
+currentLanguage = loadLanguagePreference();
 updateAutoTotal();
 updateZoomOutput();
 updateBackgroundBlurOutput();
-updateFontPreviews();
 updateStyleOutputs();
-renderPoster();
+applyLanguage(currentLanguage, false);
 
     </script>
   </body>

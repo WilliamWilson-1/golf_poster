@@ -3,6 +3,7 @@ const ctx = canvas.getContext("2d");
 
 const elements = {
   photoInput: document.getElementById("photoInput"),
+  languageSelect: document.getElementById("languageSelect"),
   nickname: document.getElementById("nickname"),
   nicknameFontSize: document.getElementById("nicknameFontSize"),
   nicknameFontSizeValue: document.getElementById("nicknameFontSizeValue"),
@@ -62,6 +63,144 @@ const fontStacks = {
     mono: 'Consolas, "Courier New", ui-monospace, monospace'
   }
 };
+const translations = {
+  zh: {
+    pageTitle: "GOLFBROTHERS 海报工作室",
+    pageDescription: "上传照片并生成可下载的高尔夫成绩海报",
+    languageLabel: "界面语言",
+    posterPreview: "海报预览",
+    posterCanvas: "海报预览画布",
+    posterEditor: "海报编辑",
+    editorSections: "编辑项目",
+    resetPoster: "清空海报",
+    uploadPhoto: "上传照片",
+    downloadPoster: "下载海报",
+    statusIdle: "上传照片后自动识别人像",
+    statusLoading: "正在自动识别人像…",
+    statusPerson: "已识别人像，总成绩将置于人物后方",
+    statusFallback: "未识别到人物，总成绩将直接覆盖照片",
+    tabProfile: "昵称",
+    tabScores: "成绩表",
+    tabTotal: "总成绩",
+    tabExtra: "额外信息",
+    tabPhoto: "图片",
+    nickname: "昵称",
+    nicknameSize: "昵称字号",
+    nicknameColor: "昵称颜色",
+    club: "俱乐部",
+    clubSize: "俱乐部字号",
+    clubColor: "俱乐部颜色",
+    scoreTable: "成绩表",
+    scorePlaceholder: "输入最多 18 洞成绩，用空格或逗号分隔",
+    badge: "圆形标记",
+    highlightHoles: "高亮洞号",
+    highlightPlaceholder: "例如 3,6",
+    scoreTableColor: "成绩表底色",
+    totalScore: "总成绩",
+    autoTotal: "自动统计",
+    totalHintEmpty: "录入成绩后自动合计",
+    totalHintManual: "自动统计已关闭，可手动输入",
+    totalHintCount: "已统计 {count} 洞",
+    totalSize: "总分字号",
+    totalColor: "总分颜色",
+    totalOpacity: "总成绩透明度",
+    totalHeight: "总成绩高度",
+    extraInfo: "额外信息",
+    extraSize: "额外信息字号",
+    extraColor: "信息颜色",
+    brandText: "品牌文字",
+    englishFont: "英文字体",
+    fontClean: "清晰无衬线",
+    fontSport: "竞技窄体",
+    fontRounded: "轻快圆体",
+    fontClassic: "经典衬线",
+    fontMono: "等宽字形",
+    numberFont: "数字字体",
+    numberPower: "力量黑体",
+    numberCondensed: "紧凑比分",
+    numberGeometric: "几何数字",
+    numberClassic: "经典数字",
+    numberMono: "等宽记分",
+    backgroundSize: "背景大小",
+    resetLayout: "复位背景与海报元素",
+    backgroundBlur: "背景模糊",
+    subjectDepth: "人物景深",
+    waitingPhoto: "等待上传照片",
+    retryRecognition: "重新识别",
+    analyzingPhoto: "正在分析照片中的人物主体",
+    personRatio: "人物占画面约 {percent}%",
+    noClearPerson: "画面中没有足够清晰的人物主体",
+    recognitionUnavailable: "自动识别不可用，已切换为普通叠加"
+  },
+  en: {
+    pageTitle: "GOLFBROTHERS Poster Studio",
+    pageDescription: "Upload a photo and create a downloadable golf score poster",
+    languageLabel: "Interface language",
+    posterPreview: "Poster preview",
+    posterCanvas: "Poster preview canvas",
+    posterEditor: "Poster editor",
+    editorSections: "Editor sections",
+    resetPoster: "Clear poster",
+    uploadPhoto: "UPLOAD PHOTO",
+    downloadPoster: "DOWNLOAD",
+    statusIdle: "Upload a photo to detect the subject",
+    statusLoading: "Detecting subject…",
+    statusPerson: "Subject detected; total score will sit behind the player",
+    statusFallback: "No subject detected; total score will overlay the photo",
+    tabProfile: "PLAYER",
+    tabScores: "SCORES",
+    tabTotal: "TOTAL",
+    tabExtra: "DETAILS",
+    tabPhoto: "IMAGE",
+    nickname: "Player name",
+    nicknameSize: "Name size",
+    nicknameColor: "Name color",
+    club: "Club",
+    clubSize: "Club size",
+    clubColor: "Club color",
+    scoreTable: "Scorecard",
+    scorePlaceholder: "Enter up to 18 scores, separated by spaces or commas",
+    badge: "Round badge",
+    highlightHoles: "Highlight holes",
+    highlightPlaceholder: "e.g. 3,6",
+    scoreTableColor: "Scorecard color",
+    totalScore: "Total score",
+    autoTotal: "Auto total",
+    totalHintEmpty: "Scores will be totaled automatically",
+    totalHintManual: "Auto total is off; enter a total manually",
+    totalHintCount: "{count} holes counted",
+    totalSize: "Total size",
+    totalColor: "Total color",
+    totalOpacity: "Total opacity",
+    totalHeight: "Total position",
+    extraInfo: "Additional info",
+    extraSize: "Info size",
+    extraColor: "Info color",
+    brandText: "Brand text",
+    englishFont: "Text font",
+    fontClean: "Clean Sans",
+    fontSport: "Sport Condensed",
+    fontRounded: "Rounded",
+    fontClassic: "Classic Serif",
+    fontMono: "Monospace",
+    numberFont: "Number font",
+    numberPower: "Power Black",
+    numberCondensed: "Condensed Score",
+    numberGeometric: "Geometric",
+    numberClassic: "Classic Numerals",
+    numberMono: "Monospace Score",
+    backgroundSize: "Background size",
+    resetLayout: "Reset background and poster elements",
+    backgroundBlur: "Background blur",
+    subjectDepth: "Subject depth",
+    waitingPhoto: "Waiting for a photo",
+    retryRecognition: "RETRY",
+    analyzingPhoto: "Analyzing the subject in this photo",
+    personRatio: "Subject covers about {percent}% of the frame",
+    noClearPerson: "No clear person was found in the frame",
+    recognitionUnavailable: "Subject detection unavailable; using standard overlay"
+  }
+};
 const emptyValues = {
   nickname: "",
   club: "",
@@ -84,6 +223,8 @@ let dragState = null;
 let elementDragState = null;
 let selectedElement = null;
 let activeEditorTab = "profile";
+let currentLanguage = "zh";
+let recognitionDetailState = { key: "waitingPhoto", params: {} };
 let elementPositions = createDefaultElementPositions();
 const elementBounds = {};
 let imageState = {
@@ -107,6 +248,64 @@ function resetElementPositions() {
   scoreBox.y = defaultScoreBox.y;
   elements.totalY.value = "300";
   selectedElement = null;
+}
+
+function translate(key, params = {}) {
+  const dictionary = translations[currentLanguage] || translations.zh;
+  let value = dictionary[key] || translations.zh[key] || key;
+  Object.entries(params).forEach(([name, replacement]) => {
+    value = value.split(`{${name}}`).join(String(replacement));
+  });
+  return value;
+}
+
+function loadLanguagePreference() {
+  try {
+    const stored = window.localStorage.getItem("golf-poster-language");
+    return stored === "en" ? "en" : "zh";
+  } catch (error) {
+    return "zh";
+  }
+}
+
+function applyLanguage(language, persist = true) {
+  currentLanguage = language === "en" ? "en" : "zh";
+  document.documentElement.lang = currentLanguage === "en" ? "en" : "zh-CN";
+  elements.languageSelect.value = currentLanguage;
+
+  document.querySelectorAll("[data-i18n]").forEach((element) => {
+    element.textContent = translate(element.dataset.i18n);
+  });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
+    element.placeholder = translate(element.dataset.i18nPlaceholder);
+  });
+  document.querySelectorAll("[data-i18n-title]").forEach((element) => {
+    const value = translate(element.dataset.i18nTitle);
+    element.title = value;
+    element.setAttribute("aria-label", value);
+  });
+  document.querySelectorAll("[data-i18n-aria]").forEach((element) => {
+    element.setAttribute("aria-label", translate(element.dataset.i18nAria));
+  });
+
+  document.title = translate("pageTitle");
+  const description = document.querySelector('meta[name="description"]');
+  if (description) {
+    description.content = translate("pageDescription");
+  }
+
+  if (persist) {
+    try {
+      window.localStorage.setItem("golf-poster-language", currentLanguage);
+    } catch (error) {
+      // Language switching still works when local storage is unavailable.
+    }
+  }
+
+  updateTotalHintText();
+  refreshRecognitionText();
+  updateFontPreviews();
+  renderPoster();
 }
 
 function getEnglishFont() {
@@ -158,30 +357,42 @@ function parseScores() {
   return values;
 }
 
-function updateAutoTotal() {
-  const automatic = elements.autoTotal.checked;
-  elements.totalScore.readOnly = automatic;
-  elements.totalScore.classList.toggle("is-auto", automatic);
-
-  if (!automatic) {
-    elements.totalHint.textContent = "自动统计已关闭，可手动输入";
-    renderPoster();
-    return;
-  }
-
-  const numericScores = elements.scoreInput.value
+function getNumericScores() {
+  return elements.scoreInput.value
     .split(/[\s,，、|]+/)
     .map((item) => item.trim())
     .filter(Boolean)
     .slice(0, 18)
     .map((item) => Number(item))
     .filter((score) => Number.isFinite(score));
+}
 
+function updateTotalHintText() {
+  if (!elements.autoTotal.checked) {
+    elements.totalHint.textContent = translate("totalHintManual");
+    return;
+  }
+  const count = getNumericScores().length;
+  elements.totalHint.textContent = count
+    ? translate("totalHintCount", { count })
+    : translate("totalHintEmpty");
+}
+
+function updateAutoTotal() {
+  const automatic = elements.autoTotal.checked;
+  elements.totalScore.readOnly = automatic;
+  elements.totalScore.classList.toggle("is-auto", automatic);
+
+  if (!automatic) {
+    updateTotalHintText();
+    renderPoster();
+    return;
+  }
+
+  const numericScores = getNumericScores();
   const total = numericScores.reduce((sum, score) => sum + score, 0);
   elements.totalScore.value = numericScores.length ? String(Math.round(total * 10) / 10) : "";
-  elements.totalHint.textContent = numericScores.length
-    ? `已统计 ${numericScores.length} 洞`
-    : "录入成绩后自动合计";
+  updateTotalHintText();
   renderPoster();
 }
 
@@ -517,19 +728,25 @@ function renderPoster({ exporting = false } = {}) {
   ctx.restore();
 }
 
-function updateRecognitionStatus(state, detail) {
-  segmentationState = state;
-  elements.segmentationStatus.dataset.state = state;
-  elements.recognitionDetail.textContent = detail;
-
-  const statusText = {
-    idle: "上传照片后自动识别人像",
-    loading: "正在自动识别人像…",
-    person: "已识别人像，总成绩将置于人物后方",
-    fallback: "未识别到人物，总成绩将直接覆盖照片"
+function refreshRecognitionText() {
+  const statusKeys = {
+    idle: "statusIdle",
+    loading: "statusLoading",
+    person: "statusPerson",
+    fallback: "statusFallback"
   };
+  elements.segmentationStatus.textContent = translate(statusKeys[segmentationState]);
+  elements.recognitionDetail.textContent = translate(
+    recognitionDetailState.key,
+    recognitionDetailState.params
+  );
+}
 
-  elements.segmentationStatus.textContent = statusText[state];
+function updateRecognitionStatus(state, detailKey, params = {}) {
+  segmentationState = state;
+  recognitionDetailState = { key: detailKey, params };
+  elements.segmentationStatus.dataset.state = state;
+  refreshRecognitionText();
   elements.retrySegmentation.disabled = !uploadedImage || state === "loading";
   renderPoster();
 }
@@ -639,7 +856,7 @@ async function runSegmentation(token) {
     return;
   }
 
-  updateRecognitionStatus("loading", "正在分析照片中的人物主体");
+  updateRecognitionStatus("loading", "analyzingPhoto");
 
   try {
     await ensureSegmentationLibrary();
@@ -666,10 +883,12 @@ async function runSegmentation(token) {
 
     if (looksLikePerson) {
       subjectMaskSource = mask;
-      updateRecognitionStatus("person", `人物占画面约 ${Math.round(metrics.strongRatio * 100)}%`);
+      updateRecognitionStatus("person", "personRatio", {
+        percent: Math.round(metrics.strongRatio * 100)
+      });
     } else {
       subjectMaskSource = null;
-      updateRecognitionStatus("fallback", "画面中没有足够清晰的人物主体");
+      updateRecognitionStatus("fallback", "noClearPerson");
     }
   } catch (error) {
     if (token !== segmentationToken) {
@@ -681,7 +900,7 @@ async function runSegmentation(token) {
     }
     selfieSegmenter = null;
     subjectMaskSource = null;
-    updateRecognitionStatus("fallback", "自动识别不可用，已切换为普通叠加");
+    updateRecognitionStatus("fallback", "recognitionUnavailable");
   }
 }
 
@@ -865,7 +1084,7 @@ function resetPoster() {
   elements.autoTotal.checked = true;
   resetCanvasLayout({ render: false });
   updateAutoTotal();
-  updateRecognitionStatus("idle", "等待上传照片");
+  updateRecognitionStatus("idle", "waitingPhoto");
 }
 
 document.querySelectorAll(".tab").forEach((tab) => {
@@ -900,6 +1119,9 @@ document.querySelectorAll(".tab").forEach((tab) => {
 
 elements.scoreInput.addEventListener("input", updateAutoTotal);
 elements.autoTotal.addEventListener("change", updateAutoTotal);
+elements.languageSelect.addEventListener("change", (event) => {
+  applyLanguage(event.target.value);
+});
 elements.englishFont.addEventListener("change", () => {
   updateFontPreviews();
   renderPoster();
@@ -950,9 +1172,9 @@ canvas.addEventListener("pointermove", movePointer);
 canvas.addEventListener("pointerup", endPointer);
 canvas.addEventListener("pointercancel", endPointer);
 
+currentLanguage = loadLanguagePreference();
 updateAutoTotal();
 updateZoomOutput();
 updateBackgroundBlurOutput();
-updateFontPreviews();
 updateStyleOutputs();
-renderPoster();
+applyLanguage(currentLanguage, false);

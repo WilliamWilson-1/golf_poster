@@ -121,6 +121,38 @@ h1 {
   letter-spacing: 0;
 }
 
+.top-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.language-menu {
+  width: 62px;
+  height: 46px;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  border-radius: 4px;
+  padding: 0 8px;
+  color: var(--white);
+  background: var(--navy-deep);
+  outline: none;
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.language-menu:focus {
+  border-color: var(--yellow);
+  box-shadow: 0 0 0 3px rgba(255, 209, 0, 0.28);
+}
+
+.language-menu option {
+  color: var(--ink);
+  background: var(--white);
+}
+
 .icon-button {
   flex: 0 0 auto;
   width: 46px;
@@ -642,11 +674,39 @@ input[type="range"] {
 
 @media (max-width: 380px) {
   .topbar {
+    gap: 10px;
     padding-inline: 16px;
   }
 
+  .brand-lockup {
+    gap: 9px;
+  }
+
+  .club-mark {
+    width: 27px;
+  }
+
+  .eyebrow {
+    font-size: 11px;
+  }
+
   h1 {
-    font-size: 25px;
+    font-size: 22px;
+  }
+
+  .top-actions {
+    gap: 6px;
+  }
+
+  .language-menu {
+    width: 54px;
+    height: 42px;
+    padding-inline: 5px;
+  }
+
+  .icon-button {
+    width: 42px;
+    height: 42px;
   }
 
   .tournament-strip {
