@@ -30,6 +30,13 @@ const elements = {
   extraFontSize: document.getElementById("extraFontSize"),
   extraFontSizeValue: document.getElementById("extraFontSizeValue"),
   extraColor: document.getElementById("extraColor"),
+  stickerInput: document.getElementById("stickerInput"),
+  stickerUploadButton: document.getElementById("stickerUploadButton"),
+  stickerCount: document.getElementById("stickerCount"),
+  stickerList: document.getElementById("stickerList"),
+  stickerScale: document.getElementById("stickerScale"),
+  stickerScaleValue: document.getElementById("stickerScaleValue"),
+  removeSticker: document.getElementById("removeSticker"),
   brandText: document.getElementById("brandText"),
   englishFont: document.getElementById("englishFont"),
   numberFont: document.getElementById("numberFont"),
@@ -152,6 +159,12 @@ const translations = {
     extraInfo: "额外信息",
     extraSize: "额外信息字号",
     extraColor: "信息颜色",
+    stickers: "贴纸",
+    uploadSticker: "上传贴纸",
+    removeSticker: "删除选中贴纸",
+    stickerList: "贴纸列表",
+    stickerScale: "贴纸大小",
+    stickerItem: "贴纸 {index}",
     brandText: "品牌文字",
     englishFont: "英文字体",
     numberFont: "数字字体",
@@ -213,6 +226,12 @@ const translations = {
     extraInfo: "Additional info",
     extraSize: "Info size",
     extraColor: "Info color",
+    stickers: "Stickers",
+    uploadSticker: "UPLOAD STICKER",
+    removeSticker: "Remove selected sticker",
+    stickerList: "Sticker list",
+    stickerScale: "Sticker size",
+    stickerItem: "Sticker {index}",
     brandText: "Brand text",
     englishFont: "Text font",
     numberFont: "Number font",
@@ -254,6 +273,11 @@ let currentLanguage = "zh";
 let recognitionDetailState = { key: "waitingPhoto", params: {} };
 let elementPositions = createDefaultElementPositions();
 const elementBounds = {};
+const maxStickerCount = 5;
+let stickers = [];
+let selectedStickerId = null;
+let stickerIdCounter = 0;
+let stickerLoadToken = 0;
 let imageState = {
   scale: 1,
   offsetX: 0,
@@ -277,6 +301,161 @@ function resetElementPositions() {
   selectedElement = null;
 }
 
+function stickerElementKey(id) {
+  return `sticker:${id}`;
+}
+
+function getStickerById(id) {
+  return stickers.find((sticker) => sticker.id === id) || null;
+}
+
+function getStickerFromElementKey(key) {
+  if (!key || !key.startsWith("sticker:")) {
+    return null;
+  }
+  return getStickerById(key.slice("sticker:".length));
+}
+
+function getStickerBounds(sticker) {
+  const width = sticker.baseWidth * sticker.scale;
+  const height = sticker.baseHeight * sticker.scale;
+  return {
+    x: sticker.x - width / 2,
+    y: sticker.y - height / 2,
+    w: width,
+    h: height
+  };
+}
+
+function setStickerDefaultPosition(sticker, index) {
+  const offset = (index - 2) * 28;
+  sticker.x = posterSize / 2 + offset;
+  sticker.y = getPosterHeight() * 0.52 + (index % 2) * 26;
+  sticker.scale = 1;
+}
+
+function resetStickerPositions() {
+  stickers.forEach((sticker, index) => setStickerDefaultPosition(sticker, index));
+  updateStickerControls();
+}
+
+function renderStickerList() {
+  elements.stickerList.replaceChildren();
+  stickers.forEach((sticker, index) => {
+    const button = document.createElement("button");
+    button.className = "sticker-thumbnail";
+    button.type = "button";
+    button.classList.toggle("is-active", sticker.id === selectedStickerId);
+    button.setAttribute("aria-label", translate("stickerItem", { index: index + 1 }));
+
+    const image = document.createElement("img");
+    image.src = sticker.image.src;
+    image.alt = "";
+    image.draggable = false;
+
+    const number = document.createElement("span");
+    number.textContent = String(index + 1);
+
+    button.append(image, number);
+    button.addEventListener("click", () => {
+      selectSticker(sticker.id);
+      renderPoster();
+    });
+    elements.stickerList.appendChild(button);
+  });
+}
+
+function updateStickerControls() {
+  const selectedSticker = getStickerById(selectedStickerId);
+  const isFull = stickers.length >= maxStickerCount;
+  elements.stickerCount.textContent = `${stickers.length}/${maxStickerCount}`;
+  elements.stickerInput.disabled = isFull;
+  elements.stickerUploadButton.classList.toggle("is-disabled", isFull);
+  elements.removeSticker.disabled = !selectedSticker;
+  elements.stickerScale.disabled = !selectedSticker;
+  elements.stickerScale.value = selectedSticker
+    ? String(Math.round(selectedSticker.scale * 100))
+    : "100";
+  elements.stickerScaleValue.textContent = `${elements.stickerScale.value}%`;
+  renderStickerList();
+}
+
+function selectSticker(id) {
+  const sticker = getStickerById(id);
+  selectedStickerId = sticker ? sticker.id : null;
+  if (sticker) {
+    selectedElement = stickerElementKey(sticker.id);
+  } else if (getStickerFromElementKey(selectedElement)) {
+    selectedElement = null;
+  }
+  updateStickerControls();
+}
+
+function loadStickerImage(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = () => {
+      const image = new Image();
+      image.onerror = reject;
+      image.onload = () => resolve(image);
+      image.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function addStickerFiles(fileList) {
+  const token = ++stickerLoadToken;
+  const available = maxStickerCount - stickers.length;
+  const files = Array.from(fileList)
+    .filter((file) => file.type.startsWith("image/"))
+    .slice(0, available);
+
+  for (const file of files) {
+    try {
+      const image = await loadStickerImage(file);
+      if (token !== stickerLoadToken || stickers.length >= maxStickerCount) {
+        return;
+      }
+      const maxBaseSize = 230;
+      const ratio = Math.min(maxBaseSize / image.naturalWidth, maxBaseSize / image.naturalHeight);
+      const sticker = {
+        id: String(++stickerIdCounter),
+        image,
+        baseWidth: image.naturalWidth * ratio,
+        baseHeight: image.naturalHeight * ratio,
+        x: 0,
+        y: 0,
+        scale: 1
+      };
+      setStickerDefaultPosition(sticker, stickers.length);
+      stickers.push(sticker);
+      selectedStickerId = sticker.id;
+      selectedElement = stickerElementKey(sticker.id);
+    } catch (error) {
+      // Skip unreadable image files and continue with the remaining selection.
+    }
+  }
+
+  elements.stickerInput.value = "";
+  updateStickerControls();
+  renderPoster();
+}
+
+function removeSelectedSticker() {
+  const index = stickers.findIndex((sticker) => sticker.id === selectedStickerId);
+  if (index === -1) {
+    return;
+  }
+  stickers.splice(index, 1);
+  const nextSticker = stickers[Math.min(index, stickers.length - 1)] || null;
+  selectedStickerId = nextSticker ? nextSticker.id : null;
+  selectedElement = nextSticker ? stickerElementKey(nextSticker.id) : null;
+  updateStickerControls();
+  renderPoster();
+}
+
 function getPosterHeight() {
   return canvas.height;
 }
@@ -295,6 +474,7 @@ function setTemplateOrientation(orientation) {
   imageState = { scale: 1, offsetX: 0, offsetY: 0 };
   elements.zoomRange.value = "100";
   resetElementPositions();
+  resetStickerPositions();
   updateZoomOutput();
   renderPoster();
 }
@@ -354,6 +534,7 @@ function applyLanguage(language, persist = true) {
   updateTotalHintText();
   refreshRecognitionText();
   updateFontPreviews();
+  updateStickerControls();
   renderPoster();
 }
 
@@ -752,6 +933,14 @@ function drawScoreCard(context) {
   context.restore();
 }
 
+function drawStickers(context) {
+  stickers.forEach((sticker) => {
+    const bounds = getStickerBounds(sticker);
+    context.drawImage(sticker.image, bounds.x, bounds.y, bounds.w, bounds.h);
+    elementBounds[stickerElementKey(sticker.id)] = bounds;
+  });
+}
+
 function drawSelectionGuide(context) {
   if (activeEditorTab !== "photo" || !selectedElement || !elementBounds[selectedElement]) {
     return;
@@ -800,6 +989,7 @@ function renderPoster({ exporting = false } = {}) {
   drawLabels(ctx);
   drawScoreCard(ctx);
   drawBrand(ctx);
+  drawStickers(ctx);
 
   ctx.strokeStyle = "rgba(255,255,255,0.8)";
   ctx.lineWidth = 4;
@@ -1013,11 +1203,19 @@ function pointInsideBounds(point, bounds) {
 }
 
 function hitTestElement(point) {
-  const hitOrder = ["nickname", "club", "extra", "scoreCard", "total"];
+  const stickerHitOrder = stickers
+    .slice()
+    .reverse()
+    .map((sticker) => stickerElementKey(sticker.id));
+  const hitOrder = [...stickerHitOrder, "nickname", "club", "extra", "scoreCard", "total"];
   return hitOrder.find((key) => elementBounds[key] && pointInsideBounds(point, elementBounds[key])) || null;
 }
 
 function getElementAnchor(key) {
+  const sticker = getStickerFromElementKey(key);
+  if (sticker) {
+    return { x: sticker.x, y: sticker.y };
+  }
   if (key === "scoreCard") {
     return { x: scoreBox.x, y: scoreBox.y };
   }
@@ -1028,6 +1226,12 @@ function getElementAnchor(key) {
 }
 
 function setElementAnchor(key, x, y) {
+  const sticker = getStickerFromElementKey(key);
+  if (sticker) {
+    sticker.x = x;
+    sticker.y = y;
+    return;
+  }
   if (key === "scoreCard") {
     scoreBox.x = x;
     scoreBox.y = y;
@@ -1060,6 +1264,11 @@ function startPointer(event) {
       anchor: getElementAnchor(target)
     };
     dragState = null;
+    const sticker = getStickerFromElementKey(target);
+    if (sticker) {
+      selectedStickerId = sticker.id;
+      updateStickerControls();
+    }
     renderPoster();
     return;
   }
@@ -1150,6 +1359,7 @@ function resetCanvasLayout({ render = true } = {}) {
   elements.backgroundBlur.value = "0";
   imageState = { scale: 1, offsetX: 0, offsetY: 0 };
   resetElementPositions();
+  resetStickerPositions();
   updateZoomOutput();
   updateBackgroundBlurOutput();
   if (render) {
@@ -1159,15 +1369,20 @@ function resetCanvasLayout({ render = true } = {}) {
 
 function resetPoster() {
   segmentationToken += 1;
+  stickerLoadToken += 1;
   uploadedImage = null;
   subjectMaskSource = null;
+  stickers = [];
+  selectedStickerId = null;
   elements.photoInput.value = "";
+  elements.stickerInput.value = "";
   Object.entries(emptyValues).forEach(([key, value]) => {
     elements[key].value = value;
   });
   elements.totalOpacity.value = "88";
   elements.autoTotal.checked = true;
   resetCanvasLayout({ render: false });
+  updateStickerControls();
   updateAutoTotal();
   updateRecognitionStatus("idle", "waitingPhoto");
 }
@@ -1180,6 +1395,8 @@ document.querySelectorAll(".tab").forEach((tab) => {
     elementDragState = null;
     if (target !== "photo") {
       selectedElement = null;
+    } else if (selectedStickerId) {
+      selectedElement = stickerElementKey(selectedStickerId);
     }
     canvas.classList.toggle("is-layout-mode", target === "photo");
     document.querySelectorAll(".tab").forEach((item) => item.classList.toggle("is-active", item === tab));
@@ -1223,6 +1440,19 @@ elements.numberFont.addEventListener("change", () => {
   updateFontPreviews();
   renderPoster();
 });
+elements.stickerInput.addEventListener("change", (event) => {
+  addStickerFiles(event.target.files);
+});
+elements.stickerScale.addEventListener("input", () => {
+  const sticker = getStickerById(selectedStickerId);
+  if (!sticker) {
+    return;
+  }
+  sticker.scale = Number(elements.stickerScale.value) / 100;
+  elements.stickerScaleValue.textContent = `${elements.stickerScale.value}%`;
+  renderPoster();
+});
+elements.removeSticker.addEventListener("click", removeSelectedSticker);
 [
   elements.nicknameFontSize,
   elements.clubFontSize,
@@ -1271,6 +1501,7 @@ updateAutoTotal();
 updateZoomOutput();
 updateBackgroundBlurOutput();
 updateStyleOutputs();
+updateStickerControls();
 applyLanguage(currentLanguage, false);
 if (document.fonts && document.fonts.ready) {
   document.fonts.ready.then(renderPoster);

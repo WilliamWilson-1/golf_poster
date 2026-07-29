@@ -180,6 +180,30 @@
               <input id="extraColor" type="color" value="#ffffff">
             </label>
           </div>
+          <div class="sticker-panel">
+            <div class="field-heading">
+              <strong data-i18n="stickers">贴纸</strong>
+              <output id="stickerCount">0/5</output>
+            </div>
+            <div class="sticker-actions">
+              <label id="stickerUploadButton" class="sticker-upload-button">
+                <input id="stickerInput" type="file" accept="image/*" multiple>
+                <span class="action-icon" aria-hidden="true">＋</span>
+                <span data-i18n="uploadSticker">上传贴纸</span>
+              </label>
+              <button id="removeSticker" class="sticker-remove-button" type="button" disabled title="删除选中贴纸" data-i18n-title="removeSticker">
+                <span aria-hidden="true">×</span>
+              </button>
+            </div>
+            <div id="stickerList" class="sticker-list" aria-label="贴纸列表" data-i18n-aria="stickerList"></div>
+            <label class="field">
+              <div class="field-heading">
+                <span data-i18n="stickerScale">贴纸大小</span>
+                <output id="stickerScaleValue" for="stickerScale">100%</output>
+              </div>
+              <input id="stickerScale" type="range" min="20" max="250" value="100" disabled>
+            </label>
+          </div>
           <label class="field">
             <span data-i18n="brandText">品牌文字</span>
             <input id="brandText" type="text" value="GOLFBROTHERS" maxlength="22" autocomplete="off">

@@ -705,6 +705,125 @@ input[type="range"] {
   gap: 12px;
 }
 
+.sticker-panel {
+  display: grid;
+  gap: 12px;
+  padding: 14px 12px;
+  border-top: 3px solid var(--navy);
+  background: var(--white);
+}
+
+.sticker-panel .field-heading strong {
+  color: var(--ink);
+  font-size: 12px;
+}
+
+.sticker-panel .field-heading output {
+  color: var(--navy-soft);
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.sticker-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 48px;
+  gap: 10px;
+}
+
+.sticker-upload-button {
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid var(--yellow);
+  border-radius: 4px;
+  color: var(--navy-deep);
+  background: var(--yellow);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 950;
+}
+
+.sticker-upload-button input {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sticker-upload-button.is-disabled {
+  cursor: default;
+  filter: grayscale(1);
+  opacity: 0.48;
+}
+
+.sticker-remove-button {
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--navy);
+  border-radius: 4px;
+  color: var(--white);
+  background: var(--navy);
+  font-family: Arial, sans-serif;
+  font-size: 28px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.sticker-remove-button:disabled {
+  cursor: default;
+  opacity: 0.35;
+}
+
+.sticker-list {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  min-height: 54px;
+  gap: 8px;
+}
+
+.sticker-thumbnail {
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+  aspect-ratio: 1 / 1;
+  border: 2px solid var(--line);
+  border-radius: 4px;
+  padding: 4px;
+  background: var(--work);
+}
+
+.sticker-thumbnail.is-active {
+  border-color: var(--navy);
+  box-shadow: inset 0 -5px 0 var(--yellow);
+}
+
+.sticker-thumbnail img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.sticker-thumbnail span {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  display: grid;
+  width: 18px;
+  height: 18px;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--white);
+  background: var(--navy);
+  font-family: Arial, sans-serif;
+  font-size: 10px;
+  font-weight: 900;
+}
+
 .photo-tools {
   display: flex;
   min-height: 68px;
