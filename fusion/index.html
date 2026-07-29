@@ -173,29 +173,25 @@ button:disabled {
   background: transparent;
 }
 
-.reset-icon::before,
-.reset-icon::after {
-  position: absolute;
-  content: "";
+.reset-icon {
+  display: grid;
+  place-items: center;
+  color: var(--white);
+  background: #063758;
+  box-shadow: inset 0 -2px 0 rgba(255, 209, 0, 0.9);
 }
 
-.reset-icon::before {
-  top: 9px;
-  left: 9px;
-  width: 17px;
-  height: 17px;
-  border: 3px solid var(--white);
-  border-left-color: transparent;
-  border-radius: 50%;
+.reset-icon span {
+  display: block;
+  font-family: "Arial Black", "Segoe UI Symbol", Arial, sans-serif;
+  font-size: 28px;
+  font-weight: 950;
+  line-height: 1;
+  transform: translateY(-1px);
 }
 
-.reset-icon::after {
-  top: 7px;
-  left: 7px;
-  width: 8px;
-  height: 8px;
-  border-top: 3px solid var(--white);
-  border-left: 3px solid var(--white);
+.reset-icon:active span {
+  transform: translateY(-1px) rotate(-35deg);
 }
 
 .close-icon::before,
@@ -1064,7 +1060,9 @@ input[type="color"] {
             <option value="zh">中文</option>
             <option value="en">EN</option>
           </select>
-          <button id="resetPoster" class="icon-button reset-icon" type="button" aria-label="重置海报" title="重置海报"></button>
+          <button id="resetPoster" class="icon-button reset-icon" type="button" aria-label="重置海报" title="重置海报">
+            <span aria-hidden="true">↻</span>
+          </button>
         </div>
       </header>
 
