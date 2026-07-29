@@ -176,8 +176,8 @@ const posterTemplates = {
     }
   },
   client1: {
-    zh: "甲方模板 1",
-    en: "Client Template 1",
+    zh: "巡回典藏",
+    en: "Tour Edition",
     descriptionZh: "横向两行成绩卡",
     descriptionEn: "Two-row horizontal scorecard",
     tone: "standard",
@@ -196,8 +196,8 @@ const posterTemplates = {
     }
   },
   client2: {
-    zh: "甲方模板 2",
-    en: "Client Template 2",
+    zh: "赛场纵章",
+    en: "Matchday Column",
     descriptionZh: "左侧纵向成绩卡",
     descriptionEn: "Left vertical scorecard",
     tone: "editorial",
