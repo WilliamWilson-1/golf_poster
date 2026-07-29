@@ -2,6 +2,7 @@ const POSTER_WIDTH = 1000;
 const POSTER_HEIGHT = 1265;
 const BRAND_HEIGHT = 70;
 const MAX_STICKERS = 5;
+const MASK_MAX_DIMENSION = 800;
 
 const paletteCatalog = {
   forestGold: {
@@ -258,10 +259,12 @@ const translations = {
     resetPhoto: "复位画布",
     photoScale: "照片大小",
     backgroundBlur: "背景模糊",
+    edgeShrink: "边缘收缩",
+    edgeFeather: "边缘柔化",
     subjectDepth: "人物景深",
     waitingPhoto: "等待上传照片",
-    analyzingPhoto: "正在识别人物主体",
-    personDetected: "人物已识别，可形成前后图层",
+    analyzingPhoto: "正在识别并精修人物边缘",
+    personDetected: "人物已识别，精细边缘已生成",
     noPerson: "未识别到人物，按普通照片生成",
     retryRecognition: "重新识别",
     scorecardStep: "成绩卡",
@@ -335,10 +338,12 @@ const translations = {
     resetPhoto: "RESET LAYOUT",
     photoScale: "Photo size",
     backgroundBlur: "Background blur",
+    edgeShrink: "Edge contract",
+    edgeFeather: "Edge feather",
     subjectDepth: "Subject depth",
     waitingPhoto: "Waiting for a photo",
-    analyzingPhoto: "Detecting the subject",
-    personDetected: "Subject detected; depth layers are available",
+    analyzingPhoto: "Detecting and refining subject edges",
+    personDetected: "Subject detected; refined edges are ready",
     noPerson: "No subject detected; using the full photo",
     retryRecognition: "RETRY",
     scorecardStep: "Scorecard",
@@ -422,6 +427,7 @@ const elements = Object.fromEntries(
     "templateNext", "editorScreen", "stepCounter", "stepTitle", "openPosterPreview",
     "posterCanvas", "gestureHint", "controlScroller", "photoInput", "resetPhoto",
     "photoScale", "photoScaleValue", "backgroundBlur", "backgroundBlurValue",
+    "edgeShrink", "edgeShrinkValue", "edgeFeather", "edgeFeatherValue",
     "recognitionDetail", "retrySegmentation", "paletteList", "scoreInput",
     "highlightInput", "badgeText", "scoreFont", "cardColor", "lineColor",
     "scoreTextColor", "scorecardScale", "scorecardScaleValue", "totalScore",
@@ -454,6 +460,7 @@ let selfieSegmenter = null;
 let segmentationLibraryPromise = null;
 let pendingSegmentationResolve = null;
 let segmentationQueue = Promise.resolve();
+let maskTuningTimer = null;
 let gestureTarget = null;
 const activePointers = new Map();
 let lastGestureCenter = null;
@@ -501,9 +508,11 @@ function createModel(templateId, sample) {
   return {
     templateId,
     photo: null,
-    subjectMask: null,
+    subjectMaskBase: null,
+    subjectCutout: null,
     segmentationState: "idle",
     image: { scale: 1, x: 0, y: 0, blur: 0 },
+    edge: { shrink: 2, feather: 1 },
     scores: sample ? ["4", "4", "5", "3", "4", "3", "4", "4", "5", "4", "3", "4", "4", "4", "3", "4", "3", "5"] : Array(18).fill(""),
     highlights: sample ? new Set([3, 6, 14]) : new Set(),
     badge: "",
@@ -572,9 +581,11 @@ function createModel(templateId, sample) {
 
 function preserveContent(next, previous) {
   next.photo = previous.photo;
-  next.subjectMask = previous.subjectMask;
+  next.subjectMaskBase = previous.subjectMaskBase;
+  next.subjectCutout = previous.subjectCutout;
   next.segmentationState = previous.segmentationState;
   next.image = { ...previous.image };
+  next.edge = { ...previous.edge };
   next.scores = [...previous.scores];
   next.highlights = new Set(previous.highlights);
   next.badge = previous.badge;
@@ -785,6 +796,10 @@ function syncAllControls() {
   elements.photoScaleValue.textContent = `${Math.round(state.image.scale * 100)}%`;
   elements.backgroundBlur.value = String(state.image.blur);
   elements.backgroundBlurValue.textContent = `${state.image.blur}px`;
+  elements.edgeShrink.value = String(state.edge.shrink);
+  elements.edgeShrinkValue.textContent = `${state.edge.shrink > 0 ? "+" : ""}${state.edge.shrink}px`;
+  elements.edgeFeather.value = String(state.edge.feather);
+  elements.edgeFeatherValue.textContent = `${state.edge.feather}px`;
   elements.scoreInput.value = state.scores.filter(Boolean).join(" ");
   elements.highlightInput.value = [...state.highlights].join(",");
   elements.badgeText.value = state.badge;
@@ -980,15 +995,8 @@ function drawSubject(context, template, model) {
     drawPreviewSubject(context, template);
     return;
   }
-  if (!model.photo || !model.subjectMask || model.segmentationState !== "person") return;
-  const layer = document.createElement("canvas");
-  layer.width = POSTER_WIDTH;
-  layer.height = POSTER_HEIGHT;
-  const layerContext = layer.getContext("2d");
-  drawCover(layerContext, model.photo, model);
-  layerContext.globalCompositeOperation = "destination-in";
-  drawCover(layerContext, model.subjectMask, model);
-  context.drawImage(layer, 0, 0);
+  if (!model.subjectCutout || model.segmentationState !== "person") return;
+  drawCover(context, model.subjectCutout, model);
 }
 
 function transformedRect(base, transform) {
@@ -1550,6 +1558,7 @@ function endPointer(event) {
 function resetPhoto() {
   const defaults = createModel(state.templateId, false);
   state.image = { ...defaults.image };
+  state.edge = { ...defaults.edge };
   state.scorecard.x = defaults.scorecard.x;
   state.scorecard.y = defaults.scorecard.y;
   state.total.x = defaults.total.x;
@@ -1563,6 +1572,7 @@ function resetPhoto() {
     sticker.y = 630 + (index % 2) * 90;
     sticker.scale = 1;
   });
+  if (state.subjectMaskBase) rebuildSubjectAssets();
   syncAllControls();
   renderMain();
 }
@@ -1574,7 +1584,8 @@ function loadPhoto(file) {
     const image = new Image();
     image.onload = () => {
       state.photo = image;
-      state.subjectMask = null;
+      state.subjectMaskBase = null;
+      state.subjectCutout = null;
       state.segmentationState = "loading";
       state.image = { scale: 1, x: 0, y: 0, blur: state.image.blur };
       syncAllControls();
@@ -1587,20 +1598,22 @@ function loadPhoto(file) {
 }
 
 function copyMask(mask) {
+  const photoWidth = state.photo.naturalWidth || state.photo.width;
+  const photoHeight = state.photo.naturalHeight || state.photo.height;
+  const scale = Math.min(1, MASK_MAX_DIMENSION / Math.max(photoWidth, photoHeight));
   const canvasElement = document.createElement("canvas");
-  canvasElement.width = mask.width || state.photo.naturalWidth;
-  canvasElement.height = mask.height || state.photo.naturalHeight;
-  canvasElement.getContext("2d").drawImage(mask, 0, 0, canvasElement.width, canvasElement.height);
+  canvasElement.width = Math.max(1, Math.round(photoWidth * scale));
+  canvasElement.height = Math.max(1, Math.round(photoHeight * scale));
+  const context = canvasElement.getContext("2d", { willReadFrequently: true });
+  context.imageSmoothingEnabled = true;
+  context.imageSmoothingQuality = "high";
+  context.drawImage(mask, 0, 0, canvasElement.width, canvasElement.height);
   return canvasElement;
 }
 
-function measureMask(mask) {
-  const sample = document.createElement("canvas");
-  sample.width = 160;
-  sample.height = 160;
-  const sampleContext = sample.getContext("2d", { willReadFrequently: true });
-  sampleContext.drawImage(mask, 0, 0, 160, 160);
-  const pixels = sampleContext.getImageData(0, 0, 160, 160).data;
+function extractMaskConfidence(mask) {
+  const context = mask.getContext("2d", { willReadFrequently: true });
+  const pixels = context.getImageData(0, 0, mask.width, mask.height).data;
   let varyingAlpha = false;
   for (let index = 3; index < pixels.length; index += 4) {
     if (pixels[index] < 250) {
@@ -1608,17 +1621,252 @@ function measureMask(mask) {
       break;
     }
   }
+  const confidence = new Float32Array(mask.width * mask.height);
+  for (let index = 0; index < confidence.length; index += 1) {
+    const pixel = index * 4;
+    confidence[index] = varyingAlpha
+      ? pixels[pixel + 3] / 255
+      : (pixels[pixel] + pixels[pixel + 1] + pixels[pixel + 2]) / (255 * 3);
+  }
+  return confidence;
+}
+
+function measureMask(confidence) {
   let strong = 0;
   let mean = 0;
-  for (let index = 0; index < pixels.length; index += 4) {
-    const confidence = varyingAlpha
-      ? pixels[index + 3] / 255
-      : (pixels[index] + pixels[index + 1] + pixels[index + 2]) / (255 * 3);
-    mean += confidence;
-    if (confidence >= 0.55) strong += 1;
+  const stride = Math.max(1, Math.floor(confidence.length / (160 * 160)));
+  let count = 0;
+  for (let index = 0; index < confidence.length; index += stride) {
+    const value = confidence[index];
+    mean += value;
+    if (value >= 0.55) strong += 1;
+    count += 1;
   }
-  const count = pixels.length / 4;
   return { strongRatio: strong / count, meanConfidence: mean / count };
+}
+
+function createGuidance(photo, width, height) {
+  const canvasElement = document.createElement("canvas");
+  canvasElement.width = width;
+  canvasElement.height = height;
+  const context = canvasElement.getContext("2d", { willReadFrequently: true });
+  context.imageSmoothingEnabled = true;
+  context.imageSmoothingQuality = "high";
+  context.drawImage(photo, 0, 0, width, height);
+  const pixels = context.getImageData(0, 0, width, height).data;
+  const guidance = new Float32Array(width * height);
+  for (let index = 0; index < guidance.length; index += 1) {
+    const pixel = index * 4;
+    guidance[index] = (
+      pixels[pixel] * 0.2126 +
+      pixels[pixel + 1] * 0.7152 +
+      pixels[pixel + 2] * 0.0722
+    ) / 255;
+  }
+  return guidance;
+}
+
+function boxMean(input, width, height, radius, integral) {
+  const integralWidth = width + 1;
+  integral.fill(0);
+  for (let y = 1; y <= height; y += 1) {
+    let rowSum = 0;
+    const sourceOffset = (y - 1) * width;
+    const integralOffset = y * integralWidth;
+    const previousOffset = (y - 1) * integralWidth;
+    for (let x = 1; x <= width; x += 1) {
+      rowSum += input[sourceOffset + x - 1];
+      integral[integralOffset + x] = integral[previousOffset + x] + rowSum;
+    }
+  }
+
+  const output = new Float32Array(input.length);
+  for (let y = 0; y < height; y += 1) {
+    const top = Math.max(0, y - radius);
+    const bottom = Math.min(height - 1, y + radius);
+    for (let x = 0; x < width; x += 1) {
+      const left = Math.max(0, x - radius);
+      const right = Math.min(width - 1, x + radius);
+      const area = (right - left + 1) * (bottom - top + 1);
+      const sum =
+        integral[(bottom + 1) * integralWidth + right + 1] -
+        integral[top * integralWidth + right + 1] -
+        integral[(bottom + 1) * integralWidth + left] +
+        integral[top * integralWidth + left];
+      output[y * width + x] = sum / area;
+    }
+  }
+  return output;
+}
+
+function guidedFilter(guidance, confidence, width, height) {
+  const radius = Math.max(2, Math.round(Math.min(width, height) / 150));
+  const epsilon = 0.006;
+  const integral = new Float64Array((width + 1) * (height + 1));
+  const meanGuidance = boxMean(guidance, width, height, radius, integral);
+  const meanConfidence = boxMean(confidence, width, height, radius, integral);
+  const products = new Float32Array(confidence.length);
+
+  for (let index = 0; index < products.length; index += 1) {
+    products[index] = guidance[index] * guidance[index];
+  }
+  const guidanceCorrelation = boxMean(products, width, height, radius, integral);
+  for (let index = 0; index < products.length; index += 1) {
+    products[index] = guidance[index] * confidence[index];
+  }
+  const crossCorrelation = boxMean(products, width, height, radius, integral);
+  const coefficientA = new Float32Array(confidence.length);
+  const coefficientB = new Float32Array(confidence.length);
+
+  for (let index = 0; index < confidence.length; index += 1) {
+    const variance = guidanceCorrelation[index] - meanGuidance[index] * meanGuidance[index];
+    const covariance = crossCorrelation[index] - meanGuidance[index] * meanConfidence[index];
+    coefficientA[index] = covariance / (variance + epsilon);
+    coefficientB[index] = meanConfidence[index] - coefficientA[index] * meanGuidance[index];
+  }
+
+  const meanA = boxMean(coefficientA, width, height, radius, integral);
+  const meanB = boxMean(coefficientB, width, height, radius, integral);
+  const refined = new Float32Array(confidence.length);
+  for (let index = 0; index < refined.length; index += 1) {
+    refined[index] = clamp(meanA[index] * guidance[index] + meanB[index], 0, 1);
+  }
+  return refined;
+}
+
+function extremeFilter(input, width, height, radius, minimum) {
+  if (!radius) return input;
+  const horizontal = new Float32Array(input.length);
+  const output = new Float32Array(input.length);
+  const initial = minimum ? 1 : 0;
+  for (let y = 0; y < height; y += 1) {
+    const offset = y * width;
+    for (let x = 0; x < width; x += 1) {
+      let value = initial;
+      for (let dx = -radius; dx <= radius; dx += 1) {
+        const sampleX = clamp(x + dx, 0, width - 1);
+        const sample = input[offset + sampleX];
+        value = minimum ? Math.min(value, sample) : Math.max(value, sample);
+      }
+      horizontal[offset + x] = value;
+    }
+  }
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      let value = initial;
+      for (let dy = -radius; dy <= radius; dy += 1) {
+        const sampleY = clamp(y + dy, 0, height - 1);
+        const sample = horizontal[sampleY * width + x];
+        value = minimum ? Math.min(value, sample) : Math.max(value, sample);
+      }
+      output[y * width + x] = value;
+    }
+  }
+  return output;
+}
+
+function smoothStep(low, high, value) {
+  const position = clamp((value - low) / Math.max(0.0001, high - low), 0, 1);
+  return position * position * (3 - 2 * position);
+}
+
+function buildAlphaMask(base, edge) {
+  const radius = Math.abs(Math.round(edge.shrink));
+  const confidence = radius
+    ? extremeFilter(base.confidence, base.width, base.height, radius, edge.shrink > 0)
+    : base.confidence;
+  const transition = edge.feather === 0 ? 0.01 : 0.0275 + edge.feather * 0.0175;
+  const center = clamp(0.5 + edge.shrink * 0.018, 0.42, 0.62);
+  const low = center - transition / 2;
+  const high = center + transition / 2;
+  const alpha = new Float32Array(confidence.length);
+  for (let index = 0; index < confidence.length; index += 1) {
+    let value = edge.feather === 0
+      ? Number(confidence[index] >= center)
+      : smoothStep(low, high, confidence[index]);
+    if (value < 0.006) value = 0;
+    if (value > 0.994) value = 1;
+    alpha[index] = value;
+  }
+  return alpha;
+}
+
+function createSubjectCutout(photo, width, height, alpha) {
+  const canvasElement = document.createElement("canvas");
+  canvasElement.width = width;
+  canvasElement.height = height;
+  const context = canvasElement.getContext("2d", { willReadFrequently: true });
+  context.imageSmoothingEnabled = true;
+  context.imageSmoothingQuality = "high";
+  context.drawImage(photo, 0, 0, width, height);
+  const imageData = context.getImageData(0, 0, width, height);
+  const source = new Uint8ClampedArray(imageData.data);
+  const searchRadius = 8;
+
+  for (let index = 0; index < alpha.length; index += 1) {
+    const value = alpha[index];
+    const pixel = index * 4;
+    if (value > 0.015 && value < 0.985) {
+      const x = index % width;
+      const y = Math.floor(index / width);
+      let bestIndex = -1;
+      let bestAlpha = 0;
+      for (let radius = 1; radius <= searchRadius && bestAlpha < 0.985; radius += 1) {
+        for (let dy = -radius; dy <= radius; dy += 1) {
+          const sampleY = y + dy;
+          if (sampleY < 0 || sampleY >= height) continue;
+          for (let dx = -radius; dx <= radius; dx += 1) {
+            if (Math.abs(dx) !== radius && Math.abs(dy) !== radius) continue;
+            const sampleX = x + dx;
+            if (sampleX < 0 || sampleX >= width) continue;
+            const sampleIndex = sampleY * width + sampleX;
+            if (alpha[sampleIndex] > bestAlpha) {
+              bestAlpha = alpha[sampleIndex];
+              bestIndex = sampleIndex;
+            }
+          }
+        }
+      }
+      if (bestIndex >= 0 && bestAlpha >= 0.985) {
+        const sourcePixel = bestIndex * 4;
+        const blend = clamp((1 - value) * 0.86, 0, 0.82);
+        imageData.data[pixel] = Math.round(source[pixel] * (1 - blend) + source[sourcePixel] * blend);
+        imageData.data[pixel + 1] = Math.round(source[pixel + 1] * (1 - blend) + source[sourcePixel + 1] * blend);
+        imageData.data[pixel + 2] = Math.round(source[pixel + 2] * (1 - blend) + source[sourcePixel + 2] * blend);
+      }
+    }
+    imageData.data[pixel + 3] = Math.round(value * 255);
+  }
+  context.putImageData(imageData, 0, 0);
+  return canvasElement;
+}
+
+function refineSegmentationMask(mask, photo, confidence = extractMaskConfidence(mask)) {
+  const guidance = createGuidance(photo, mask.width, mask.height);
+  return {
+    width: mask.width,
+    height: mask.height,
+    confidence: guidedFilter(guidance, confidence, mask.width, mask.height)
+  };
+}
+
+function rebuildSubjectAssets() {
+  if (!state.photo || !state.subjectMaskBase) return;
+  const alpha = buildAlphaMask(state.subjectMaskBase, state.edge);
+  state.subjectCutout = createSubjectCutout(
+    state.photo,
+    state.subjectMaskBase.width,
+    state.subjectMaskBase.height,
+    alpha
+  );
+}
+
+function scheduleMaskTuning() {
+  clearTimeout(maskTuningTimer);
+  maskTuningTimer = setTimeout(() => {
+    rebuildSubjectAssets();
+    renderMain();
+  }, 70);
 }
 
 function ensureSegmentationLibrary() {
@@ -1667,15 +1915,26 @@ async function runSegmentation(token) {
     ]);
     if (token !== segmentationToken) return;
     const mask = copyMask(results.segmentationMask);
-    const metrics = measureMask(mask);
+    const confidence = extractMaskConfidence(mask);
+    const metrics = measureMask(confidence);
     const person = metrics.strongRatio >= 0.012 &&
       metrics.strongRatio <= 0.82 &&
       metrics.meanConfidence >= 0.018;
-    state.subjectMask = person ? mask : null;
+    if (person) {
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+      const refinedMask = refineSegmentationMask(mask, state.photo, confidence);
+      if (token !== segmentationToken) return;
+      state.subjectMaskBase = refinedMask;
+      rebuildSubjectAssets();
+    } else {
+      state.subjectMaskBase = null;
+      state.subjectCutout = null;
+    }
     state.segmentationState = person ? "person" : "fallback";
   } catch {
     if (token !== segmentationToken) return;
-    state.subjectMask = null;
+    state.subjectMaskBase = null;
+    state.subjectCutout = null;
     state.segmentationState = "fallback";
     pendingSegmentationResolve = null;
     if (selfieSegmenter?.close) selfieSegmenter.close();
@@ -1688,7 +1947,10 @@ async function runSegmentation(token) {
 function requestSegmentation() {
   if (!state.photo) return;
   const token = ++segmentationToken;
-  state.subjectMask = null;
+  state.segmentationState = "loading";
+  state.subjectMaskBase = null;
+  state.subjectCutout = null;
+  updateRecognitionUi();
   segmentationQueue = segmentationQueue.catch(() => undefined).then(() => runSegmentation(token));
 }
 
@@ -1701,6 +1963,9 @@ function updateRecognitionUi() {
   };
   elements.recognitionDetail.textContent = translate(keys[state.segmentationState] || "waitingPhoto");
   elements.retrySegmentation.disabled = !state.photo || state.segmentationState === "loading";
+  const unavailable = state.segmentationState !== "person";
+  elements.edgeShrink.disabled = unavailable;
+  elements.edgeFeather.disabled = unavailable;
 }
 
 function addStickerFiles(files) {
@@ -1756,6 +2021,7 @@ function downloadPoster() {
 
 function resetAll() {
   segmentationToken += 1;
+  clearTimeout(maskTuningTimer);
   selectedTemplateId = null;
   state = createModel("academy", false);
   returnToSummary = false;
@@ -1801,6 +2067,17 @@ function bindEvents() {
     state.image.blur = Number(elements.backgroundBlur.value);
     elements.backgroundBlurValue.textContent = `${state.image.blur}px`;
     renderMain();
+  });
+  elements.edgeShrink.addEventListener("input", () => {
+    state.edge.shrink = Number(elements.edgeShrink.value);
+    elements.edgeShrinkValue.textContent =
+      `${state.edge.shrink > 0 ? "+" : ""}${state.edge.shrink}px`;
+    scheduleMaskTuning();
+  });
+  elements.edgeFeather.addEventListener("input", () => {
+    state.edge.feather = Number(elements.edgeFeather.value);
+    elements.edgeFeatherValue.textContent = `${state.edge.feather}px`;
+    scheduleMaskTuning();
   });
   elements.retrySegmentation.addEventListener("click", requestSegmentation);
 

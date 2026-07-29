@@ -548,6 +548,10 @@ button:disabled {
   accent-color: var(--yellow-deep);
 }
 
+.range-line input:disabled {
+  opacity: 0.35;
+}
+
 .range-line output {
   color: var(--navy);
   font-family: "Arial Narrow", Arial, sans-serif;
