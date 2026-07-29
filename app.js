@@ -1645,7 +1645,7 @@ function measureMask(confidence) {
   return { strongRatio: strong / count, meanConfidence: mean / count };
 }
 
-function createGuidance(photo, width, height) {
+function createPhotoAnalysis(photo, width, height) {
   const canvasElement = document.createElement("canvas");
   canvasElement.width = width;
   canvasElement.height = height;
@@ -1663,7 +1663,7 @@ function createGuidance(photo, width, height) {
       pixels[pixel + 2] * 0.0722
     ) / 255;
   }
-  return guidance;
+  return { guidance, pixels };
 }
 
 function boxMean(input, width, height, radius, integral) {
@@ -1732,6 +1732,183 @@ function guidedFilter(guidance, confidence, width, height) {
     refined[index] = clamp(meanA[index] * guidance[index] + meanB[index], 0, 1);
   }
   return refined;
+}
+
+function colorSignature(red, green, blue) {
+  const r = red / 255;
+  const g = green / 255;
+  const b = blue / 255;
+  const luma = r * 0.299 + g * 0.587 + b * 0.114;
+  return [luma, (b - luma) * 0.565, (r - luma) * 0.713];
+}
+
+function sampleBackgroundSignature(pixels, confidence, width, y, startX, endX) {
+  let red = 0;
+  let green = 0;
+  let blue = 0;
+  let count = 0;
+  const from = clamp(Math.min(startX, endX), 0, width - 1);
+  const to = clamp(Math.max(startX, endX), 0, width - 1);
+  for (let x = from; x <= to; x += 1) {
+    const index = y * width + x;
+    if (confidence[index] > 0.35) continue;
+    const pixel = index * 4;
+    red += pixels[pixel];
+    green += pixels[pixel + 1];
+    blue += pixels[pixel + 2];
+    count += 1;
+  }
+  return count ? colorSignature(red / count, green / count, blue / count) : null;
+}
+
+function colorDistanceSquared(pixels, index, leftReference, rightReference) {
+  const pixel = index * 4;
+  const signature = colorSignature(
+    pixels[pixel],
+    pixels[pixel + 1],
+    pixels[pixel + 2]
+  );
+  const distanceTo = (reference) => {
+    if (!reference) return Number.POSITIVE_INFINITY;
+    const luma = signature[0] - reference[0];
+    const blue = signature[1] - reference[1];
+    const red = signature[2] - reference[2];
+    return luma * luma * 0.2 + blue * blue * 0.8 + red * red * 0.8;
+  };
+  return Math.min(distanceTo(leftReference), distanceTo(rightReference));
+}
+
+// Reopen narrow, background-colored channels that the low-resolution person mask filled in.
+function recoverInteriorBackground(confidence, pixels, width, height) {
+  let left = width;
+  let right = -1;
+  let top = height;
+  let bottom = -1;
+  for (let index = 0; index < confidence.length; index += 1) {
+    if (confidence[index] < 0.55) continue;
+    const x = index % width;
+    const y = Math.floor(index / width);
+    left = Math.min(left, x);
+    right = Math.max(right, x);
+    top = Math.min(top, y);
+    bottom = Math.max(bottom, y);
+  }
+  if (right <= left || bottom <= top) return confidence;
+
+  const subjectWidth = right - left + 1;
+  const subjectHeight = bottom - top + 1;
+  const startY = clamp(Math.round(top + subjectHeight * 0.55), 0, height - 1);
+  const endY = clamp(bottom + 2, 0, height - 1);
+  const roiLeft = clamp(left - 2, 0, width - 1);
+  const roiRight = clamp(right + 2, 0, width - 1);
+  const backgroundWindow = clamp(Math.round(subjectWidth * 0.08), 10, 48);
+  const maxGapWidth = clamp(Math.round(subjectWidth * 0.16), 10, Math.round(width * 0.12));
+  const backgroundThreshold = 0.075 * 0.075;
+  const foregroundThreshold = 0.085 * 0.085;
+  const candidates = new Uint8Array(confidence.length);
+  const blockers = new Uint8Array(width);
+  const leftBlocker = new Int32Array(width);
+  const rightBlocker = new Int32Array(width);
+
+  for (let y = startY; y <= endY; y += 1) {
+    let rowLeft = width;
+    let rowRight = -1;
+    const rowOffset = y * width;
+    for (let x = roiLeft; x <= roiRight; x += 1) {
+      if (confidence[rowOffset + x] < 0.55) continue;
+      rowLeft = Math.min(rowLeft, x);
+      rowRight = Math.max(rowRight, x);
+    }
+    if (rowRight - rowLeft < 6) continue;
+
+    const leftReference = sampleBackgroundSignature(
+      pixels,
+      confidence,
+      width,
+      y,
+      rowLeft - backgroundWindow,
+      rowLeft - 2
+    );
+    const rightReference = sampleBackgroundSignature(
+      pixels,
+      confidence,
+      width,
+      y,
+      rowRight + 2,
+      rowRight + backgroundWindow
+    );
+    if (!leftReference && !rightReference) continue;
+
+    blockers.fill(0);
+    leftBlocker.fill(-1);
+    rightBlocker.fill(-1);
+    for (let x = rowLeft; x <= rowRight; x += 1) {
+      const index = rowOffset + x;
+      const distance = colorDistanceSquared(pixels, index, leftReference, rightReference);
+      if (confidence[index] >= 0.55 && distance > foregroundThreshold) blockers[x] = 1;
+    }
+
+    let nearest = -1;
+    for (let x = rowLeft; x <= rowRight; x += 1) {
+      if (blockers[x]) nearest = x;
+      leftBlocker[x] = nearest;
+    }
+    nearest = -1;
+    for (let x = rowRight; x >= rowLeft; x -= 1) {
+      if (blockers[x]) nearest = x;
+      rightBlocker[x] = nearest;
+    }
+
+    for (let x = rowLeft + 1; x < rowRight; x += 1) {
+      const before = leftBlocker[x];
+      const after = rightBlocker[x];
+      if (before < rowLeft || after < 0 || after - before > maxGapWidth) continue;
+      const index = rowOffset + x;
+      const distance = colorDistanceSquared(pixels, index, leftReference, rightReference);
+      if (distance < backgroundThreshold) candidates[index] = 1;
+    }
+  }
+
+  const visited = new Uint8Array(confidence.length);
+  const queue = new Int32Array((roiRight - roiLeft + 1) * (endY - startY + 1));
+  let queueStart = 0;
+  let queueEnd = 0;
+  const enqueue = (index) => {
+    if (visited[index]) return;
+    visited[index] = 1;
+    queue[queueEnd] = index;
+    queueEnd += 1;
+  };
+  const tryEnqueue = (index) => {
+    if (
+      !visited[index] &&
+      (confidence[index] < 0.22 || candidates[index])
+    ) enqueue(index);
+  };
+  for (let x = roiLeft; x <= roiRight; x += 1) {
+    const index = endY * width + x;
+    if (confidence[index] < 0.22) enqueue(index);
+  }
+  for (let y = startY; y <= endY; y += 1) {
+    const leftIndex = y * width + roiLeft;
+    const rightIndex = y * width + roiRight;
+    if (confidence[leftIndex] < 0.22) enqueue(leftIndex);
+    if (confidence[rightIndex] < 0.22) enqueue(rightIndex);
+  }
+
+  const output = new Float32Array(confidence);
+  while (queueStart < queueEnd) {
+    const index = queue[queueStart];
+    queueStart += 1;
+    const x = index % width;
+    const y = Math.floor(index / width);
+    if (candidates[index]) output[index] = Math.min(output[index], 0.04);
+    if (x > roiLeft) tryEnqueue(index - 1);
+    if (x < roiRight) tryEnqueue(index + 1);
+    if (y > startY) tryEnqueue(index - width);
+    if (y < endY) tryEnqueue(index + width);
+  }
+  return output;
 }
 
 function extremeFilter(input, width, height, radius, minimum) {
@@ -1842,11 +2019,22 @@ function createSubjectCutout(photo, width, height, alpha) {
 }
 
 function refineSegmentationMask(mask, photo, confidence = extractMaskConfidence(mask)) {
-  const guidance = createGuidance(photo, mask.width, mask.height);
+  const analysis = createPhotoAnalysis(photo, mask.width, mask.height);
+  const guided = guidedFilter(
+    analysis.guidance,
+    confidence,
+    mask.width,
+    mask.height
+  );
   return {
     width: mask.width,
     height: mask.height,
-    confidence: guidedFilter(guidance, confidence, mask.width, mask.height)
+    confidence: recoverInteriorBackground(
+      guided,
+      analysis.pixels,
+      mask.width,
+      mask.height
+    )
   };
 }
 
