@@ -346,13 +346,7 @@ h1 {
   transform: translateY(1px);
 }
 
-.action-icon {
-  font-family: Arial, sans-serif;
-  font-size: 21px;
-  font-weight: 900;
-  line-height: 1;
-}
-
+.upload-icon,
 .download-icon {
   position: relative;
   display: inline-block;
@@ -361,14 +355,33 @@ h1 {
   border-bottom: 3px solid currentColor;
 }
 
+.upload-icon::before,
 .download-icon::before {
   position: absolute;
-  top: 0;
   left: 8px;
   width: 4px;
-  height: 12px;
   background: currentColor;
   content: "";
+}
+
+.upload-icon::before {
+  top: 7px;
+  height: 12px;
+}
+
+.upload-icon::after {
+  position: absolute;
+  top: 0;
+  left: 2px;
+  border-right: 8px solid transparent;
+  border-bottom: 9px solid currentColor;
+  border-left: 8px solid transparent;
+  content: "";
+}
+
+.download-icon::before {
+  top: 0;
+  height: 12px;
 }
 
 .download-icon::after {

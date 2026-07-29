@@ -355,13 +355,7 @@ h1 {
   transform: translateY(1px);
 }
 
-.action-icon {
-  font-family: Arial, sans-serif;
-  font-size: 21px;
-  font-weight: 900;
-  line-height: 1;
-}
-
+.upload-icon,
 .download-icon {
   position: relative;
   display: inline-block;
@@ -370,14 +364,33 @@ h1 {
   border-bottom: 3px solid currentColor;
 }
 
+.upload-icon::before,
 .download-icon::before {
   position: absolute;
-  top: 0;
   left: 8px;
   width: 4px;
-  height: 12px;
   background: currentColor;
   content: "";
+}
+
+.upload-icon::before {
+  top: 7px;
+  height: 12px;
+}
+
+.upload-icon::after {
+  position: absolute;
+  top: 0;
+  left: 2px;
+  border-right: 8px solid transparent;
+  border-bottom: 9px solid currentColor;
+  border-left: 8px solid transparent;
+  content: "";
+}
+
+.download-icon::before {
+  top: 0;
+  height: 12px;
 }
 
 .download-icon::after {
@@ -1003,7 +1016,7 @@ input[type="range"] {
         <div class="primary-actions">
           <label class="file-button">
             <input id="photoInput" type="file" accept="image/*">
-            <span class="action-icon" aria-hidden="true">＋</span>
+            <span class="upload-icon" aria-hidden="true"></span>
             <span data-i18n="uploadPhoto">上传照片</span>
           </label>
           <button id="downloadPoster" class="download-button" type="button">
@@ -1143,7 +1156,7 @@ input[type="range"] {
             <div class="sticker-actions">
               <label id="stickerUploadButton" class="sticker-upload-button">
                 <input id="stickerInput" type="file" accept="image/*" multiple>
-                <span class="action-icon" aria-hidden="true">＋</span>
+                <span class="upload-icon" aria-hidden="true"></span>
                 <span data-i18n="uploadSticker">上传贴纸</span>
               </label>
               <button id="removeSticker" class="sticker-remove-button" type="button" disabled title="删除选中贴纸" data-i18n-title="removeSticker">
