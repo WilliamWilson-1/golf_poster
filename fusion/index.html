@@ -3,75 +3,41 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="#002b50">
+    <meta name="theme-color" content="#001f38">
     <title>GOLFBROTHERS Poster Studio</title>
-    <meta name="description" content="上传照片并生成可下载的高尔夫成绩海报">
+    <meta name="description" content="上传照片并按模板生成可下载的高尔夫成绩海报">
     <style>
-@font-face {
-  font-family: "Bebas Neue";
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("https://cdn.jsdelivr.net/npm/@fontsource/bebas-neue@5.3.0/files/bebas-neue-latin-400-normal.woff2") format("woff2");
-}
-
-@font-face {
-  font-family: "Oswald";
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url("https://cdn.jsdelivr.net/npm/@fontsource/oswald@5.2.8/files/oswald-latin-700-normal.woff2") format("woff2");
-}
-
-@font-face {
-  font-family: "Playfair Display";
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url("https://cdn.jsdelivr.net/npm/@fontsource/playfair-display@5.3.0/files/playfair-display-latin-700-normal.woff2") format("woff2");
-}
-
-@font-face {
-  font-family: "Space Mono";
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url("https://cdn.jsdelivr.net/npm/@fontsource/space-mono@5.3.0/files/space-mono-latin-700-normal.woff2") format("woff2");
-}
-
 :root {
-  color-scheme: light;
   --navy: #002b50;
-  --navy-deep: #001d37;
-  --navy-soft: #17486b;
+  --navy-deep: #001f38;
   --yellow: #ffd100;
-  --yellow-deep: #d9a900;
-  --ink: #092b45;
-  --muted: #6c7d8b;
-  --line: #cfd7dd;
-  --surface: #ffffff;
+  --yellow-deep: #d4a900;
+  --ink: #17232d;
+  --muted: #667682;
+  --line: #d6dde2;
   --work: #eef1f3;
   --white: #ffffff;
-  --success: #08755b;
-  --shadow: 0 18px 44px rgba(0, 29, 55, 0.16);
+  --danger: #b32d38;
+  --header-height: 58px;
+  color-scheme: light;
+  font-family: Arial, "Microsoft YaHei", sans-serif;
 }
 
 * {
   box-sizing: border-box;
 }
 
-html {
-  background: #dfe5e9;
-}
-
+html,
 body {
+  width: 100%;
+  min-width: 320px;
+  height: 100%;
   margin: 0;
-  min-height: 100vh;
-  font-family: "Arial Narrow", "Roboto Condensed", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-  color: var(--ink);
-  background: #dfe5e9;
+  overflow: hidden;
+  background: #11171c;
 }
 
+body,
 button,
 input,
 textarea,
@@ -79,739 +45,811 @@ select {
   font: inherit;
 }
 
-button {
+button,
+input,
+textarea,
+select {
   border: 0;
+}
+
+button,
+label,
+select,
+input[type="range"],
+input[type="color"] {
+  touch-action: manipulation;
+}
+
+button {
   cursor: pointer;
 }
 
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+[hidden] {
+  display: none !important;
+}
+
 .app-shell {
-  width: min(100%, 560px);
-  min-height: 100vh;
+  width: min(100%, 520px);
+  height: 100dvh;
   margin: 0 auto;
   overflow: hidden;
+  color: var(--ink);
   background: var(--work);
-  box-shadow: 0 0 64px rgba(0, 29, 55, 0.2);
+  box-shadow: 0 0 44px rgba(0, 0, 0, 0.38);
 }
 
-.hero-panel,
-.controls-panel {
-  width: 100%;
-}
-
-.hero-panel {
-  background: var(--work);
-}
-
-.topbar {
+.app-header {
+  position: relative;
+  z-index: 30;
   display: flex;
-  min-height: 106px;
+  height: var(--header-height);
   align-items: center;
   justify-content: space-between;
-  gap: 18px;
-  padding: calc(18px + env(safe-area-inset-top)) 20px 18px;
+  gap: 14px;
+  padding: 0 14px;
   color: var(--white);
-  background: var(--navy);
-  border-bottom: 4px solid var(--yellow);
+  background: var(--navy-deep);
+  border-bottom: 3px solid var(--yellow);
 }
 
 .brand-lockup {
   display: flex;
   min-width: 0;
   align-items: center;
-  gap: 13px;
+  gap: 10px;
 }
 
-.club-mark {
+.brand-lockup > div {
+  display: grid;
+  min-width: 0;
+  gap: 1px;
+}
+
+.brand-lockup strong {
+  overflow: hidden;
+  font-family: "Arial Black", Arial, sans-serif;
+  font-size: 14px;
+  font-style: italic;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.brand-lockup span:last-child {
+  color: #b8c6d0;
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.brand-flag {
   position: relative;
-  flex: 0 0 auto;
-  width: 31px;
-  height: 42px;
-  border-left: 4px solid var(--white);
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  border-left: 3px solid var(--white);
 }
 
-.club-mark::before {
+.brand-flag::after {
   position: absolute;
-  top: 2px;
+  top: 3px;
   left: 3px;
-  width: 26px;
-  height: 17px;
+  width: 22px;
+  height: 13px;
   background: var(--yellow);
   clip-path: polygon(0 0, 100% 50%, 0 100%);
   content: "";
 }
 
-.eyebrow {
-  margin: 0 0 3px;
-  color: var(--yellow);
-  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
-  font-size: 13px;
-  font-weight: 900;
-  line-height: 1;
-  letter-spacing: 0;
-}
-
-h1 {
-  margin: 0;
-  overflow-wrap: anywhere;
-  color: var(--white);
-  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
-  font-size: 29px;
-  font-style: italic;
-  font-weight: 900;
-  line-height: 1;
-  letter-spacing: 0;
-}
-
-.top-actions {
+.header-actions {
   display: flex;
-  flex: 0 0 auto;
   align-items: center;
   gap: 8px;
 }
 
 .language-menu {
-  width: 62px;
-  height: 46px;
+  width: 58px;
+  height: 38px;
   border: 1px solid rgba(255, 255, 255, 0.32);
   border-radius: 4px;
-  padding: 0 8px;
+  padding: 0 5px;
   color: var(--white);
-  background: var(--navy-deep);
-  outline: none;
-  font-family: "Arial Narrow", Arial, sans-serif;
-  font-size: 13px;
+  background: #002743;
+  font-size: 11px;
   font-weight: 900;
-  text-align: center;
-}
-
-.language-menu:focus {
-  border-color: var(--yellow);
-  box-shadow: 0 0 0 3px rgba(255, 209, 0, 0.28);
-}
-
-.language-menu option {
-  color: var(--ink);
-  background: var(--white);
 }
 
 .icon-button {
-  flex: 0 0 auto;
-  width: 46px;
-  height: 46px;
+  position: relative;
+  width: 38px;
+  height: 38px;
   border: 1px solid rgba(255, 255, 255, 0.32);
-  border-radius: 50%;
-  color: var(--white);
+  border-radius: 4px;
   background: transparent;
-  font-size: 25px;
-  line-height: 1;
 }
 
-.icon-button:active {
-  color: var(--navy);
-  background: var(--yellow);
-  border-color: var(--yellow);
+.reset-icon::before,
+.reset-icon::after {
+  position: absolute;
+  content: "";
 }
 
-.tournament-strip {
-  display: flex;
-  min-height: 52px;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 0 20px;
-  color: var(--navy);
-  background: var(--white);
-  border-bottom: 1px solid var(--line);
+.reset-icon::before {
+  top: 9px;
+  left: 9px;
+  width: 17px;
+  height: 17px;
+  border: 3px solid var(--white);
+  border-left-color: transparent;
+  border-radius: 50%;
 }
 
-.tournament-strip strong {
-  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
-  font-size: 15px;
-  font-style: italic;
+.reset-icon::after {
+  top: 7px;
+  left: 7px;
+  width: 8px;
+  height: 8px;
+  border-top: 3px solid var(--white);
+  border-left: 3px solid var(--white);
 }
 
-.tournament-strip span {
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 900;
-  text-align: right;
+.close-icon::before,
+.close-icon::after {
+  position: absolute;
+  top: 17px;
+  left: 9px;
+  width: 18px;
+  height: 3px;
+  background: currentColor;
+  content: "";
 }
 
-.template-library {
-  display: grid;
-  gap: 12px;
-  padding: 14px 18px 16px;
-  background: var(--white);
-  border-bottom: 1px solid var(--line);
+.close-icon::before {
+  transform: rotate(45deg);
 }
 
-.template-library__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
+.close-icon::after {
+  transform: rotate(-45deg);
 }
 
-.template-library__header > div:first-child {
-  display: grid;
-  gap: 3px;
+.template-screen {
+  height: calc(100dvh - var(--header-height));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 22px 16px calc(92px + env(safe-area-inset-bottom));
+  background: var(--work);
 }
 
-.section-kicker {
+.template-intro {
+  margin-bottom: 18px;
+}
+
+.step-index {
   color: var(--yellow-deep);
   font-family: "Arial Narrow", Arial, sans-serif;
   font-size: 10px;
   font-weight: 950;
 }
 
-.template-library__header strong {
-  color: var(--navy);
-  font-size: 14px;
-  font-weight: 950;
+.template-intro h1,
+.panel-heading h2,
+.preview-dialog h2 {
+  margin: 4px 0 0;
+  letter-spacing: 0;
+}
+
+.template-intro h1 {
+  color: var(--navy-deep);
+  font-size: 25px;
+  line-height: 1.12;
+}
+
+.template-intro p,
+.panel-heading p {
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
 }
 
 .template-gallery {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-  padding-bottom: 3px;
+  gap: 12px;
 }
 
-.template-option {
-  display: grid;
+.template-card {
+  position: relative;
   min-width: 0;
-  gap: 7px;
   padding: 0;
-  color: var(--muted);
-  background: transparent;
-  scroll-snap-align: start;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  color: var(--ink);
+  background: var(--white);
+  box-shadow: 0 6px 18px rgba(0, 31, 56, 0.1);
   text-align: left;
+  overflow: hidden;
 }
 
-.template-option > strong {
+.template-card[aria-checked="true"] {
+  border-color: var(--yellow-deep);
+  box-shadow: 0 0 0 2px var(--navy), 0 8px 20px rgba(0, 31, 56, 0.16);
+}
+
+.template-card canvas {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1000 / 1265;
+  background: #173b2c;
+}
+
+.template-card__meta {
+  display: grid;
+  min-height: 59px;
+  gap: 3px;
+  padding: 9px 10px 10px;
+}
+
+.template-card__meta strong {
   overflow: hidden;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 950;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.template-option.is-active {
-  color: var(--navy);
-}
-
-.template-art {
-  position: relative;
-  display: block;
+.template-card__meta span {
   overflow: hidden;
-  height: 118px;
-  border: 2px solid transparent;
-  border-radius: 4px;
-  background: #163f2e;
-}
-
-.template-option.is-active .template-art {
-  border-color: var(--yellow);
-  box-shadow: 0 0 0 2px var(--navy);
-}
-
-.template-art::before {
-  position: absolute;
-  inset: 0 0 auto;
-  height: 13px;
-  background: #050505;
-  content: "";
-}
-
-.template-art__score {
-  position: absolute;
-  top: 18px;
-  right: 7px;
-  color: rgba(255, 255, 255, 0.75);
-  font-family: Georgia, serif;
-  font-size: 43px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: 1;
-}
-
-.template-art__subject {
-  position: absolute;
-  bottom: 21px;
-  left: 16px;
-  width: 38px;
-  height: 68px;
-  border-radius: 18px 18px 3px 3px;
-  background: #d7dce0;
-}
-
-.template-art__subject::before {
-  position: absolute;
-  top: -11px;
-  left: 9px;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: #edf0f2;
-  content: "";
-}
-
-.template-art__table {
-  position: absolute;
-  right: 7px;
-  bottom: 8px;
-  left: 7px;
-  height: 18px;
-  border-top: 1px solid currentColor;
-  border-bottom: 1px solid currentColor;
-  color: #ffd100;
-  background: rgba(0, 43, 80, 0.72);
-}
-
-.template-art--template1 {
-  background: linear-gradient(180deg, #2d6547 0%, #173b2c 100%);
-}
-
-.template-art--template1 .template-art__score {
-  top: 60px;
-  right: 0;
-  left: 0;
-  color: rgba(255, 255, 255, 0.78);
-  text-align: center;
-}
-
-.template-art--template1 .template-art__subject {
-  bottom: 0;
-  left: calc(50% - 19px);
-}
-
-.template-art--template1 .template-art__table {
-  top: 28px;
-  right: 23%;
-  bottom: auto;
-  left: 23%;
-  height: 20px;
-}
-
-.template-art--template2 {
-  background: linear-gradient(125deg, #122e22 0%, #315e44 100%);
-}
-
-.template-art--template2 .template-art__score {
-  top: 25px;
-  right: auto;
-  left: 8%;
-  width: 29%;
-  color: rgba(255, 255, 255, 0.82);
-  font-size: 31px;
-  text-align: center;
-}
-
-.template-art--template2 .template-art__subject {
-  bottom: 0;
-  left: 53%;
-  width: 44px;
-  height: 82px;
-}
-
-.template-art--template2 .template-art__table {
-  top: 46px;
-  right: auto;
-  bottom: 5px;
-  left: 8%;
-  width: 29%;
-  height: auto;
-  border: 0;
-  border-right: 2px solid currentColor;
-  background: rgba(8, 32, 16, 0.62);
-}
-
-.poster-stage {
-  position: relative;
-  overflow: hidden;
-  margin: 16px 18px 14px;
-  border: 2px solid var(--navy);
-  border-radius: 6px;
-  background: var(--navy-deep);
-  box-shadow: var(--shadow);
-}
-
-#posterCanvas {
-  display: block;
-  width: 100%;
-  aspect-ratio: 1000 / 1265;
-  touch-action: pan-y;
-  background: var(--navy-deep);
-}
-
-#posterCanvas.is-layout-mode {
-  cursor: grab;
-  touch-action: none;
-}
-
-#posterCanvas.is-layout-mode:active {
-  cursor: grabbing;
-}
-
-.primary-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  padding: 0 18px;
-}
-
-.file-button,
-.download-button {
-  display: flex;
-  min-height: 50px;
-  align-items: center;
-  justify-content: center;
-  gap: 9px;
-  border-radius: 4px;
-  font-size: 14px;
-  font-weight: 950;
-}
-
-.file-button {
-  color: var(--navy-deep);
-  background: var(--yellow);
-  border: 1px solid var(--yellow);
-}
-
-.file-button input {
-  position: absolute;
-  inline-size: 1px;
-  block-size: 1px;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.download-button {
-  color: var(--white);
-  background: var(--navy);
-  border: 1px solid var(--navy);
-}
-
-.file-button:active,
-.download-button:active {
-  transform: translateY(1px);
-}
-
-.upload-icon,
-.download-icon {
-  position: relative;
-  display: inline-block;
-  width: 20px;
-  height: 22px;
-  border-bottom: 3px solid currentColor;
-}
-
-.upload-icon::before,
-.download-icon::before {
-  position: absolute;
-  left: 8px;
-  width: 4px;
-  background: currentColor;
-  content: "";
-}
-
-.upload-icon::before {
-  top: 7px;
-  height: 12px;
-}
-
-.upload-icon::after {
-  position: absolute;
-  top: 0;
-  left: 2px;
-  border-right: 8px solid transparent;
-  border-bottom: 9px solid currentColor;
-  border-left: 8px solid transparent;
-  content: "";
-}
-
-.download-icon::before {
-  top: 0;
-  height: 12px;
-}
-
-.download-icon::after {
-  position: absolute;
-  top: 8px;
-  left: 2px;
-  border-top: 9px solid currentColor;
-  border-right: 8px solid transparent;
-  border-left: 8px solid transparent;
-  content: "";
-}
-
-.recognition-status {
-  min-height: 38px;
-  margin: 0;
-  padding: 10px 20px 11px;
   color: var(--muted);
-  background: var(--white);
-  border-bottom: 1px solid var(--line);
-  font-size: 12px;
-  font-weight: 800;
-}
-
-.recognition-status::before {
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  margin-right: 8px;
-  border-radius: 50%;
-  background: #94a3ad;
-  content: "";
-  vertical-align: 1px;
-}
-
-.recognition-status[data-state="loading"] {
-  color: #8f6c00;
-}
-
-.recognition-status[data-state="loading"]::before {
-  background: var(--yellow-deep);
-}
-
-.recognition-status[data-state="person"] {
-  color: var(--success);
-}
-
-.recognition-status[data-state="person"]::before {
-  background: var(--success);
-}
-
-.recognition-status[data-state="fallback"]::before {
-  background: #a84d3f;
-}
-
-.controls-panel {
-  background: var(--work);
-}
-
-.tabs {
-  position: sticky;
-  top: 0;
-  z-index: 4;
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  min-height: 70px;
-  background: var(--navy);
-  border-bottom: 1px solid var(--navy-deep);
-}
-
-.tab {
-  position: relative;
-  min-width: 0;
-  min-height: 70px;
-  padding: 0 4px;
-  color: #91a9ba;
-  background: transparent;
-  font-size: 13px;
-  font-weight: 950;
+  font-size: 10px;
+  line-height: 1.3;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.tab::after {
+.template-check {
   position: absolute;
-  right: 0;
+  top: 8px;
+  right: 8px;
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border: 2px solid var(--white);
+  border-radius: 50%;
+  color: var(--navy-deep);
+  background: var(--yellow);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.28);
+  font-size: 14px;
+  font-weight: 950;
+  opacity: 0;
+}
+
+.template-card[aria-checked="true"] .template-check {
+  opacity: 1;
+}
+
+.template-footer {
+  position: fixed;
+  z-index: 20;
+  right: max(0px, calc((100vw - 520px) / 2));
   bottom: 0;
-  left: 0;
-  height: 5px;
-  background: transparent;
-  content: "";
+  left: max(0px, calc((100vw - 520px) / 2));
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, rgba(238, 241, 243, 0), var(--work) 22%);
 }
 
-.tab.is-active {
-  color: var(--white);
+.primary-button,
+.secondary-button,
+.back-button,
+.download-button,
+.danger-button,
+.preview-button,
+.summary-edit {
+  min-height: 46px;
+  border-radius: 4px;
+  font-weight: 950;
 }
 
-.tab.is-active::after {
+.primary-button,
+.download-button {
+  color: var(--navy-deep);
   background: var(--yellow);
 }
 
-.tab-panel {
-  display: none;
+.next-button {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
-.tab-panel.is-active {
+.next-button i {
+  width: 10px;
+  height: 10px;
+  border-top: 3px solid currentColor;
+  border-right: 3px solid currentColor;
+  transform: rotate(45deg);
+}
+
+.editor-screen {
   display: grid;
-  gap: 16px;
-  padding: 20px 18px calc(34px + env(safe-area-inset-bottom));
+  height: calc(100dvh - var(--header-height));
+  grid-template-rows: minmax(270px, 48%) minmax(0, 1fr) auto;
+  overflow: hidden;
   background: var(--work);
 }
 
-.field {
+.editor-screen.is-summary {
+  grid-template-rows: minmax(340px, 1fr) minmax(190px, 34%) auto;
+}
+
+.preview-zone {
+  position: relative;
+  z-index: 10;
+  display: grid;
+  min-height: 0;
+  grid-template-rows: 45px minmax(0, 1fr) 26px;
+  overflow: hidden;
+  color: var(--white);
+  background: #171d22;
+  border-bottom: 3px solid var(--yellow);
+}
+
+.preview-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 12px;
+  background: #10161a;
+}
+
+.preview-toolbar > div {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+}
+
+.preview-toolbar strong {
+  font-size: 13px;
+}
+
+.preview-button {
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  color: var(--white);
+  background: transparent;
+  font-size: 11px;
+}
+
+.canvas-stage,
+.modal-canvas-stage {
+  display: flex;
+  min-height: 0;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 7px 10px;
+}
+
+#posterCanvas,
+#modalCanvas {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: 100%;
+  max-height: 100%;
+  aspect-ratio: 1000 / 1265;
+  background: #173b2c;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.34);
+}
+
+#posterCanvas {
+  touch-action: none;
+}
+
+.gesture-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #b9c5cc;
+  background: #10161a;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.control-scroller {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--work);
+}
+
+.control-panel {
+  display: none;
+  gap: 15px;
+  padding: 16px 14px calc(24px + env(safe-area-inset-bottom));
+}
+
+.control-panel.is-active {
+  display: grid;
+}
+
+.panel-heading {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.panel-number {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  color: var(--yellow);
+  background: var(--navy);
+  font-family: "Arial Black", Arial, sans-serif;
+  font-size: 13px;
+}
+
+.panel-heading h2 {
+  color: var(--navy-deep);
+  font-size: 18px;
+}
+
+.control-field {
   display: grid;
   min-width: 0;
   gap: 7px;
 }
 
-.field span,
-.field-heading > label:first-child {
+.control-field > span,
+.field-heading > label:first-child,
+.color-grid span {
   color: var(--ink);
   font-size: 12px;
   font-weight: 950;
 }
 
-.field-heading {
-  display: flex;
-  min-width: 0;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.field-heading output {
-  color: var(--navy-soft);
-  font-family: "Arial Narrow", Arial, sans-serif;
-  font-size: 12px;
-  font-weight: 900;
-}
-
-.field input,
-.field textarea,
-.field select {
+.control-field input:not([type="range"]):not([type="color"]),
+.control-field textarea,
+.control-field select,
+.total-input-block > input {
   width: 100%;
-  min-height: 48px;
+  min-height: 44px;
   border: 1px solid var(--line);
   border-radius: 4px;
-  padding: 11px 12px;
+  padding: 9px 11px;
   color: var(--ink);
   background: var(--white);
   outline: none;
 }
 
-.field input::placeholder,
-.field textarea::placeholder {
-  color: #99a6af;
-}
-
-.field textarea {
+.control-field textarea {
   resize: vertical;
   line-height: 1.45;
 }
 
-.field input:focus,
-.field textarea:focus,
-.field select:focus {
+.control-field input:focus,
+.control-field textarea:focus,
+.control-field select:focus,
+.total-input-block > input:focus {
   border-color: var(--navy);
-  box-shadow: 0 0 0 3px rgba(255, 209, 0, 0.4);
+  box-shadow: 0 0 0 3px rgba(255, 209, 0, 0.38);
 }
 
-.field select {
-  appearance: auto;
-  font-size: 14px;
-  font-weight: 850;
-}
-
-.style-row {
+.range-line {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 84px;
-  align-items: end;
-  gap: 12px;
-  padding: 12px;
-  border-top: 3px solid var(--navy);
-  background: var(--surface);
-}
-
-.field input[type="color"],
-.color-line input[type="color"] {
-  width: 48px;
-  height: 48px;
-  min-height: 48px;
-  padding: 4px;
-  border: 1px solid var(--line);
-  border-radius: 4px;
-  background: var(--white);
-  cursor: pointer;
-}
-
-.color-field input[type="color"] {
-  justify-self: start;
-}
-
-.color-line {
-  display: flex;
-  min-height: 62px;
+  grid-template-columns: minmax(0, 1fr) 54px;
   align-items: center;
-  justify-content: space-between;
-  padding: 7px 12px;
-  border-left: 4px solid var(--yellow);
-  background: var(--surface);
+  gap: 10px;
 }
 
-.color-line label {
+.range-line input {
+  width: 100%;
+  accent-color: var(--yellow-deep);
+}
+
+.range-line output {
+  color: var(--navy);
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 950;
+  text-align: right;
+}
+
+.two-column {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.action-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(110px, 0.56fr);
+  align-items: center;
+  gap: 10px;
+}
+
+.upload-button,
+.secondary-button {
+  display: flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border-radius: 4px;
   font-size: 12px;
   font-weight: 950;
 }
 
-.total-field {
-  padding: 14px;
+.upload-button {
+  position: relative;
+  color: var(--navy-deep);
+  background: var(--yellow);
+  overflow: hidden;
+}
+
+.upload-button input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.upload-button.is-disabled {
+  opacity: 0.42;
+  pointer-events: none;
+}
+
+.secondary-button {
+  border: 1px solid var(--navy);
+  color: var(--navy);
+  background: var(--white);
+}
+
+.upload-symbol,
+.download-symbol {
+  position: relative;
+  display: block;
+  width: 22px;
+  height: 22px;
+  border-bottom: 4px solid currentColor;
+}
+
+.upload-symbol::before,
+.download-symbol::before {
+  position: absolute;
+  left: 9px;
+  width: 4px;
+  height: 14px;
+  background: currentColor;
+  content: "";
+}
+
+.upload-symbol::before {
+  top: 1px;
+}
+
+.download-symbol::before {
+  top: 2px;
+}
+
+.upload-symbol::after,
+.download-symbol::after {
+  position: absolute;
+  left: 5px;
+  width: 10px;
+  height: 10px;
+  border-top: 4px solid currentColor;
+  border-left: 4px solid currentColor;
+  content: "";
+}
+
+.upload-symbol::after {
+  top: 0;
+  transform: rotate(45deg);
+}
+
+.download-symbol::after {
+  top: 6px;
+  transform: rotate(225deg);
+}
+
+.recognition-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 12px;
+  border-left: 4px solid var(--yellow);
+  background: var(--white);
+}
+
+.recognition-line > div {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.recognition-line strong {
+  color: var(--navy);
+  font-size: 12px;
+}
+
+.recognition-line span {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recognition-line button {
+  min-height: 32px;
+  flex: 0 0 auto;
+  padding: 0 10px;
+  border: 1px solid var(--navy);
+  border-radius: 3px;
+  color: var(--navy);
+  background: transparent;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.palette-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.palette-option {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  min-height: 47px;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--ink);
+  background: var(--white);
+  text-align: left;
+}
+
+.palette-option.is-active {
+  border-color: var(--navy);
+  box-shadow: inset 0 -3px 0 var(--yellow);
+}
+
+.palette-swatches {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  height: 29px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 3px;
+}
+
+.palette-option strong {
+  overflow: hidden;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.color-grid label {
+  display: grid;
+  gap: 6px;
+  padding: 9px;
+  border: 1px solid var(--line);
+  background: var(--white);
+}
+
+input[type="color"] {
+  width: 100%;
+  height: 36px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.total-input-block {
+  display: grid;
+  gap: 8px;
+  padding: 13px;
   color: var(--white);
   background: var(--navy);
   border-bottom: 4px solid var(--yellow);
 }
 
-.total-field .field-heading > label:first-child,
-.total-field .toggle-control span {
+.field-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.total-input-block .field-heading > label:first-child,
+.total-input-block .switch-control span {
   color: var(--white);
 }
 
-.total-field input {
-  min-height: 62px;
-  border-color: rgba(255, 255, 255, 0.28);
-  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
-  font-size: 34px;
-  font-weight: 950;
+.total-input-block > input {
+  min-height: 56px;
+  border-color: rgba(255, 255, 255, 0.3);
+  font-family: Impact, "Arial Black", sans-serif;
+  font-size: 30px;
 }
 
-.total-field input.is-auto {
+.total-input-block > input.is-auto {
   color: var(--navy-deep);
   background: var(--yellow);
 }
 
-.total-field small {
-  color: #b7c7d3;
-  font-size: 11px;
+.total-input-block small {
+  color: #b8c7d1;
+  font-size: 10px;
   font-weight: 800;
 }
 
-.toggle-control {
+.switch-row {
+  min-height: 52px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  background: var(--white);
+}
+
+.switch-control {
   position: relative;
-  display: inline-flex;
+  display: flex;
+  width: 100%;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
+  gap: 10px;
   cursor: pointer;
 }
 
-.toggle-control span {
-  color: var(--muted);
+.switch-control span {
+  color: var(--ink);
   font-size: 11px;
+  font-weight: 900;
 }
 
-.toggle-control input {
+.switch-control input {
   position: absolute;
   width: 1px;
   height: 1px;
-  min-height: 1px;
-  padding: 0;
-  border: 0;
   opacity: 0;
 }
 
-.toggle-control i {
+.switch-control i {
   position: relative;
   width: 42px;
   height: 24px;
+  flex: 0 0 42px;
   border-radius: 12px;
-  background: #9caab4;
-  transition: background 160ms ease;
+  background: #9ba8b1;
 }
 
-.toggle-control i::after {
+.switch-control i::after {
   position: absolute;
   top: 3px;
   left: 3px;
@@ -821,1820 +859,2193 @@ h1 {
   background: var(--white);
   box-shadow: 0 1px 4px rgba(0, 29, 55, 0.24);
   content: "";
-  transition: transform 160ms ease;
+  transition: transform 150ms ease;
 }
 
-.toggle-control input:checked + i {
+.switch-control input:checked + i {
   background: var(--yellow);
 }
 
-.toggle-control input:checked + i::after {
+.switch-control input:checked + i::after {
   background: var(--navy-deep);
   transform: translateX(18px);
 }
 
-.toggle-control input:focus-visible + i {
-  outline: 3px solid rgba(255, 209, 0, 0.42);
-  outline-offset: 2px;
-}
-
-.layer-toggle-field {
-  display: flex;
-  min-height: 52px;
-  align-items: center;
-  padding: 12px;
-  border: 1px solid var(--line);
-  border-radius: 4px;
-  background: var(--white);
-}
-
-.layer-toggle-field .toggle-control {
-  width: 100%;
-  justify-content: space-between;
-}
-
-.layer-toggle-field .toggle-control span {
-  color: var(--ink);
-  font-size: 12px;
-  font-weight: 950;
-}
-
-input[type="range"] {
-  padding: 0;
-  accent-color: var(--yellow-deep);
-}
-
-.range-row {
+.segmented-control {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 44px;
-  align-items: center;
-  gap: 10px;
-}
-
-.range-reset {
-  width: 44px;
-  height: 44px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding: 3px;
   border: 1px solid var(--navy);
-  border-radius: 50%;
-  color: var(--white);
-  background: var(--navy);
-  font-size: 22px;
-  font-weight: 900;
-  line-height: 1;
-}
-
-.field-grid,
-.font-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.sticker-panel {
-  display: grid;
-  gap: 12px;
-  padding: 14px 12px;
-  border-top: 3px solid var(--navy);
   background: var(--white);
 }
 
-.sticker-panel .field-heading strong {
-  color: var(--ink);
-  font-size: 12px;
+.segmented-control button {
+  min-height: 38px;
+  padding: 4px;
+  color: var(--navy);
+  background: transparent;
+  font-size: 10px;
+  font-weight: 950;
+  line-height: 1.15;
+  white-space: normal;
 }
 
-.sticker-panel .field-heading output {
-  color: var(--navy-soft);
-  font-family: "Arial Narrow", Arial, sans-serif;
-  font-size: 12px;
-  font-weight: 900;
-}
-
-.sticker-actions {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 48px;
-  gap: 10px;
-}
-
-.sticker-upload-button {
-  display: flex;
-  min-height: 48px;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  border: 1px solid var(--yellow);
-  border-radius: 4px;
+.segmented-control button.is-active {
   color: var(--navy-deep);
   background: var(--yellow);
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 950;
-}
-
-.sticker-upload-button input {
-  position: absolute;
-  inline-size: 1px;
-  block-size: 1px;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.sticker-upload-button.is-disabled {
-  cursor: default;
-  filter: grayscale(1);
-  opacity: 0.48;
-}
-
-.sticker-remove-button {
-  width: 48px;
-  height: 48px;
-  border: 1px solid var(--navy);
-  border-radius: 4px;
-  color: var(--white);
-  background: var(--navy);
-  font-family: Arial, sans-serif;
-  font-size: 28px;
-  font-weight: 900;
-  line-height: 1;
-}
-
-.sticker-remove-button:disabled {
-  cursor: default;
-  opacity: 0.35;
 }
 
 .sticker-list {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  min-height: 54px;
-  gap: 8px;
+  min-height: 62px;
+  gap: 7px;
 }
 
-.sticker-thumbnail {
+.sticker-item {
   position: relative;
+  aspect-ratio: 1;
   overflow: hidden;
-  min-width: 0;
-  aspect-ratio: 1 / 1;
-  border: 2px solid var(--line);
+  border: 2px solid transparent;
   border-radius: 4px;
-  padding: 4px;
-  background: var(--work);
+  padding: 0;
+  background: #dce2e6;
 }
 
-.sticker-thumbnail.is-active {
-  border-color: var(--navy);
-  box-shadow: inset 0 -5px 0 var(--yellow);
+.sticker-item.is-active {
+  border-color: var(--yellow-deep);
+  box-shadow: 0 0 0 2px var(--navy);
 }
 
-.sticker-thumbnail img {
-  display: block;
+.sticker-item img {
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
 
-.sticker-thumbnail span {
-  position: absolute;
-  top: 3px;
-  left: 3px;
+.danger-button {
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  background: var(--white);
+}
+
+.summary-actions {
   display: grid;
-  width: 18px;
-  height: 18px;
-  place-items: center;
-  border-radius: 50%;
-  color: var(--white);
-  background: var(--navy);
-  font-family: Arial, sans-serif;
-  font-size: 10px;
-  font-weight: 900;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
 }
 
-.photo-tools {
-  display: flex;
-  min-height: 68px;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 10px 12px;
-  color: var(--white);
-  background: var(--navy);
-  border-left: 4px solid var(--yellow);
-}
-
-.photo-tools div {
-  display: grid;
-  min-width: 0;
-  gap: 3px;
-}
-
-.photo-tools strong {
-  color: var(--white);
-  font-size: 13px;
-}
-
-.photo-tools span {
-  overflow-wrap: anywhere;
-  color: #a9bcc9;
+.summary-edit {
+  min-height: 42px;
+  border: 1px solid var(--navy);
+  color: var(--navy);
+  background: var(--white);
   font-size: 11px;
 }
 
-.photo-tools button {
-  flex: 0 0 auto;
-  min-height: 38px;
-  border-radius: 4px;
-  padding: 0 12px;
-  color: var(--navy-deep);
-  background: var(--yellow);
-  border: 1px solid var(--yellow);
-  font-size: 12px;
-  font-weight: 950;
+.download-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
-.photo-tools button:disabled {
-  cursor: default;
-  filter: grayscale(1);
-  opacity: 0.46;
+.wizard-nav {
+  display: grid;
+  grid-template-columns: minmax(105px, 0.42fr) minmax(0, 1fr);
+  gap: 9px;
+  padding: 9px 12px calc(9px + env(safe-area-inset-bottom));
+  background: var(--white);
+  border-top: 1px solid var(--line);
 }
 
-@media (max-width: 380px) {
-  .topbar {
-    gap: 10px;
-    padding-inline: 16px;
-  }
-
-  .brand-lockup {
-    gap: 9px;
-  }
-
-  .club-mark {
-    width: 27px;
-  }
-
-  .eyebrow {
-    font-size: 11px;
-  }
-
-  h1 {
-    font-size: 22px;
-  }
-
-  .top-actions {
-    gap: 6px;
-  }
-
-  .language-menu {
-    width: 54px;
-    height: 42px;
-    padding-inline: 5px;
-  }
-
-  .icon-button {
-    width: 42px;
-    height: 42px;
-  }
-
-  .tournament-strip {
-    padding-inline: 16px;
-  }
-
-  .poster-stage {
-    margin-inline: 12px;
-  }
-
-  .template-library {
-    padding-inline: 12px;
-  }
-
-  .primary-actions {
-    padding-inline: 12px;
-  }
-
-  .tab {
-    font-size: 11px;
-  }
-
-  .tab-panel.is-active {
-    padding-inline: 12px;
-  }
-
-  .font-grid {
-    grid-template-columns: 1fr;
-  }
+.back-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid var(--navy);
+  color: var(--navy);
+  background: var(--white);
 }
 
-@media (min-width: 700px) {
-  body {
-    padding-block: 24px;
-  }
+.back-button i {
+  width: 10px;
+  height: 10px;
+  border-bottom: 3px solid currentColor;
+  border-left: 3px solid currentColor;
+  transform: rotate(45deg);
+}
 
+.preview-modal {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 14px;
+}
+
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 10, 18, 0.82);
+}
+
+.preview-dialog {
+  position: relative;
+  display: grid;
+  width: min(100%, 460px);
+  height: min(92dvh, 760px);
+  grid-template-rows: 56px minmax(0, 1fr) auto;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 6px;
+  color: var(--white);
+  background: #151b20;
+  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.52);
+}
+
+.preview-dialog header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 10px 7px 13px;
+  background: var(--navy-deep);
+  border-bottom: 3px solid var(--yellow);
+}
+
+.preview-dialog h2 {
+  font-size: 15px;
+}
+
+.preview-dialog .primary-button {
+  margin: 10px;
+}
+
+.preview-dialog .close-icon {
+  color: var(--white);
+}
+
+@media (min-width: 720px) {
   .app-shell {
-    min-height: calc(100vh - 48px);
-    border: 1px solid rgba(0, 43, 80, 0.16);
+    border-right: 1px solid #2a343c;
+    border-left: 1px solid #2a343c;
   }
 }
-</style>
+
+@media (max-height: 680px) {
+  .editor-screen {
+    grid-template-rows: minmax(230px, 44%) minmax(0, 1fr) auto;
+  }
+
+  .preview-zone {
+    grid-template-rows: 40px minmax(0, 1fr) 22px;
+  }
+}
+
+    </style>
   </head>
   <body>
-    <main class="app-shell">
-      <section class="hero-panel" aria-label="海报预览" data-i18n-aria="posterPreview">
-        <div class="topbar">
-          <div class="brand-lockup">
-            <span class="club-mark" aria-hidden="true"></span>
-            <div>
-              <p class="eyebrow">GOLFBROTHERS</p>
-              <h1>POSTER STUDIO</h1>
-            </div>
-          </div>
-          <div class="top-actions">
-            <select id="languageSelect" class="language-menu" aria-label="界面语言" data-i18n-aria="languageLabel">
-              <option value="zh">中</option>
-              <option value="en">EN</option>
-            </select>
-            <button class="icon-button" id="resetPoster" type="button" aria-label="清空海报" title="清空海报" data-i18n-title="resetPoster">↻</button>
+    <main id="app" class="app-shell" data-step="template">
+      <header class="app-header">
+        <div class="brand-lockup">
+          <span class="brand-flag" aria-hidden="true"></span>
+          <div>
+            <strong>GOLFBROTHERS</strong>
+            <span>POSTER STUDIO</span>
           </div>
         </div>
-
-        <div class="tournament-strip">
-          <strong>GB INTERNATIONAL</strong>
-          <span>TOURNAMENT GRAPHICS / 01</span>
+        <div class="header-actions">
+          <select id="languageSelect" class="language-menu" aria-label="界面语言">
+            <option value="zh">中文</option>
+            <option value="en">EN</option>
+          </select>
+          <button id="resetPoster" class="icon-button reset-icon" type="button" aria-label="重置海报" title="重置海报"></button>
         </div>
+      </header>
 
-        <div class="template-library">
-          <div class="template-library__header">
-            <div>
-              <span class="section-kicker">01 / TEMPLATE</span>
-              <strong data-i18n="templateLibrary">选择模板</strong>
-            </div>
-          </div>
-          <div class="template-gallery" aria-label="海报模板" data-i18n-aria="templateLibrary">
-            <button class="template-option is-active" type="button" data-template="template1" aria-pressed="true">
-              <span class="template-art template-art--template1" aria-hidden="true">
-                <i class="template-art__score">68</i>
-                <i class="template-art__subject"></i>
-                <i class="template-art__table"></i>
-              </span>
-              <strong data-i18n="templateOne">模板 1</strong>
-            </button>
-            <button class="template-option" type="button" data-template="template2" aria-pressed="false">
-              <span class="template-art template-art--template2" aria-hidden="true">
-                <i class="template-art__score">62</i>
-                <i class="template-art__subject"></i>
-                <i class="template-art__table"></i>
-              </span>
-              <strong data-i18n="templateTwo">模板 2</strong>
-            </button>
-          </div>
+      <section id="templateScreen" class="template-screen">
+        <div class="template-intro">
+          <span class="step-index">01 / 07</span>
+          <h1 data-i18n="chooseTemplate">选择海报模板</h1>
+          <p data-i18n="chooseTemplateHint">点击模板可放大查看，选择后进入编辑。</p>
         </div>
-
-        <div class="poster-stage">
-          <canvas id="posterCanvas" class="is-layout-mode" width="1000" height="1265" aria-label="海报预览画布" data-i18n-aria="posterCanvas"></canvas>
-        </div>
-
-        <div class="primary-actions">
-          <label class="file-button">
-            <input id="photoInput" type="file" accept="image/*">
-            <span class="upload-icon" aria-hidden="true"></span>
-            <span data-i18n="uploadPhoto">上传照片</span>
-          </label>
-          <button id="downloadPoster" class="download-button" type="button">
-            <span class="download-icon" aria-hidden="true"></span>
-            <span data-i18n="downloadPoster">下载海报</span>
+        <div id="templateGallery" class="template-gallery" role="radiogroup" aria-label="海报模板"></div>
+        <footer class="template-footer">
+          <button id="templateNext" class="primary-button next-button" type="button" disabled>
+            <span data-i18n="next">下一步</span>
+            <i aria-hidden="true"></i>
           </button>
-        </div>
-        <p id="segmentationStatus" class="recognition-status" data-state="idle" aria-live="polite" data-i18n="statusIdle">上传照片后自动识别人像</p>
+        </footer>
       </section>
 
-      <section class="controls-panel" aria-label="海报编辑" data-i18n-aria="posterEditor">
-        <div class="tabs" role="tablist" aria-label="编辑项目" data-i18n-aria="editorSections">
-          <button class="tab is-active" type="button" data-tab="photo" role="tab" data-i18n="tabPhoto">图片</button>
-          <button class="tab" type="button" data-tab="scores" role="tab" data-i18n="tabScores">成绩表</button>
-          <button class="tab" type="button" data-tab="total" role="tab" data-i18n="tabTotal">总成绩</button>
-          <button class="tab" type="button" data-tab="profile" role="tab" data-i18n="tabProfile">昵称</button>
-          <button class="tab" type="button" data-tab="extra" role="tab" data-i18n="tabExtra">额外信息</button>
+      <section id="editorScreen" class="editor-screen" hidden>
+        <div class="preview-zone">
+          <div class="preview-toolbar">
+            <div>
+              <span id="stepCounter" class="step-index">02 / 07</span>
+              <strong id="stepTitle">调整照片</strong>
+            </div>
+            <button id="openPosterPreview" class="preview-button" type="button" data-i18n="preview">预览</button>
+          </div>
+          <div class="canvas-stage">
+            <canvas id="posterCanvas" width="1000" height="1265" aria-label="海报预览画布"></canvas>
+          </div>
+          <div id="gestureHint" class="gesture-hint" data-i18n="photoGesture">拖动移动照片，双指缩放</div>
         </div>
 
-        <div class="tab-panel" data-panel="profile">
-          <label class="field">
-            <span data-i18n="nickname">昵称</span>
-            <input id="nickname" type="text" value="" maxlength="18" autocomplete="off">
-          </label>
-          <div class="style-row">
-            <label class="field">
-              <div class="field-heading">
-                <span data-i18n="nicknameSize">昵称字号</span>
-                <output id="nicknameFontSizeValue" for="nicknameFontSize">34px</output>
+        <div id="controlScroller" class="control-scroller">
+          <section class="control-panel is-active" data-panel="photo">
+            <div class="panel-heading">
+              <span class="panel-number">02</span>
+              <div>
+                <h2 data-i18n="photoStep">照片</h2>
+                <p data-i18n="photoStepHint">当前画布手势仅调整照片。</p>
               </div>
-              <input id="nicknameFontSize" type="range" min="18" max="54" value="34">
-            </label>
-            <label class="field color-field">
-              <span data-i18n="nicknameColor">昵称颜色</span>
-              <input id="nicknameColor" type="color" value="#ffffff">
-            </label>
-          </div>
-          <label class="field">
-            <span data-i18n="club">球场信息 / 赛事名称</span>
-            <input id="club" type="text" value="" maxlength="26" autocomplete="off">
-          </label>
-          <div class="style-row">
-            <label class="field">
-              <div class="field-heading">
-                <span data-i18n="clubSize">赛事信息字号</span>
-                <output id="clubFontSizeValue" for="clubFontSize">34px</output>
+            </div>
+
+            <div class="action-row">
+              <label class="upload-button">
+                <input id="photoInput" type="file" accept="image/*">
+                <span class="upload-symbol" aria-hidden="true"></span>
+                <span data-i18n="uploadPhoto">上传照片</span>
+              </label>
+              <button id="resetPhoto" class="secondary-button" type="button" data-i18n="resetPhoto">复位画布</button>
+            </div>
+
+            <label class="control-field">
+              <span data-i18n="photoScale">照片大小</span>
+              <div class="range-line">
+                <input id="photoScale" type="range" min="80" max="260" value="100">
+                <output id="photoScaleValue">100%</output>
               </div>
-              <input id="clubFontSize" type="range" min="18" max="54" value="34">
             </label>
-            <label class="field color-field">
-              <span data-i18n="clubColor">赛事信息颜色</span>
-              <input id="clubColor" type="color" value="#ffffff">
-            </label>
-          </div>
-        </div>
 
-        <div class="tab-panel" data-panel="scores">
-          <label class="field">
-            <span data-i18n="scoreTable">成绩表</span>
-            <textarea id="scoreInput" rows="4" spellcheck="false" placeholder="输入最多 18 洞成绩，用空格或逗号分隔" data-i18n-placeholder="scorePlaceholder"></textarea>
-          </label>
-          <div class="field-grid">
-            <label class="field">
-              <span data-i18n="badge">圆形标记</span>
-              <input id="badgeText" type="text" value="" maxlength="2" inputmode="numeric">
+            <label class="control-field">
+              <span data-i18n="backgroundBlur">背景模糊</span>
+              <div class="range-line">
+                <input id="backgroundBlur" type="range" min="0" max="30" value="0">
+                <output id="backgroundBlurValue">0px</output>
+              </div>
             </label>
-            <label class="field">
-              <span data-i18n="highlightHoles">高亮洞号</span>
-              <input id="highlightInput" type="text" value="" placeholder="例如 3,6" inputmode="numeric" data-i18n-placeholder="highlightPlaceholder">
-            </label>
-          </div>
-          <div class="color-line">
-            <label for="scoreTableColor" data-i18n="scoreTableColor">成绩表颜色</label>
-            <input id="scoreTableColor" type="color" value="#006337">
-          </div>
-        </div>
 
-        <div class="tab-panel" data-panel="total">
-          <div class="field total-field">
-            <div class="field-heading">
-              <label for="totalScore" data-i18n="totalScore">总成绩</label>
-              <label class="toggle-control">
-                <span data-i18n="autoTotal">自动统计</span>
-                <input id="autoTotal" type="checkbox" role="switch" checked>
+            <div class="recognition-line">
+              <div>
+                <strong data-i18n="subjectDepth">人物景深</strong>
+                <span id="recognitionDetail" data-i18n="waitingPhoto">等待上传照片</span>
+              </div>
+              <button id="retrySegmentation" type="button" disabled data-i18n="retryRecognition">重新识别</button>
+            </div>
+          </section>
+
+          <section class="control-panel" data-panel="scorecard">
+            <div class="panel-heading">
+              <span class="panel-number">03</span>
+              <div>
+                <h2 data-i18n="scorecardStep">成绩卡</h2>
+                <p data-i18n="scorecardStepHint">当前画布手势仅调整成绩卡。</p>
+              </div>
+            </div>
+
+            <div class="control-field">
+              <span data-i18n="palette">模板配色</span>
+              <div id="paletteList" class="palette-list"></div>
+            </div>
+
+            <label class="control-field">
+              <span data-i18n="scores">逐洞成绩</span>
+              <textarea id="scoreInput" rows="3" spellcheck="false" placeholder="输入最多 18 洞成绩，用空格或逗号分隔"></textarea>
+            </label>
+
+            <div class="two-column">
+              <label class="control-field">
+                <span data-i18n="highlightHoles">高亮洞号</span>
+                <input id="highlightInput" type="text" inputmode="numeric" placeholder="3,6">
+              </label>
+              <label class="control-field">
+                <span data-i18n="badge">首洞标记</span>
+                <input id="badgeText" type="text" maxlength="2" inputmode="numeric">
+              </label>
+            </div>
+
+            <label class="control-field">
+              <span data-i18n="scoreFont">成绩字体</span>
+              <select id="scoreFont"></select>
+            </label>
+
+            <div class="color-grid">
+              <label>
+                <span data-i18n="cardColor">底板</span>
+                <input id="cardColor" type="color">
+              </label>
+              <label>
+                <span data-i18n="lineColor">分隔线</span>
+                <input id="lineColor" type="color">
+              </label>
+              <label>
+                <span data-i18n="scoreTextColor">数字</span>
+                <input id="scoreTextColor" type="color">
+              </label>
+            </div>
+
+            <label class="control-field">
+              <span data-i18n="scorecardScale">成绩卡大小</span>
+              <div class="range-line">
+                <input id="scorecardScale" type="range" min="55" max="180" value="100">
+                <output id="scorecardScaleValue">100%</output>
+              </div>
+            </label>
+          </section>
+
+          <section class="control-panel" data-panel="total">
+            <div class="panel-heading">
+              <span class="panel-number">04</span>
+              <div>
+                <h2 data-i18n="totalStep">总成绩</h2>
+                <p data-i18n="totalStepHint">当前画布手势仅调整总成绩。</p>
+              </div>
+            </div>
+
+            <div class="total-input-block">
+              <div class="field-heading">
+                <label for="totalScore" data-i18n="totalScore">总成绩</label>
+                <label class="switch-control">
+                  <span data-i18n="autoTotal">自动统计</span>
+                  <input id="autoTotal" type="checkbox" checked>
+                  <i aria-hidden="true"></i>
+                </label>
+              </div>
+              <input id="totalScore" type="text" maxlength="4" inputmode="numeric" readonly>
+              <small id="totalHint" data-i18n="totalHintEmpty">录入成绩后自动合计</small>
+            </div>
+
+            <label class="control-field">
+              <span data-i18n="numberFont">数字字体</span>
+              <select id="numberFont"></select>
+            </label>
+
+            <div class="two-column">
+              <label class="control-field">
+                <span data-i18n="totalColor">总成绩颜色</span>
+                <input id="totalColor" type="color">
+              </label>
+              <label class="control-field">
+                <span data-i18n="totalOpacity">透明度</span>
+                <div class="range-line">
+                  <input id="totalOpacity" type="range" min="35" max="100" value="90">
+                  <output id="totalOpacityValue">90%</output>
+                </div>
+              </label>
+            </div>
+
+            <label class="control-field">
+              <span data-i18n="totalSize">总成绩大小</span>
+              <div class="range-line">
+                <input id="totalSize" type="range" min="100" max="1600" value="500">
+                <output id="totalSizeValue">500px</output>
+              </div>
+            </label>
+
+            <div class="switch-row">
+              <label class="switch-control">
+                <span data-i18n="totalAboveSubject">总成绩置于人物上方</span>
+                <input id="totalAboveSubject" type="checkbox">
                 <i aria-hidden="true"></i>
               </label>
             </div>
-            <input id="totalScore" type="text" value="" maxlength="4" inputmode="numeric" readonly>
-            <small id="totalHint" data-i18n="totalHintEmpty">录入成绩后自动合计</small>
-          </div>
-          <div class="style-row">
-            <label class="field">
-              <div class="field-heading">
-                <span data-i18n="totalSize">总分字号</span>
-                <output id="totalFontSizeValue" for="totalFontSize">335px</output>
-              </div>
-              <input id="totalFontSize" type="range" min="160" max="1600" value="335">
-            </label>
-            <label class="field color-field">
-              <span data-i18n="totalColor">总分颜色</span>
-              <input id="totalColor" type="color" value="#083728">
-            </label>
-          </div>
-          <label class="field">
-            <span data-i18n="totalOpacity">总成绩透明度</span>
-            <input id="totalOpacity" type="range" min="45" max="95" value="88">
-          </label>
-          <label class="field">
-            <span data-i18n="totalHeight">总成绩高度</span>
-            <input id="totalY" type="range" min="-420" max="1500" value="300">
-          </label>
-          <div class="layer-toggle-field">
-            <label class="toggle-control">
-              <span data-i18n="totalAboveSubject">总成绩置于人物上方</span>
-              <input id="totalAboveSubject" type="checkbox" role="switch">
-              <i aria-hidden="true"></i>
-            </label>
-          </div>
-        </div>
+          </section>
 
-        <div class="tab-panel" data-panel="extra">
-          <label class="field">
-            <span data-i18n="extraInfo">额外信息</span>
-            <textarea id="extraInfo" rows="3" maxlength="56"></textarea>
-          </label>
-          <div class="style-row">
-            <label class="field">
-              <div class="field-heading">
-                <span data-i18n="extraSize">额外信息字号</span>
-                <output id="extraFontSizeValue" for="extraFontSize">21px</output>
+          <section class="control-panel" data-panel="identity">
+            <div class="panel-heading">
+              <span class="panel-number">05</span>
+              <div>
+                <h2 data-i18n="identityStep">文字信息</h2>
+                <p data-i18n="identityStepHint">选择一个文字元素后在画布中移动。</p>
               </div>
-              <input id="extraFontSize" type="range" min="14" max="36" value="21">
-            </label>
-            <label class="field color-field">
-              <span data-i18n="extraColor">信息颜色</span>
-              <input id="extraColor" type="color" value="#ffffff">
-            </label>
-          </div>
-          <div class="sticker-panel">
-            <div class="field-heading">
-              <strong data-i18n="stickers">贴纸</strong>
-              <output id="stickerCount">0/5</output>
             </div>
-            <div class="sticker-actions">
-              <label id="stickerUploadButton" class="sticker-upload-button">
+
+            <div class="segmented-control" role="group" aria-label="当前文字元素">
+              <button class="identity-target is-active" type="button" data-target="nickname" data-i18n="nickname">昵称</button>
+              <button class="identity-target" type="button" data-target="course" data-i18n="course">球场</button>
+              <button class="identity-target" type="button" data-target="date" data-i18n="date">日期</button>
+              <button class="identity-target" type="button" data-target="extra" data-i18n="extraInfo">补充信息</button>
+            </div>
+
+            <label class="control-field">
+              <span data-i18n="nickname">昵称</span>
+              <input id="nickname" type="text" maxlength="24" autocomplete="off">
+            </label>
+            <label class="control-field">
+              <span data-i18n="course">球场 / 赛事</span>
+              <input id="course" type="text" maxlength="40" autocomplete="off">
+            </label>
+            <label class="control-field">
+              <span data-i18n="date">日期</span>
+              <input id="dateInput" type="date">
+            </label>
+            <label class="control-field">
+              <span data-i18n="extraInfo">补充信息</span>
+              <input id="extraInfo" type="text" maxlength="48" autocomplete="off">
+            </label>
+
+            <label class="control-field">
+              <span data-i18n="textFont">文字字体</span>
+              <select id="textFont"></select>
+            </label>
+
+            <div class="two-column">
+              <label class="control-field">
+                <span data-i18n="textColor">文字颜色</span>
+                <input id="textColor" type="color">
+              </label>
+              <label class="control-field">
+                <span data-i18n="textSize">当前文字大小</span>
+                <div class="range-line">
+                  <input id="identitySize" type="range" min="12" max="100" value="38">
+                  <output id="identitySizeValue">38px</output>
+                </div>
+              </label>
+            </div>
+
+            <label class="control-field">
+              <span data-i18n="brandText">品牌文字</span>
+              <input id="brandText" type="text" value="GOLFBROTHERS" maxlength="24">
+            </label>
+          </section>
+
+          <section class="control-panel" data-panel="stickers">
+            <div class="panel-heading">
+              <span class="panel-number">06</span>
+              <div>
+                <h2 data-i18n="stickerStep">贴纸</h2>
+                <p data-i18n="stickerStepHint">上传后选择贴纸，在画布中移动或缩放。</p>
+              </div>
+            </div>
+
+            <div class="action-row">
+              <label id="stickerUploadButton" class="upload-button">
                 <input id="stickerInput" type="file" accept="image/*" multiple>
-                <span class="upload-icon" aria-hidden="true"></span>
+                <span class="upload-symbol" aria-hidden="true"></span>
                 <span data-i18n="uploadSticker">上传贴纸</span>
               </label>
-              <button id="removeSticker" class="sticker-remove-button" type="button" disabled title="删除选中贴纸" data-i18n-title="removeSticker">
-                <span aria-hidden="true">×</span>
-              </button>
+              <output id="stickerCount">0 / 5</output>
             </div>
-            <div id="stickerList" class="sticker-list" aria-label="贴纸列表" data-i18n-aria="stickerList"></div>
-            <label class="field">
-              <div class="field-heading">
-                <span data-i18n="stickerScale">贴纸大小</span>
-                <output id="stickerScaleValue" for="stickerScale">100%</output>
+
+            <div id="stickerList" class="sticker-list" aria-label="贴纸列表"></div>
+
+            <label class="control-field">
+              <span data-i18n="stickerScale">贴纸大小</span>
+              <div class="range-line">
+                <input id="stickerScale" type="range" min="10" max="260" value="100" disabled>
+                <output id="stickerScaleValue">100%</output>
               </div>
-              <input id="stickerScale" type="range" min="20" max="250" value="100" disabled>
             </label>
-          </div>
-          <label class="field">
-            <span data-i18n="brandText">品牌文字</span>
-            <input id="brandText" type="text" value="GOLFBROTHERS" maxlength="22" autocomplete="off">
-          </label>
-          <div class="font-grid">
-            <label class="field">
-              <span data-i18n="englishFont">英文字体</span>
-              <select id="englishFont">
-                <option value="arial">Arial</option>
-                <option value="impact">Impact</option>
-                <option value="arialBlack">Arial Black</option>
-                <option value="bebasNeue">Bebas Neue</option>
-                <option value="oswald">Oswald</option>
-                <option value="montserrat">Montserrat</option>
-                <option value="playfairDisplay">Playfair Display</option>
-                <option value="georgia">Georgia</option>
-                <option value="timesNewRoman">Times New Roman</option>
-                <option value="franklinGothic">Franklin Gothic Medium</option>
-                <option value="arialRounded">Arial Rounded MT Bold</option>
-                <option value="spaceMono">Space Mono</option>
-                <option value="courierNew">Courier New</option>
-              </select>
-            </label>
-            <label class="field">
-              <span data-i18n="numberFont">数字字体</span>
-              <select id="numberFont">
-                <option value="arialBlack">Arial Black</option>
-                <option value="impact">Impact</option>
-                <option value="bebasNeue">Bebas Neue</option>
-                <option value="oswald">Oswald</option>
-                <option value="montserrat">Montserrat</option>
-                <option value="playfairDisplay">Playfair Display</option>
-                <option value="georgia">Georgia</option>
-                <option value="timesNewRoman">Times New Roman</option>
-                <option value="spaceMono">Space Mono</option>
-                <option value="courierNew">Courier New</option>
-              </select>
-            </label>
-          </div>
+            <button id="removeSticker" class="danger-button" type="button" disabled data-i18n="removeSticker">删除选中贴纸</button>
+          </section>
+
+          <section class="control-panel summary-panel" data-panel="summary">
+            <div class="panel-heading">
+              <span class="panel-number">07</span>
+              <div>
+                <h2 data-i18n="summaryStep">完成海报</h2>
+                <p data-i18n="summaryStepHint">可直接跳回任意步骤修改，确认后自动返回这里。</p>
+              </div>
+            </div>
+
+            <div class="summary-actions">
+              <button class="summary-edit" type="button" data-edit-step="template" data-i18n="editTemplate">修改模板</button>
+              <button class="summary-edit" type="button" data-edit-step="photo" data-i18n="editPhoto">修改照片</button>
+              <button class="summary-edit" type="button" data-edit-step="scorecard" data-i18n="editScorecard">修改成绩卡</button>
+              <button class="summary-edit" type="button" data-edit-step="total" data-i18n="editTotal">修改总成绩</button>
+              <button class="summary-edit" type="button" data-edit-step="identity" data-i18n="editIdentity">修改文字</button>
+              <button class="summary-edit" type="button" data-edit-step="stickers" data-i18n="editStickers">修改贴纸</button>
+            </div>
+
+            <button id="downloadPoster" class="download-button" type="button">
+              <span class="download-symbol" aria-hidden="true"></span>
+              <span data-i18n="downloadPoster">下载完整海报</span>
+            </button>
+          </section>
         </div>
 
-        <div class="tab-panel is-active" data-panel="photo">
-          <div class="field">
-            <div class="field-heading">
-              <label for="zoomRange" data-i18n="backgroundSize">背景大小</label>
-              <output id="zoomValue" for="zoomRange">100%</output>
-            </div>
-            <div class="range-row">
-              <input id="zoomRange" type="range" min="80" max="220" value="100">
-              <button id="resetZoom" class="range-reset" type="button" aria-label="复位背景与海报元素" title="复位背景与海报元素" data-i18n-title="resetLayout">↺</button>
-            </div>
-          </div>
-          <label class="field">
-            <div class="field-heading">
-              <span data-i18n="backgroundBlur">背景模糊</span>
-              <output id="backgroundBlurValue" for="backgroundBlur">0px</output>
-            </div>
-            <input id="backgroundBlur" type="range" min="0" max="30" value="0">
-          </label>
-          <div class="photo-tools">
-            <div>
-              <strong data-i18n="subjectDepth">人物景深</strong>
-              <span id="recognitionDetail" data-i18n="waitingPhoto">等待上传照片</span>
-            </div>
-            <button id="retrySegmentation" type="button" disabled data-i18n="retryRecognition">重新识别</button>
-          </div>
-        </div>
+        <footer class="wizard-nav">
+          <button id="backButton" class="back-button" type="button">
+            <i aria-hidden="true"></i>
+            <span data-i18n="back">上一步</span>
+          </button>
+          <button id="nextButton" class="primary-button next-button" type="button">
+            <span data-i18n="next">下一步</span>
+            <i aria-hidden="true"></i>
+          </button>
+        </footer>
       </section>
     </main>
 
+    <div id="previewModal" class="preview-modal" hidden>
+      <button class="modal-backdrop" type="button" aria-label="关闭预览"></button>
+      <section class="preview-dialog" role="dialog" aria-modal="true" aria-labelledby="previewModalTitle">
+        <header>
+          <div>
+            <span class="step-index">GOLFBROTHERS</span>
+            <h2 id="previewModalTitle">模板预览</h2>
+          </div>
+          <button id="closePreviewModal" class="icon-button close-icon" type="button" aria-label="关闭"></button>
+        </header>
+        <div class="modal-canvas-stage">
+          <canvas id="modalCanvas" width="1000" height="1265"></canvas>
+        </div>
+        <button id="useTemplateButton" class="primary-button" type="button" data-i18n="useTemplate">选择此模板</button>
+      </section>
+    </div>
+
     <script>
-const canvas = document.getElementById("posterCanvas");
-const ctx = canvas.getContext("2d");
+const POSTER_WIDTH = 1000;
+const POSTER_HEIGHT = 1265;
+const BRAND_HEIGHT = 70;
+const MAX_STICKERS = 5;
 
-const elements = {
-  photoInput: document.getElementById("photoInput"),
-  languageSelect: document.getElementById("languageSelect"),
-  nickname: document.getElementById("nickname"),
-  nicknameFontSize: document.getElementById("nicknameFontSize"),
-  nicknameFontSizeValue: document.getElementById("nicknameFontSizeValue"),
-  nicknameColor: document.getElementById("nicknameColor"),
-  club: document.getElementById("club"),
-  clubFontSize: document.getElementById("clubFontSize"),
-  clubFontSizeValue: document.getElementById("clubFontSizeValue"),
-  clubColor: document.getElementById("clubColor"),
-  scoreInput: document.getElementById("scoreInput"),
-  badgeText: document.getElementById("badgeText"),
-  highlightInput: document.getElementById("highlightInput"),
-  scoreTableColor: document.getElementById("scoreTableColor"),
-  totalScore: document.getElementById("totalScore"),
-  totalFontSize: document.getElementById("totalFontSize"),
-  totalFontSizeValue: document.getElementById("totalFontSizeValue"),
-  totalColor: document.getElementById("totalColor"),
-  autoTotal: document.getElementById("autoTotal"),
-  totalHint: document.getElementById("totalHint"),
-  totalOpacity: document.getElementById("totalOpacity"),
-  totalY: document.getElementById("totalY"),
-  totalAboveSubject: document.getElementById("totalAboveSubject"),
-  extraInfo: document.getElementById("extraInfo"),
-  extraFontSize: document.getElementById("extraFontSize"),
-  extraFontSizeValue: document.getElementById("extraFontSizeValue"),
-  extraColor: document.getElementById("extraColor"),
-  stickerInput: document.getElementById("stickerInput"),
-  stickerUploadButton: document.getElementById("stickerUploadButton"),
-  stickerCount: document.getElementById("stickerCount"),
-  stickerList: document.getElementById("stickerList"),
-  stickerScale: document.getElementById("stickerScale"),
-  stickerScaleValue: document.getElementById("stickerScaleValue"),
-  removeSticker: document.getElementById("removeSticker"),
-  brandText: document.getElementById("brandText"),
-  englishFont: document.getElementById("englishFont"),
-  numberFont: document.getElementById("numberFont"),
-  zoomRange: document.getElementById("zoomRange"),
-  zoomValue: document.getElementById("zoomValue"),
-  backgroundBlur: document.getElementById("backgroundBlur"),
-  backgroundBlurValue: document.getElementById("backgroundBlurValue"),
-  resetZoom: document.getElementById("resetZoom"),
-  downloadPoster: document.getElementById("downloadPoster"),
-  resetPoster: document.getElementById("resetPoster"),
-  segmentationStatus: document.getElementById("segmentationStatus"),
-  recognitionDetail: document.getElementById("recognitionDetail"),
-  retrySegmentation: document.getElementById("retrySegmentation")
+const paletteCatalog = {
+  forestGold: {
+    zh: "松柏金",
+    en: "Forest Gold",
+    total: "#d8bd55",
+    card: "#15533a",
+    line: "#ead36d",
+    scoreText: "#ffffff",
+    text: "#ffffff"
+  },
+  roseMist: {
+    zh: "粉红淡灰",
+    en: "Rose Mist",
+    total: "#f28aa5",
+    card: "#77777d",
+    line: "#f7bccb",
+    scoreText: "#ffffff",
+    text: "#fff7f8"
+  },
+  sapphireTan: {
+    zh: "宝石蓝浅棕",
+    en: "Sapphire Tan",
+    total: "#1c5fa8",
+    card: "#b89568",
+    line: "#ead9bf",
+    scoreText: "#ffffff",
+    text: "#f8f2e9"
+  },
+  crimsonInk: {
+    zh: "赤红墨黑",
+    en: "Crimson Ink",
+    total: "#dc3f4d",
+    card: "#a92331",
+    line: "#f4dadd",
+    scoreText: "#ffffff",
+    text: "#ffffff"
+  },
+  mastersYellow: {
+    zh: "大师黄绿",
+    en: "Masters Yellow",
+    total: "#f4df3b",
+    card: "#24733f",
+    line: "#f4df3b",
+    scoreText: "#ffffff",
+    text: "#ffffff"
+  },
+  pineCoral: {
+    zh: "松绿珊瑚",
+    en: "Pine Coral",
+    total: "#f0eee8",
+    card: "#183a28",
+    line: "#ef5e68",
+    scoreText: "#f7f3ed",
+    text: "#ffffff"
+  },
+  navySilver: {
+    zh: "海军蓝银",
+    en: "Navy Silver",
+    total: "#e8edf0",
+    card: "#173b59",
+    line: "#b9c8d2",
+    scoreText: "#ffffff",
+    text: "#ffffff"
+  },
+  wineBlush: {
+    zh: "酒红浅粉",
+    en: "Wine Blush",
+    total: "#f3b5bd",
+    card: "#772d3b",
+    line: "#f1c9ce",
+    scoreText: "#ffffff",
+    text: "#fff7f7"
+  }
 };
 
-const posterSize = 1000;
-const topBarHeight = 70;
+const sharedBrand = { x: 0, y: 0, w: 1000, h: 70 };
+
 const posterTemplates = {
-  template1: {
-    preset: {
-      scoreTableColor: "#006337",
-      totalColor: "#083728",
-      nicknameColor: "#ffffff",
-      clubColor: "#ffffff",
-      extraColor: "#ffffff",
-      englishFont: "playfairDisplay",
-      numberFont: "playfairDisplay",
-      nicknameFontSize: "40",
-      clubFontSize: "22",
-      extraFontSize: "22",
-      totalFontSize: "500",
-      totalOpacity: "90"
-    },
+  academy: {
+    zh: "学院经典",
+    en: "Academy Classic",
+    descriptionZh: "通透网格与巨型总分",
+    descriptionEn: "Open grid and oversized total",
+    tone: "soft",
+    scoreStyle: "grid",
+    highlightShape: "mixed",
+    paletteIds: ["forestGold", "roseMist", "sapphireTan"],
+    defaults: { totalSize: 470, totalOpacity: 88, nicknameSize: 42, courseSize: 22, dateSize: 18 },
     layout: {
-      width: 1000,
-      height: 1265,
-      scoreDirection: "horizontal",
-      logoRegion: { x: 0, y: 0, w: 1000, h: 70 },
-      nicknameRegion: { x: 230, y: 115, w: 540, h: 60, align: "center" },
-      scoreBox: { x: 230, y: 190, w: 540, h: 200 },
-      infoRegion: { x: 230, y: 400, w: 540, h: 40, align: "center" },
-      totalRegion: { x: 60, y: 540, w: 880, h: 580 },
-      positions: {
-        total: { x: 500 },
-        nickname: { x: 500, y: 145 },
-        club: { x: 500, y: 420 }
-      },
-      totalY: 830
+      brand: sharedBrand,
+      total: { x: 100, y: 145, w: 800, h: 500 },
+      score: { x: 130, y: 640, w: 740, h: 190, direction: "horizontal" },
+      nickname: { x: 55, y: 855, w: 455, h: 68, align: "left", italic: true },
+      course: { x: 585, y: 850, w: 355, h: 72, align: "left" },
+      date: { x: 585, y: 925, w: 355, h: 34, align: "left" },
+      extra: { x: 55, y: 930, w: 455, h: 34, align: "left" },
+      subject: { x: 285, y: 345, w: 430, h: 810 }
     }
   },
-  template2: {
-    preset: {
-      scoreTableColor: "#173b2c",
-      totalColor: "#ffffff",
-      nicknameColor: "#ffffff",
-      clubColor: "#ffffff",
-      extraColor: "#ffffff",
-      englishFont: "playfairDisplay",
-      numberFont: "playfairDisplay",
-      nicknameFontSize: "40",
-      clubFontSize: "20",
-      extraFontSize: "20",
-      totalFontSize: "180",
-      totalOpacity: "92"
-    },
+  duo: {
+    zh: "冠军红场",
+    en: "Victory Red",
+    descriptionZh: "暗场照片与红色成绩板",
+    descriptionEn: "Dark photo with a red scorecard",
+    tone: "dark",
+    scoreStyle: "solid",
+    highlightShape: "circle",
+    paletteIds: ["crimsonInk", "roseMist", "sapphireTan"],
+    defaults: { totalSize: 500, totalOpacity: 92, nicknameSize: 38, courseSize: 18, dateSize: 18 },
     layout: {
-      width: 1000,
-      height: 1265,
-      scoreDirection: "vertical",
-      logoRegion: { x: 0, y: 0, w: 1000, h: 70 },
-      nicknameRegion: { x: 45, y: 150, w: 540, h: 60, align: "left" },
-      totalRegion: { x: 85, y: 235, w: 290, h: 200 },
-      scoreBox: { x: 85, y: 465, w: 290, h: 760 },
-      scoreDivider: { x: 227, y: 465, w: 6, h: 760 },
-      scoreColumns: [
-        { x: 130, y: 500, w: 82, h: 675 },
-        { x: 252, y: 500, w: 82, h: 675 }
-      ],
-      infoRegion: { x: 49, y: 465, w: 35, h: 750, align: "center", vertical: true },
-      positions: {
-        total: { x: 230 },
-        nickname: { x: 45, y: 180 },
-        club: { x: 66.5, y: 840 }
+      brand: sharedBrand,
+      total: { x: 110, y: 130, w: 780, h: 520 },
+      nickname: { x: 170, y: 865, w: 660, h: 62, align: "center", italic: true },
+      score: { x: 150, y: 945, w: 700, h: 190, direction: "horizontal" },
+      course: { x: 150, y: 1152, w: 500, h: 40, align: "left" },
+      date: { x: 665, y: 1152, w: 185, h: 40, align: "right" },
+      extra: { x: 150, y: 1205, w: 700, h: 30, align: "center" },
+      subject: { x: 90, y: 370, w: 820, h: 850 }
+    }
+  },
+  masters: {
+    zh: "大师赛黄标",
+    en: "Masters Mark",
+    descriptionZh: "顶部成绩板与黄色总分",
+    descriptionEn: "Top scorecard and yellow total",
+    tone: "natural",
+    scoreStyle: "solid",
+    highlightShape: "mixed",
+    paletteIds: ["mastersYellow", "sapphireTan", "roseMist"],
+    defaults: { totalSize: 610, totalOpacity: 86, nicknameSize: 42, courseSize: 20, dateSize: 18 },
+    layout: {
+      brand: sharedBrand,
+      nickname: { x: 230, y: 98, w: 540, h: 60, align: "center", italic: true },
+      score: { x: 230, y: 170, w: 540, h: 195, direction: "horizontal" },
+      course: { x: 230, y: 382, w: 390, h: 40, align: "left" },
+      date: { x: 635, y: 382, w: 135, h: 40, align: "right" },
+      extra: { x: 230, y: 425, w: 540, h: 34, align: "center" },
+      total: { x: 28, y: 500, w: 944, h: 650 },
+      subject: { x: 250, y: 470, w: 560, h: 735 }
+    }
+  },
+  sidebar: {
+    zh: "杂志侧栏",
+    en: "Editorial Sidebar",
+    descriptionZh: "右侧纵向成绩与赛事信息",
+    descriptionEn: "Vertical score and event sidebar",
+    tone: "editorial",
+    scoreStyle: "sidebar",
+    highlightShape: "circle",
+    paletteIds: ["pineCoral", "sapphireTan", "wineBlush"],
+    defaults: { totalSize: 230, totalOpacity: 96, nicknameSize: 38, courseSize: 17, dateSize: 17 },
+    layout: {
+      brand: sharedBrand,
+      nickname: { x: 605, y: 112, w: 350, h: 105, align: "center" },
+      total: { x: 620, y: 245, w: 320, h: 235 },
+      score: {
+        x: 635,
+        y: 500,
+        w: 255,
+        h: 650,
+        direction: "vertical",
+        dividerWidth: 4,
+        columns: [
+          { x: 650, y: 515, w: 95, h: 620 },
+          { x: 780, y: 515, w: 95, h: 620 }
+        ]
       },
-      totalY: 335
+      course: { x: 920, y: 500, w: 35, h: 650, align: "center", vertical: true },
+      extra: { x: 40, y: 1185, w: 550, h: 32, align: "left" },
+      subject: { x: 20, y: 330, w: 630, h: 865 }
+    }
+  },
+  client1: {
+    zh: "甲方模板 1",
+    en: "Client Template 1",
+    descriptionZh: "横向两行成绩卡",
+    descriptionEn: "Two-row horizontal scorecard",
+    tone: "standard",
+    scoreStyle: "solid",
+    highlightShape: "mixed",
+    paletteIds: ["forestGold", "sapphireTan", "roseMist"],
+    defaults: { totalSize: 500, totalOpacity: 90, nicknameSize: 40, courseSize: 22, dateSize: 18 },
+    layout: {
+      brand: sharedBrand,
+      nickname: { x: 230, y: 115, w: 540, h: 60, align: "center" },
+      score: { x: 230, y: 190, w: 540, h: 200, direction: "horizontal" },
+      course: { x: 230, y: 400, w: 540, h: 40, align: "center", combinesDate: true },
+      extra: { x: 230, y: 450, w: 540, h: 34, align: "center" },
+      total: { x: 60, y: 540, w: 880, h: 580 },
+      subject: { x: 215, y: 360, w: 570, h: 850 }
+    }
+  },
+  client2: {
+    zh: "甲方模板 2",
+    en: "Client Template 2",
+    descriptionZh: "左侧纵向成绩卡",
+    descriptionEn: "Left vertical scorecard",
+    tone: "editorial",
+    scoreStyle: "sidebar",
+    highlightShape: "circle",
+    paletteIds: ["pineCoral", "navySilver", "wineBlush"],
+    defaults: { totalSize: 180, totalOpacity: 92, nicknameSize: 40, courseSize: 20, dateSize: 18 },
+    layout: {
+      brand: sharedBrand,
+      nickname: { x: 45, y: 150, w: 540, h: 60, align: "left" },
+      total: { x: 85, y: 235, w: 290, h: 200 },
+      score: {
+        x: 85,
+        y: 465,
+        w: 290,
+        h: 760,
+        direction: "vertical",
+        dividerWidth: 6,
+        columns: [
+          { x: 130, y: 500, w: 82, h: 675 },
+          { x: 252, y: 500, w: 82, h: 675 }
+        ]
+      },
+      course: { x: 49, y: 465, w: 35, h: 750, align: "center", vertical: true, combinesDate: true },
+      extra: { x: 390, y: 1180, w: 560, h: 34, align: "right" },
+      subject: { x: 360, y: 280, w: 600, h: 910 }
     }
   }
 };
-let activePosterTemplate = "template1";
-const scoreBox = { ...posterTemplates.template1.layout.scoreBox };
-const fontStacks = {
-  english: {
-    arial: 'Arial, "Helvetica Neue", sans-serif',
-    impact: 'Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif',
-    arialBlack: '"Arial Black", Impact, sans-serif',
-    bebasNeue: '"Bebas Neue", Impact, "Arial Narrow", sans-serif',
-    oswald: 'Oswald, "Arial Narrow", Impact, sans-serif',
-    montserrat: 'Montserrat, "Helvetica Neue", Arial, sans-serif',
-    playfairDisplay: '"Playfair Display", Georgia, "Times New Roman", serif',
-    georgia: 'Georgia, "Times New Roman", serif',
-    timesNewRoman: '"Times New Roman", Times, serif',
-    franklinGothic: '"Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif',
-    arialRounded: '"Arial Rounded MT Bold", "Trebuchet MS", sans-serif',
-    spaceMono: '"Space Mono", Consolas, "Courier New", monospace',
-    courierNew: '"Courier New", Courier, monospace'
-  },
-  number: {
-    arialBlack: '"Arial Black", Impact, sans-serif',
-    impact: 'Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif',
-    bebasNeue: '"Bebas Neue", Impact, "Arial Narrow", sans-serif',
-    oswald: 'Oswald, "Arial Narrow", Impact, sans-serif',
-    montserrat: 'Montserrat, "Helvetica Neue", Arial, sans-serif',
-    playfairDisplay: '"Playfair Display", Georgia, "Times New Roman", serif',
-    georgia: 'Georgia, "Times New Roman", serif',
-    timesNewRoman: '"Times New Roman", Times, serif',
-    spaceMono: '"Space Mono", Consolas, "Courier New", monospace',
-    courierNew: '"Courier New", Courier, monospace'
-  }
-};
+
+const fontOptions = [
+  { id: "arial", label: "Arial", stack: 'Arial, "Helvetica Neue", sans-serif' },
+  { id: "arialBlack", label: "Arial Black", stack: '"Arial Black", Impact, sans-serif' },
+  { id: "impact", label: "Impact", stack: 'Impact, "Arial Narrow Bold", sans-serif' },
+  { id: "georgia", label: "Georgia", stack: 'Georgia, "Times New Roman", serif' },
+  { id: "times", label: "Times New Roman", stack: '"Times New Roman", Times, serif' },
+  { id: "baskerville", label: "Baskerville", stack: 'Baskerville, Georgia, serif' },
+  { id: "didot", label: "Didot", stack: 'Didot, "Times New Roman", serif' },
+  { id: "trebuchet", label: "Trebuchet MS", stack: '"Trebuchet MS", Arial, sans-serif' },
+  { id: "verdana", label: "Verdana", stack: 'Verdana, Geneva, sans-serif' },
+  { id: "courier", label: "Courier New", stack: '"Courier New", Courier, monospace' }
+];
+
 const translations = {
   zh: {
-    pageTitle: "GOLFBROTHERS 海报工作室",
-    pageDescription: "上传照片并生成可下载的高尔夫成绩海报",
-    languageLabel: "界面语言",
-    posterPreview: "海报预览",
-    posterCanvas: "海报预览画布",
-    posterEditor: "海报编辑",
-    editorSections: "编辑项目",
-    resetPoster: "清空海报",
-    templateLibrary: "选择模板",
-    templateOne: "模板 1",
-    templateTwo: "模板 2",
+    chooseTemplate: "选择海报模板",
+    chooseTemplateHint: "点击模板可放大查看，选择后进入编辑。",
+    next: "下一步",
+    back: "上一步",
+    confirmChange: "确认修改",
+    preview: "预览",
+    useTemplate: "选择此模板",
+    templatePreview: "模板预览",
+    posterPreview: "完整海报预览",
+    photoStep: "照片",
+    photoStepHint: "当前画布手势仅调整照片。",
     uploadPhoto: "上传照片",
-    downloadPoster: "下载海报",
-    statusIdle: "上传照片后自动识别人像",
-    statusLoading: "正在自动识别人像…",
-    statusPerson: "已识别人像，总成绩将置于人物后方",
-    statusFallback: "未识别到人物，总成绩将直接覆盖照片",
-    tabProfile: "昵称",
-    tabScores: "成绩表",
-    tabTotal: "总成绩",
-    tabExtra: "额外信息",
-    tabPhoto: "图片",
-    nickname: "昵称",
-    nicknameSize: "昵称字号",
-    nicknameColor: "昵称颜色",
-    club: "球场信息 / 赛事名称",
-    clubSize: "赛事信息字号",
-    clubColor: "赛事信息颜色",
-    scoreTable: "成绩表",
-    scorePlaceholder: "输入最多 18 洞成绩，用空格或逗号分隔",
-    badge: "圆形标记",
+    resetPhoto: "复位画布",
+    photoScale: "照片大小",
+    backgroundBlur: "背景模糊",
+    subjectDepth: "人物景深",
+    waitingPhoto: "等待上传照片",
+    analyzingPhoto: "正在识别人物主体",
+    personDetected: "人物已识别，可形成前后图层",
+    noPerson: "未识别到人物，按普通照片生成",
+    retryRecognition: "重新识别",
+    scorecardStep: "成绩卡",
+    scorecardStepHint: "当前画布手势仅调整成绩卡。",
+    palette: "模板配色",
+    scores: "逐洞成绩",
     highlightHoles: "高亮洞号",
-    highlightPlaceholder: "例如 3,6",
-    scoreTableColor: "成绩表颜色",
+    badge: "首洞标记",
+    scoreFont: "成绩字体",
+    cardColor: "底板",
+    lineColor: "分隔线",
+    scoreTextColor: "数字",
+    scorecardScale: "成绩卡大小",
+    totalStep: "总成绩",
+    totalStepHint: "当前画布手势仅调整总成绩。",
     totalScore: "总成绩",
     autoTotal: "自动统计",
     totalHintEmpty: "录入成绩后自动合计",
     totalHintManual: "自动统计已关闭，可手动输入",
     totalHintCount: "已统计 {count} 洞",
-    totalSize: "总分字号",
-    totalColor: "总分颜色",
-    totalOpacity: "总成绩透明度",
-    totalHeight: "总成绩高度",
-    totalAboveSubject: "总成绩置于人物上方",
-    extraInfo: "额外信息",
-    extraSize: "额外信息字号",
-    extraColor: "信息颜色",
-    stickers: "贴纸",
-    uploadSticker: "上传贴纸",
-    removeSticker: "删除选中贴纸",
-    stickerList: "贴纸列表",
-    stickerScale: "贴纸大小",
-    stickerItem: "贴纸 {index}",
-    brandText: "品牌文字",
-    englishFont: "英文字体",
     numberFont: "数字字体",
-    backgroundSize: "背景大小",
-    resetLayout: "复位背景与海报元素",
-    backgroundBlur: "背景模糊",
-    subjectDepth: "人物景深",
-    waitingPhoto: "等待上传照片",
-    retryRecognition: "重新识别",
-    analyzingPhoto: "正在分析照片中的人物主体",
-    personRatio: "人物占画面约 {percent}%，可切换总成绩前后层级",
-    noClearPerson: "画面中没有足够清晰的人物主体",
-    recognitionUnavailable: "自动识别不可用，已切换为普通叠加"
+    totalColor: "总成绩颜色",
+    totalOpacity: "透明度",
+    totalSize: "总成绩大小",
+    totalAboveSubject: "总成绩置于人物上方",
+    identityStep: "文字信息",
+    identityStepHint: "选择一个文字元素后在画布中移动。",
+    nickname: "昵称",
+    course: "球场",
+    date: "日期",
+    extraInfo: "补充信息",
+    textFont: "文字字体",
+    textColor: "文字颜色",
+    textSize: "当前文字大小",
+    brandText: "品牌文字",
+    stickerStep: "贴纸",
+    stickerStepHint: "上传后选择贴纸，在画布中移动或缩放。",
+    uploadSticker: "上传贴纸",
+    stickerScale: "贴纸大小",
+    removeSticker: "删除选中贴纸",
+    summaryStep: "完成海报",
+    summaryStepHint: "可直接跳回任意步骤修改，确认后自动返回这里。",
+    editTemplate: "修改模板",
+    editPhoto: "修改照片",
+    editScorecard: "修改成绩卡",
+    editTotal: "修改总成绩",
+    editIdentity: "修改文字",
+    editStickers: "修改贴纸",
+    downloadPoster: "下载完整海报",
+    photoGesture: "拖动移动照片，双指缩放",
+    scorecardGesture: "拖动移动成绩卡，双指缩放",
+    totalGesture: "拖动移动总成绩，双指缩放",
+    identityGesture: "拖动移动当前文字，双指缩放",
+    stickerGesture: "拖动移动选中贴纸，双指缩放",
+    summaryGesture: "完整预览",
+    selectTemplateFirst: "请先选择模板"
   },
   en: {
-    pageTitle: "GOLFBROTHERS Poster Studio",
-    pageDescription: "Upload a photo and create a downloadable golf score poster",
-    languageLabel: "Interface language",
-    posterPreview: "Poster preview",
-    posterCanvas: "Poster preview canvas",
-    posterEditor: "Poster editor",
-    editorSections: "Editor sections",
-    resetPoster: "Clear poster",
-    templateLibrary: "Choose template",
-    templateOne: "Template 1",
-    templateTwo: "Template 2",
+    chooseTemplate: "Choose a poster template",
+    chooseTemplateHint: "Tap a template to inspect it, then continue.",
+    next: "NEXT",
+    back: "BACK",
+    confirmChange: "CONFIRM",
+    preview: "PREVIEW",
+    useTemplate: "USE TEMPLATE",
+    templatePreview: "Template preview",
+    posterPreview: "Full poster preview",
+    photoStep: "Photo",
+    photoStepHint: "Canvas gestures adjust only the photo.",
     uploadPhoto: "UPLOAD PHOTO",
-    downloadPoster: "DOWNLOAD",
-    statusIdle: "Upload a photo to detect the subject",
-    statusLoading: "Detecting subject…",
-    statusPerson: "Subject detected; total score will sit behind the player",
-    statusFallback: "No subject detected; total score will overlay the photo",
-    tabProfile: "PLAYER",
-    tabScores: "SCORES",
-    tabTotal: "TOTAL",
-    tabExtra: "DETAILS",
-    tabPhoto: "IMAGE",
-    nickname: "Player name",
-    nicknameSize: "Name size",
-    nicknameColor: "Name color",
-    club: "Course / event",
-    clubSize: "Info size",
-    clubColor: "Info color",
-    scoreTable: "Scorecard",
-    scorePlaceholder: "Enter up to 18 scores, separated by spaces or commas",
-    badge: "Round badge",
-    highlightHoles: "Highlight holes",
-    highlightPlaceholder: "e.g. 3,6",
-    scoreTableColor: "Scorecard color",
-    totalScore: "Total score",
-    autoTotal: "Auto total",
-    totalHintEmpty: "Scores will be totaled automatically",
-    totalHintManual: "Auto total is off; enter a total manually",
-    totalHintCount: "{count} holes counted",
-    totalSize: "Total size",
-    totalColor: "Total color",
-    totalOpacity: "Total opacity",
-    totalHeight: "Total position",
-    totalAboveSubject: "Total above player",
-    extraInfo: "Additional info",
-    extraSize: "Info size",
-    extraColor: "Info color",
-    stickers: "Stickers",
-    uploadSticker: "UPLOAD STICKER",
-    removeSticker: "Remove selected sticker",
-    stickerList: "Sticker list",
-    stickerScale: "Sticker size",
-    stickerItem: "Sticker {index}",
-    brandText: "Brand text",
-    englishFont: "Text font",
-    numberFont: "Number font",
-    backgroundSize: "Background size",
-    resetLayout: "Reset background and poster elements",
+    resetPhoto: "RESET LAYOUT",
+    photoScale: "Photo size",
     backgroundBlur: "Background blur",
     subjectDepth: "Subject depth",
     waitingPhoto: "Waiting for a photo",
+    analyzingPhoto: "Detecting the subject",
+    personDetected: "Subject detected; depth layers are available",
+    noPerson: "No subject detected; using the full photo",
     retryRecognition: "RETRY",
-    analyzingPhoto: "Analyzing the subject in this photo",
-    personRatio: "Subject covers about {percent}% of the frame; total layer can be switched",
-    noClearPerson: "No clear person was found in the frame",
-    recognitionUnavailable: "Subject detection unavailable; using standard overlay"
+    scorecardStep: "Scorecard",
+    scorecardStepHint: "Canvas gestures adjust only the scorecard.",
+    palette: "Template palette",
+    scores: "Hole scores",
+    highlightHoles: "Highlight holes",
+    badge: "First-hole badge",
+    scoreFont: "Score font",
+    cardColor: "Board",
+    lineColor: "Rules",
+    scoreTextColor: "Numbers",
+    scorecardScale: "Scorecard size",
+    totalStep: "Total",
+    totalStepHint: "Canvas gestures adjust only the total.",
+    totalScore: "Total score",
+    autoTotal: "Auto total",
+    totalHintEmpty: "Scores will be totaled automatically",
+    totalHintManual: "Auto total is off; enter a value",
+    totalHintCount: "{count} holes counted",
+    numberFont: "Number font",
+    totalColor: "Total color",
+    totalOpacity: "Opacity",
+    totalSize: "Total size",
+    totalAboveSubject: "Total above player",
+    identityStep: "Text",
+    identityStepHint: "Choose one text element, then move it on canvas.",
+    nickname: "Name",
+    course: "Course",
+    date: "Date",
+    extraInfo: "Additional info",
+    textFont: "Text font",
+    textColor: "Text color",
+    textSize: "Active text size",
+    brandText: "Brand text",
+    stickerStep: "Stickers",
+    stickerStepHint: "Select a sticker, then move or scale it on canvas.",
+    uploadSticker: "UPLOAD STICKER",
+    stickerScale: "Sticker size",
+    removeSticker: "REMOVE STICKER",
+    summaryStep: "Poster complete",
+    summaryStepHint: "Jump directly to any step; confirm to return here.",
+    editTemplate: "EDIT TEMPLATE",
+    editPhoto: "EDIT PHOTO",
+    editScorecard: "EDIT SCORECARD",
+    editTotal: "EDIT TOTAL",
+    editIdentity: "EDIT TEXT",
+    editStickers: "EDIT STICKERS",
+    downloadPoster: "DOWNLOAD POSTER",
+    photoGesture: "Drag to move photo; pinch to scale",
+    scorecardGesture: "Drag to move scorecard; pinch to scale",
+    totalGesture: "Drag to move total; pinch to scale",
+    identityGesture: "Drag active text; pinch to scale",
+    stickerGesture: "Drag selected sticker; pinch to scale",
+    summaryGesture: "Full preview",
+    selectTemplateFirst: "Choose a template first"
   }
 };
-const emptyValues = {
-  nickname: "",
-  club: "",
-  scoreInput: "",
-  badgeText: "",
-  highlightInput: "",
-  totalScore: "",
-  extraInfo: ""
+
+const stepOrder = ["template", "photo", "scorecard", "total", "identity", "stickers", "summary"];
+const editorStepTitles = {
+  photo: "photoStep",
+  scorecard: "scorecardStep",
+  total: "totalStep",
+  identity: "identityStep",
+  stickers: "stickerStep",
+  summary: "summaryStep"
+};
+const gestureKeys = {
+  photo: "photoGesture",
+  scorecard: "scorecardGesture",
+  total: "totalGesture",
+  identity: "identityGesture",
+  stickers: "stickerGesture",
+  summary: "summaryGesture"
 };
 
-let uploadedImage = null;
-let subjectMaskSource = null;
-let segmentationState = "idle";
+const elements = Object.fromEntries(
+  [
+    "app", "languageSelect", "resetPoster", "templateScreen", "templateGallery",
+    "templateNext", "editorScreen", "stepCounter", "stepTitle", "openPosterPreview",
+    "posterCanvas", "gestureHint", "controlScroller", "photoInput", "resetPhoto",
+    "photoScale", "photoScaleValue", "backgroundBlur", "backgroundBlurValue",
+    "recognitionDetail", "retrySegmentation", "paletteList", "scoreInput",
+    "highlightInput", "badgeText", "scoreFont", "cardColor", "lineColor",
+    "scoreTextColor", "scorecardScale", "scorecardScaleValue", "totalScore",
+    "autoTotal", "totalHint", "numberFont", "totalColor", "totalOpacity",
+    "totalOpacityValue", "totalSize", "totalSizeValue", "totalAboveSubject",
+    "nickname", "course", "dateInput", "extraInfo", "textFont", "textColor",
+    "identitySize", "identitySizeValue", "brandText", "stickerUploadButton",
+    "stickerInput", "stickerCount", "stickerList", "stickerScale",
+    "stickerScaleValue", "removeSticker", "downloadPoster", "backButton",
+    "nextButton", "previewModal", "closePreviewModal", "previewModalTitle",
+    "modalCanvas", "useTemplateButton"
+  ].map((id) => [id, document.getElementById(id)])
+);
+
+const canvas = elements.posterCanvas;
+const ctx = canvas.getContext("2d");
+const modalCtx = elements.modalCanvas.getContext("2d");
+
+let language = "zh";
+let selectedTemplateId = null;
+let currentStep = "template";
+let returnToSummary = false;
+let activeIdentityTarget = "nickname";
+let modalMode = "template";
+let modalTemplateId = null;
+let state = createModel("academy", false);
+let stickerIdCounter = 0;
 let segmentationToken = 0;
 let selfieSegmenter = null;
 let segmentationLibraryPromise = null;
 let pendingSegmentationResolve = null;
 let segmentationQueue = Promise.resolve();
-let dragState = null;
-let elementDragState = null;
-let selectedElement = null;
-let activeEditorTab = "photo";
-let currentLanguage = "zh";
-let recognitionDetailState = { key: "waitingPhoto", params: {} };
-let elementPositions = createDefaultElementPositions();
-const elementBounds = {};
-const maxStickerCount = 5;
-let stickers = [];
-let selectedStickerId = null;
-let stickerIdCounter = 0;
-let stickerLoadToken = 0;
-let imageState = {
-  scale: 1,
-  offsetX: 0,
-  offsetY: 0
-};
+let gestureTarget = null;
+const activePointers = new Map();
+let lastGestureCenter = null;
+let lastGestureDistance = 0;
 
-function getActiveTemplate() {
-  return posterTemplates[activePosterTemplate] || posterTemplates.template1;
+function translate(key, params = {}) {
+  const dictionary = translations[language] || translations.zh;
+  let text = dictionary[key] || translations.zh[key] || key;
+  Object.entries(params).forEach(([name, value]) => {
+    text = text.split(`{${name}}`).join(String(value));
+  });
+  return text;
 }
 
-function getActiveLayout() {
-  return getActiveTemplate().layout;
+function templateName(template) {
+  return language === "en" ? template.en : template.zh;
 }
 
-function createDefaultElementPositions() {
-  const positions = getActiveLayout().positions;
-  return Object.fromEntries(
-    Object.entries(positions).map(([key, value]) => [key, { ...value }])
-  );
+function templateDescription(template) {
+  return language === "en" ? template.descriptionEn : template.descriptionZh;
 }
 
-function resetElementPositions() {
-  const layout = getActiveLayout();
-  elementPositions = createDefaultElementPositions();
-  Object.assign(scoreBox, layout.scoreBox);
-  elements.totalY.value = String(layout.totalY);
-  elements.totalY.min = "-420";
-  elements.totalY.max = String(layout.height + 420);
-  selectedElement = null;
+function paletteName(palette) {
+  return language === "en" ? palette.en : palette.zh;
 }
 
-function stickerElementKey(id) {
-  return `sticker:${id}`;
+function fontStack(id) {
+  return fontOptions.find((font) => font.id === id)?.stack || fontOptions[0].stack;
 }
 
-function getStickerById(id) {
-  return stickers.find((sticker) => sticker.id === id) || null;
+function centerOf(region) {
+  return { x: region.x + region.w / 2, y: region.y + region.h / 2 };
 }
 
-function getStickerFromElementKey(key) {
-  if (!key || !key.startsWith("sticker:")) {
-    return null;
-  }
-  return getStickerById(key.slice("sticker:".length));
-}
-
-function getStickerBounds(sticker) {
-  const width = sticker.baseWidth * sticker.scale;
-  const height = sticker.baseHeight * sticker.scale;
+function createModel(templateId, sample) {
+  const template = posterTemplates[templateId];
+  const paletteId = template.paletteIds[0];
+  const palette = paletteCatalog[paletteId];
+  const nickname = centerOf(template.layout.nickname);
+  const course = centerOf(template.layout.course);
+  const date = template.layout.date ? centerOf(template.layout.date) : centerOf(template.layout.course);
+  const extra = centerOf(template.layout.extra);
+  const total = centerOf(template.layout.total);
+  const scorecard = centerOf(template.layout.score);
   return {
-    x: sticker.x - width / 2,
-    y: sticker.y - height / 2,
-    w: width,
-    h: height
+    templateId,
+    photo: null,
+    subjectMask: null,
+    segmentationState: "idle",
+    image: { scale: 1, x: 0, y: 0, blur: 0 },
+    scores: sample ? ["4", "4", "5", "3", "4", "3", "4", "4", "5", "4", "3", "4", "4", "4", "3", "4", "3", "5"] : Array(18).fill(""),
+    highlights: sample ? new Set([3, 6, 14]) : new Set(),
+    badge: "",
+    autoTotal: true,
+    total: {
+      value: sample ? (templateId === "duo" ? "61" : templateId === "masters" ? "66" : "67") : "",
+      x: total.x,
+      y: total.y,
+      size: template.defaults.totalSize,
+      opacity: template.defaults.totalOpacity,
+      aboveSubject: false
+    },
+    scorecard: { x: scorecard.x, y: scorecard.y, scale: 1 },
+    identity: {
+      nickname: {
+        value: sample ? (templateId === "duo" ? "PLAYER ONE & PLAYER TWO" : "PLAYER NAME") : "",
+        x: nickname.x,
+        y: nickname.y,
+        size: template.defaults.nicknameSize,
+        color: palette.text,
+        font: "georgia"
+      },
+      course: {
+        value: sample ? "GOLF CLUB / CHAMPIONSHIP" : "",
+        x: course.x,
+        y: course.y,
+        size: template.defaults.courseSize,
+        color: palette.text,
+        font: "georgia"
+      },
+      date: {
+        value: sample ? "2026.07.29" : "",
+        x: date.x,
+        y: date.y,
+        size: template.defaults.dateSize,
+        color: palette.text,
+        font: "georgia"
+      },
+      extra: {
+        value: sample ? "ROUND ONE" : "",
+        x: extra.x,
+        y: extra.y,
+        size: template.defaults.dateSize,
+        color: palette.text,
+        font: "georgia"
+      },
+      brand: "GOLFBROTHERS"
+    },
+    paletteId,
+    style: {
+      total: palette.total,
+      card: palette.card,
+      line: palette.line,
+      scoreText: palette.scoreText,
+      text: palette.text
+    },
+    fonts: {
+      score: templateId === "client1" ? "arialBlack" : "georgia",
+      total: templateId === "client1" ? "arialBlack" : "georgia"
+    },
+    stickers: [],
+    selectedStickerId: null,
+    previewSubject: sample
   };
 }
 
-function setStickerDefaultPosition(sticker, index) {
-  const offset = (index - 2) * 28;
-  sticker.x = posterSize / 2 + offset;
-  sticker.y = getPosterHeight() * 0.52 + (index % 2) * 26;
-  sticker.scale = 1;
+function preserveContent(next, previous) {
+  next.photo = previous.photo;
+  next.subjectMask = previous.subjectMask;
+  next.segmentationState = previous.segmentationState;
+  next.image = { ...previous.image };
+  next.scores = [...previous.scores];
+  next.highlights = new Set(previous.highlights);
+  next.badge = previous.badge;
+  next.autoTotal = previous.autoTotal;
+  next.total.value = previous.total.value;
+  next.total.aboveSubject = previous.total.aboveSubject;
+  next.identity.nickname.value = previous.identity.nickname.value;
+  next.identity.course.value = previous.identity.course.value;
+  next.identity.date.value = previous.identity.date.value;
+  next.identity.extra.value = previous.identity.extra.value;
+  next.identity.brand = previous.identity.brand;
+  next.stickers = previous.stickers.map((sticker) => ({ ...sticker }));
+  next.selectedStickerId = previous.selectedStickerId;
+  return next;
 }
 
-function resetStickerPositions() {
-  stickers.forEach((sticker, index) => setStickerDefaultPosition(sticker, index));
-  updateStickerControls();
+function activateTemplate(templateId, preserve = true) {
+  const next = createModel(templateId, false);
+  state = preserve ? preserveContent(next, state) : next;
+  selectedTemplateId = templateId;
+  if (activeIdentityTarget === "date" && !posterTemplates[templateId].layout.date) {
+    activeIdentityTarget = "course";
+  }
+  syncAllControls();
+  renderTemplateGallery();
+  renderMain();
+}
+
+function applyPalette(paletteId) {
+  const palette = paletteCatalog[paletteId];
+  if (!palette) return;
+  state.paletteId = paletteId;
+  state.style = {
+    total: palette.total,
+    card: palette.card,
+    line: palette.line,
+    scoreText: palette.scoreText,
+    text: palette.text
+  };
+  ["nickname", "course", "date", "extra"].forEach((key) => {
+    state.identity[key].color = palette.text;
+  });
+  syncColorControls();
+  renderPaletteList();
+  renderMain();
+}
+
+function populateFontSelect(select) {
+  select.innerHTML = "";
+  fontOptions.forEach((font) => {
+    const option = document.createElement("option");
+    option.value = font.id;
+    option.textContent = font.label;
+    select.appendChild(option);
+  });
+}
+
+function renderTemplateGallery() {
+  elements.templateGallery.innerHTML = "";
+  Object.entries(posterTemplates).forEach(([id, template]) => {
+    const button = document.createElement("button");
+    button.className = "template-card";
+    button.type = "button";
+    button.dataset.templateId = id;
+    button.setAttribute("role", "radio");
+    button.setAttribute("aria-checked", String(selectedTemplateId === id));
+
+    const thumb = document.createElement("canvas");
+    thumb.width = 260;
+    thumb.height = Math.round(260 * POSTER_HEIGHT / POSTER_WIDTH);
+    thumb.setAttribute("aria-hidden", "true");
+
+    const meta = document.createElement("span");
+    meta.className = "template-card__meta";
+    const name = document.createElement("strong");
+    name.textContent = templateName(template);
+    const description = document.createElement("span");
+    description.textContent = templateDescription(template);
+    meta.append(name, description);
+
+    const check = document.createElement("span");
+    check.className = "template-check";
+    check.textContent = "✓";
+    check.setAttribute("aria-hidden", "true");
+    button.append(thumb, meta, check);
+    button.addEventListener("click", () => {
+      activateTemplate(id, true);
+      elements.templateNext.disabled = false;
+      openTemplatePreview(id);
+    });
+    elements.templateGallery.appendChild(button);
+    renderTemplateThumbnail(thumb, id);
+  });
+}
+
+function renderTemplateThumbnail(canvasElement, templateId) {
+  const previewCtx = canvasElement.getContext("2d");
+  const scale = canvasElement.width / POSTER_WIDTH;
+  previewCtx.setTransform(scale, 0, 0, scale, 0, 0);
+  renderScene(previewCtx, createModel(templateId, true), { showGuide: false });
+  previewCtx.setTransform(1, 0, 0, 1, 0, 0);
+}
+
+function renderPaletteList() {
+  elements.paletteList.innerHTML = "";
+  const template = posterTemplates[state.templateId];
+  template.paletteIds.forEach((id) => {
+    const palette = paletteCatalog[id];
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = `palette-option${state.paletteId === id ? " is-active" : ""}`;
+    const swatches = document.createElement("span");
+    swatches.className = "palette-swatches";
+    [palette.total, palette.card, palette.line].forEach((color) => {
+      const swatch = document.createElement("i");
+      swatch.style.background = color;
+      swatches.appendChild(swatch);
+    });
+    const label = document.createElement("strong");
+    label.textContent = paletteName(palette);
+    button.append(swatches, label);
+    button.addEventListener("click", () => applyPalette(id));
+    elements.paletteList.appendChild(button);
+  });
 }
 
 function renderStickerList() {
-  elements.stickerList.replaceChildren();
-  stickers.forEach((sticker, index) => {
+  elements.stickerList.innerHTML = "";
+  state.stickers.forEach((sticker, index) => {
     const button = document.createElement("button");
-    button.className = "sticker-thumbnail";
     button.type = "button";
-    button.classList.toggle("is-active", sticker.id === selectedStickerId);
-    button.setAttribute("aria-label", translate("stickerItem", { index: index + 1 }));
-
+    button.className = `sticker-item${state.selectedStickerId === sticker.id ? " is-active" : ""}`;
+    button.title = `${translate("stickerStep")} ${index + 1}`;
     const image = document.createElement("img");
-    image.src = sticker.image.src;
+    image.src = sticker.url;
     image.alt = "";
-    image.draggable = false;
-
-    const number = document.createElement("span");
-    number.textContent = String(index + 1);
-
-    button.append(image, number);
+    button.appendChild(image);
     button.addEventListener("click", () => {
-      selectSticker(sticker.id);
-      renderPoster();
+      state.selectedStickerId = sticker.id;
+      syncStickerControls();
+      renderStickerList();
+      renderMain();
     });
     elements.stickerList.appendChild(button);
   });
+  elements.stickerCount.textContent = `${state.stickers.length} / ${MAX_STICKERS}`;
+  elements.stickerUploadButton.classList.toggle("is-disabled", state.stickers.length >= MAX_STICKERS);
 }
 
-function updateStickerControls() {
-  const selectedSticker = getStickerById(selectedStickerId);
-  const isFull = stickers.length >= maxStickerCount;
-  elements.stickerCount.textContent = `${stickers.length}/${maxStickerCount}`;
-  elements.stickerInput.disabled = isFull;
-  elements.stickerUploadButton.classList.toggle("is-disabled", isFull);
-  elements.removeSticker.disabled = !selectedSticker;
-  elements.stickerScale.disabled = !selectedSticker;
-  elements.stickerScale.value = selectedSticker
-    ? String(Math.round(selectedSticker.scale * 100))
-    : "100";
-  elements.stickerScaleValue.textContent = `${elements.stickerScale.value}%`;
-  renderStickerList();
+function syncColorControls() {
+  elements.cardColor.value = state.style.card;
+  elements.lineColor.value = state.style.line;
+  elements.scoreTextColor.value = state.style.scoreText;
+  elements.totalColor.value = state.style.total;
+  elements.textColor.value = state.identity[effectiveIdentityTarget()].color;
 }
 
-function selectSticker(id) {
-  const sticker = getStickerById(id);
-  selectedStickerId = sticker ? sticker.id : null;
+function syncIdentityControls() {
+  elements.nickname.value = state.identity.nickname.value;
+  elements.course.value = state.identity.course.value;
+  elements.dateInput.value = /^\d{4}-\d{2}-\d{2}$/.test(state.identity.date.value)
+    ? state.identity.date.value
+    : "";
+  elements.extraInfo.value = state.identity.extra.value;
+  elements.brandText.value = state.identity.brand;
+  const target = effectiveIdentityTarget();
+  elements.textFont.value = state.identity[target].font;
+  elements.textColor.value = state.identity[target].color;
+  elements.identitySize.value = String(state.identity[target].size);
+  elements.identitySizeValue.textContent = `${Math.round(state.identity[target].size)}px`;
+  document.querySelectorAll(".identity-target").forEach((button) => {
+    button.classList.toggle("is-active", button.dataset.target === activeIdentityTarget);
+    if (button.dataset.target === "date") {
+      button.disabled = !posterTemplates[state.templateId].layout.date;
+    }
+  });
+}
+
+function syncStickerControls() {
+  const sticker = selectedSticker();
+  elements.stickerScale.disabled = !sticker;
+  elements.removeSticker.disabled = !sticker;
   if (sticker) {
-    selectedElement = stickerElementKey(sticker.id);
-  } else if (getStickerFromElementKey(selectedElement)) {
-    selectedElement = null;
-  }
-  updateStickerControls();
-}
-
-function loadStickerImage(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onerror = reject;
-    reader.onload = () => {
-      const image = new Image();
-      image.onerror = reject;
-      image.onload = () => resolve(image);
-      image.src = reader.result;
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
-async function addStickerFiles(fileList) {
-  const token = ++stickerLoadToken;
-  const available = maxStickerCount - stickers.length;
-  const files = Array.from(fileList)
-    .filter((file) => file.type.startsWith("image/"))
-    .slice(0, available);
-
-  for (const file of files) {
-    try {
-      const image = await loadStickerImage(file);
-      if (token !== stickerLoadToken || stickers.length >= maxStickerCount) {
-        return;
-      }
-      const maxBaseSize = 230;
-      const ratio = Math.min(maxBaseSize / image.naturalWidth, maxBaseSize / image.naturalHeight);
-      const sticker = {
-        id: String(++stickerIdCounter),
-        image,
-        baseWidth: image.naturalWidth * ratio,
-        baseHeight: image.naturalHeight * ratio,
-        x: 0,
-        y: 0,
-        scale: 1
-      };
-      setStickerDefaultPosition(sticker, stickers.length);
-      stickers.push(sticker);
-      selectedStickerId = sticker.id;
-      selectedElement = stickerElementKey(sticker.id);
-    } catch (error) {
-      // Skip unreadable image files and continue with the remaining selection.
-    }
-  }
-
-  elements.stickerInput.value = "";
-  updateStickerControls();
-  renderPoster();
-}
-
-function removeSelectedSticker() {
-  const index = stickers.findIndex((sticker) => sticker.id === selectedStickerId);
-  if (index === -1) {
-    return;
-  }
-  stickers.splice(index, 1);
-  const nextSticker = stickers[Math.min(index, stickers.length - 1)] || null;
-  selectedStickerId = nextSticker ? nextSticker.id : null;
-  selectedElement = nextSticker ? stickerElementKey(nextSticker.id) : null;
-  updateStickerControls();
-  renderPoster();
-}
-
-function getPosterHeight() {
-  return canvas.height;
-}
-
-function updateTemplateSelection() {
-  document.querySelectorAll(".template-option").forEach((button) => {
-    const active = button.dataset.template === activePosterTemplate;
-    button.classList.toggle("is-active", active);
-    button.setAttribute("aria-pressed", String(active));
-  });
-}
-
-function applyPosterTemplate(templateId) {
-  if (!posterTemplates[templateId]) {
-    return;
-  }
-
-  activePosterTemplate = templateId;
-  const template = getActiveTemplate();
-  const preset = template.preset;
-  elements.scoreTableColor.value = preset.scoreTableColor;
-  elements.totalColor.value = preset.totalColor;
-  elements.nicknameColor.value = preset.nicknameColor;
-  elements.clubColor.value = preset.clubColor;
-  elements.extraColor.value = preset.extraColor;
-  elements.englishFont.value = preset.englishFont;
-  elements.numberFont.value = preset.numberFont;
-  elements.nicknameFontSize.value = preset.nicknameFontSize;
-  elements.clubFontSize.value = preset.clubFontSize;
-  elements.extraFontSize.value = preset.extraFontSize;
-  elements.totalFontSize.value = preset.totalFontSize;
-  elements.totalOpacity.value = preset.totalOpacity;
-  const layout = getActiveLayout();
-  canvas.width = layout.width;
-  canvas.height = layout.height;
-  updateTemplateSelection();
-  updateFontPreviews();
-  updateStyleOutputs();
-  imageState = { scale: 1, offsetX: 0, offsetY: 0 };
-  elements.zoomRange.value = "100";
-  resetElementPositions();
-  resetStickerPositions();
-  updateZoomOutput();
-  renderPoster();
-}
-
-function translate(key, params = {}) {
-  const dictionary = translations[currentLanguage] || translations.zh;
-  let value = dictionary[key] || translations.zh[key] || key;
-  Object.entries(params).forEach(([name, replacement]) => {
-    value = value.split(`{${name}}`).join(String(replacement));
-  });
-  return value;
-}
-
-function loadLanguagePreference() {
-  try {
-    const stored = window.localStorage.getItem("golf-poster-language");
-    return stored === "en" ? "en" : "zh";
-  } catch (error) {
-    return "zh";
+    elements.stickerScale.value = String(Math.round(sticker.scale * 100));
+    elements.stickerScaleValue.textContent = `${Math.round(sticker.scale * 100)}%`;
+  } else {
+    elements.stickerScale.value = "100";
+    elements.stickerScaleValue.textContent = "100%";
   }
 }
 
-function applyLanguage(language, persist = true) {
-  currentLanguage = language === "en" ? "en" : "zh";
-  document.documentElement.lang = currentLanguage === "en" ? "en" : "zh-CN";
-  elements.languageSelect.value = currentLanguage;
-
-  document.querySelectorAll("[data-i18n]").forEach((element) => {
-    element.textContent = translate(element.dataset.i18n);
-  });
-  document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
-    element.placeholder = translate(element.dataset.i18nPlaceholder);
-  });
-  document.querySelectorAll("[data-i18n-title]").forEach((element) => {
-    const value = translate(element.dataset.i18nTitle);
-    element.title = value;
-    element.setAttribute("aria-label", value);
-  });
-  document.querySelectorAll("[data-i18n-aria]").forEach((element) => {
-    element.setAttribute("aria-label", translate(element.dataset.i18nAria));
-  });
-
-  document.title = translate("pageTitle");
-  const description = document.querySelector('meta[name="description"]');
-  if (description) {
-    description.content = translate("pageDescription");
-  }
-
-  if (persist) {
-    try {
-      window.localStorage.setItem("golf-poster-language", currentLanguage);
-    } catch (error) {
-      // Language switching still works when local storage is unavailable.
-    }
-  }
-
-  updateTotalHintText();
-  refreshRecognitionText();
-  updateFontPreviews();
-  updateStickerControls();
-  renderPoster();
+function syncTotalControls() {
+  elements.totalScore.value = state.total.value;
+  elements.totalScore.readOnly = state.autoTotal;
+  elements.totalScore.classList.toggle("is-auto", state.autoTotal);
+  elements.autoTotal.checked = state.autoTotal;
+  elements.totalColor.value = state.style.total;
+  elements.totalOpacity.value = String(state.total.opacity);
+  elements.totalOpacityValue.textContent = `${Math.round(state.total.opacity)}%`;
+  elements.totalSize.value = String(Math.round(state.total.size));
+  elements.totalSizeValue.textContent = `${Math.round(state.total.size)}px`;
+  elements.totalAboveSubject.checked = state.total.aboveSubject;
+  updateTotalHint();
 }
 
-function getEnglishFont() {
-  return fontStacks.english[elements.englishFont.value] || fontStacks.english.arial;
+function syncAllControls() {
+  elements.photoScale.value = String(Math.round(state.image.scale * 100));
+  elements.photoScaleValue.textContent = `${Math.round(state.image.scale * 100)}%`;
+  elements.backgroundBlur.value = String(state.image.blur);
+  elements.backgroundBlurValue.textContent = `${state.image.blur}px`;
+  elements.scoreInput.value = state.scores.filter(Boolean).join(" ");
+  elements.highlightInput.value = [...state.highlights].join(",");
+  elements.badgeText.value = state.badge;
+  elements.scoreFont.value = state.fonts.score;
+  elements.numberFont.value = state.fonts.total;
+  elements.scorecardScale.value = String(Math.round(state.scorecard.scale * 100));
+  elements.scorecardScaleValue.textContent = `${Math.round(state.scorecard.scale * 100)}%`;
+  syncColorControls();
+  syncTotalControls();
+  syncIdentityControls();
+  syncStickerControls();
+  renderPaletteList();
+  renderStickerList();
+  updateRecognitionUi();
 }
 
-function getNumberFont() {
-  return fontStacks.number[elements.numberFont.value] || fontStacks.number.arialBlack;
-}
-
-function updateFontPreviews() {
-  elements.englishFont.style.fontFamily = getEnglishFont();
-  elements.numberFont.style.fontFamily = getNumberFont();
-}
-
-function updateStyleOutputs() {
-  elements.nicknameFontSizeValue.textContent = `${elements.nicknameFontSize.value}px`;
-  elements.clubFontSizeValue.textContent = `${elements.clubFontSize.value}px`;
-  elements.totalFontSizeValue.textContent = `${elements.totalFontSize.value}px`;
-  elements.extraFontSizeValue.textContent = `${elements.extraFontSize.value}px`;
-}
-
-function parseScores() {
-  const values = elements.scoreInput.value
-    .split(/[\s,，、|]+/)
+function parseScores(value) {
+  const scores = value
+    .split(/[\s,，、]+/)
     .map((item) => item.trim())
     .filter(Boolean)
     .slice(0, 18);
-
-  while (values.length < 18) {
-    values.push("");
-  }
-
-  return values;
+  while (scores.length < 18) scores.push("");
+  return scores;
 }
 
-function getNumericScores() {
-  return elements.scoreInput.value
-    .split(/[\s,，、|]+/)
-    .map((item) => item.trim())
-    .filter(Boolean)
-    .slice(0, 18)
-    .map((item) => Number(item))
-    .filter((score) => Number.isFinite(score));
-}
-
-function updateTotalHintText() {
-  if (!elements.autoTotal.checked) {
-    elements.totalHint.textContent = translate("totalHintManual");
-    return;
-  }
-  const count = getNumericScores().length;
-  elements.totalHint.textContent = count
-    ? translate("totalHintCount", { count })
-    : translate("totalHintEmpty");
-}
-
-function updateAutoTotal() {
-  const automatic = elements.autoTotal.checked;
-  elements.totalScore.readOnly = automatic;
-  elements.totalScore.classList.toggle("is-auto", automatic);
-
-  if (!automatic) {
-    updateTotalHintText();
-    renderPoster();
-    return;
-  }
-
-  const numericScores = getNumericScores();
-  const total = numericScores.reduce((sum, score) => sum + score, 0);
-  elements.totalScore.value = numericScores.length ? String(Math.round(total * 10) / 10) : "";
-  updateTotalHintText();
-  renderPoster();
-}
-
-function updateZoomOutput() {
-  elements.zoomValue.textContent = `${elements.zoomRange.value}%`;
-}
-
-function updateBackgroundBlurOutput() {
-  elements.backgroundBlurValue.textContent = `${elements.backgroundBlur.value}px`;
-}
-
-function parseHighlights() {
+function parseHighlights(value) {
   return new Set(
-    elements.highlightInput.value
-      .split(/[\s,，、|]+/)
+    value
+      .split(/[\s,，、]+/)
       .map((item) => Number.parseInt(item, 10))
-      .filter((num) => Number.isFinite(num) && num >= 1 && num <= 18)
+      .filter((number) => Number.isFinite(number) && number >= 1 && number <= 18)
   );
 }
 
-function drawCoverAsset(context, asset, x, y, w, h) {
-  const assetWidth = asset.naturalWidth || asset.videoWidth || asset.width;
-  const assetHeight = asset.naturalHeight || asset.videoHeight || asset.height;
-  const cover = Math.max(w / assetWidth, h / assetHeight) * imageState.scale;
-  const drawW = assetWidth * cover;
-  const drawH = assetHeight * cover;
-  const drawX = x + (w - drawW) / 2 + imageState.offsetX;
-  const drawY = y + (h - drawH) / 2 + imageState.offsetY;
-  context.drawImage(asset, drawX, drawY, drawW, drawH);
+function updateAutoTotal() {
+  if (state.autoTotal) {
+    const numeric = state.scores
+      .map((score) => Number.parseInt(score, 10))
+      .filter(Number.isFinite);
+    state.total.value = numeric.length ? String(numeric.reduce((sum, score) => sum + score, 0)) : "";
+  }
+  syncTotalControls();
+  renderMain();
 }
 
-function drawBackgroundImage(context) {
-  const posterHeight = getPosterHeight();
-  const blur = Number(elements.backgroundBlur.value);
-
-  context.save();
-  const filters = [];
-  if (blur > 0) {
-    filters.push(`blur(${blur}px)`);
-  }
-  if (activePosterTemplate === "template2") {
-    filters.push("brightness(0.82)", "saturate(0.88)");
-  }
-  if (filters.length) {
-    context.filter = filters.join(" ");
-  }
-  drawCoverAsset(context, uploadedImage, 0, topBarHeight, posterSize, posterHeight - topBarHeight);
-  context.restore();
-}
-
-function drawPlaceholder(context) {
-  const posterHeight = getPosterHeight();
-  const gradient = context.createLinearGradient(0, topBarHeight, 0, posterHeight);
-  if (activePosterTemplate === "template2") {
-    gradient.addColorStop(0, "#315e44");
-    gradient.addColorStop(1, "#122e22");
+function updateTotalHint() {
+  const count = state.scores.filter((score) => Number.isFinite(Number.parseInt(score, 10))).length;
+  if (!state.autoTotal) {
+    elements.totalHint.textContent = translate("totalHintManual");
+  } else if (count) {
+    elements.totalHint.textContent = translate("totalHintCount", { count });
   } else {
-    gradient.addColorStop(0, "#46785a");
-    gradient.addColorStop(1, "#173b2c");
+    elements.totalHint.textContent = translate("totalHintEmpty");
+  }
+}
+
+function drawCover(context, asset, model) {
+  const width = asset.naturalWidth || asset.width;
+  const height = asset.naturalHeight || asset.height;
+  const cover = Math.max(POSTER_WIDTH / width, (POSTER_HEIGHT - BRAND_HEIGHT) / height) * model.image.scale;
+  const drawWidth = width * cover;
+  const drawHeight = height * cover;
+  const x = (POSTER_WIDTH - drawWidth) / 2 + model.image.x;
+  const y = BRAND_HEIGHT + (POSTER_HEIGHT - BRAND_HEIGHT - drawHeight) / 2 + model.image.y;
+  context.drawImage(asset, x, y, drawWidth, drawHeight);
+}
+
+function drawPlaceholder(context, template, model) {
+  const palette = model.style;
+  const gradient = context.createLinearGradient(0, BRAND_HEIGHT, POSTER_WIDTH, POSTER_HEIGHT);
+  if (template.tone === "dark") {
+    gradient.addColorStop(0, "#25372b");
+    gradient.addColorStop(1, "#080b09");
+  } else if (template.tone === "soft") {
+    gradient.addColorStop(0, "#799c83");
+    gradient.addColorStop(1, "#294e37");
+  } else {
+    gradient.addColorStop(0, "#5f8f70");
+    gradient.addColorStop(1, "#183a29");
   }
   context.fillStyle = gradient;
-  context.fillRect(0, topBarHeight, posterSize, posterHeight - topBarHeight);
+  context.fillRect(0, BRAND_HEIGHT, POSTER_WIDTH, POSTER_HEIGHT - BRAND_HEIGHT);
+  context.fillStyle = "rgba(255,255,255,0.08)";
+  context.beginPath();
+  context.moveTo(0, 830);
+  context.lineTo(420, 590);
+  context.lineTo(1000, 760);
+  context.lineTo(1000, 1265);
+  context.lineTo(0, 1265);
+  context.closePath();
+  context.fill();
+  context.fillStyle = palette.line;
+  context.globalAlpha = 0.22;
+  context.fillRect(0, 600, POSTER_WIDTH, 4);
+  context.globalAlpha = 1;
 }
 
-function drawBrand(context) {
-  const brand = elements.brandText.value.trim() || "GOLFBROTHERS";
-  context.fillStyle = "#000";
-  context.fillRect(0, 0, posterSize, topBarHeight);
-
+function drawBackground(context, template, model) {
+  if (!model.photo) {
+    drawPlaceholder(context, template, model);
+    return;
+  }
   context.save();
-  context.translate(56, 18);
+  const filters = [];
+  if (model.image.blur > 0) filters.push(`blur(${model.image.blur}px)`);
+  if (template.tone === "dark") filters.push("brightness(0.62)", "saturate(0.82)", "contrast(1.08)");
+  if (template.tone === "soft") filters.push("brightness(1.04)", "saturate(0.78)");
+  if (template.tone === "editorial") filters.push("brightness(0.76)", "saturate(0.84)");
+  if (template.tone === "natural") filters.push("brightness(0.9)", "saturate(0.94)");
+  if (filters.length) context.filter = filters.join(" ");
+  drawCover(context, model.photo, model);
+  context.restore();
+  if (template.tone === "soft") {
+    context.fillStyle = "rgba(242,240,233,0.18)";
+    context.fillRect(0, BRAND_HEIGHT, POSTER_WIDTH, POSTER_HEIGHT - BRAND_HEIGHT);
+  }
+}
+
+function drawAtmosphere(context, template) {
+  if (template.tone === "dark") {
+    const gradient = context.createLinearGradient(0, 420, 0, POSTER_HEIGHT);
+    gradient.addColorStop(0, "rgba(0,0,0,0)");
+    gradient.addColorStop(1, "rgba(0,0,0,0.74)");
+    context.fillStyle = gradient;
+    context.fillRect(0, 420, POSTER_WIDTH, POSTER_HEIGHT - 420);
+  } else if (template.tone === "editorial") {
+    const gradient = context.createLinearGradient(0, 0, 480, 0);
+    gradient.addColorStop(0, "rgba(0,0,0,0.48)");
+    gradient.addColorStop(1, "rgba(0,0,0,0)");
+    context.fillStyle = gradient;
+    context.fillRect(0, BRAND_HEIGHT, 480, POSTER_HEIGHT - BRAND_HEIGHT);
+  } else {
+    const gradient = context.createLinearGradient(0, 520, 0, POSTER_HEIGHT);
+    gradient.addColorStop(0, "rgba(0,0,0,0)");
+    gradient.addColorStop(1, "rgba(0,0,0,0.36)");
+    context.fillStyle = gradient;
+    context.fillRect(0, 520, POSTER_WIDTH, POSTER_HEIGHT - 520);
+  }
+}
+
+function drawBrand(context, model) {
+  context.fillStyle = "#000";
+  context.fillRect(0, 0, POSTER_WIDTH, BRAND_HEIGHT);
+  context.save();
+  context.translate(54, 18);
   context.fillStyle = "#fff";
   context.fillRect(0, -3, 5, 40);
-  context.fillStyle = "#c59c35";
+  context.fillStyle = "#c9a13d";
   context.beginPath();
   context.moveTo(7, -1);
-  context.lineTo(49, 11);
+  context.lineTo(48, 11);
   context.lineTo(7, 23);
   context.closePath();
   context.fill();
   context.restore();
-
-  const splitPoint = brand.toUpperCase().startsWith("GOLF")
-    ? 4
-    : Math.max(4, Math.floor(brand.length * 0.45));
-  const first = brand.slice(0, splitPoint).toUpperCase();
-  const second = brand.slice(splitPoint).toUpperCase();
-  context.textBaseline = "middle";
+  const brand = (model.identity.brand || "GOLFBROTHERS").toUpperCase();
+  const split = brand.startsWith("GOLF") ? 4 : Math.max(3, Math.floor(brand.length * 0.45));
+  const first = brand.slice(0, split);
+  const second = brand.slice(split);
   context.textAlign = "left";
-  context.font = "italic 900 38px Arial, sans-serif";
+  context.textBaseline = "middle";
+  context.font = 'italic 900 37px Arial, sans-serif';
   context.fillStyle = "#fff";
-  context.fillText(first, 124, 35);
-  context.fillStyle = "#c99c32";
-  context.fillText(second, 124 + context.measureText(first).width, 35);
+  context.fillText(first, 120, 35);
+  context.fillStyle = "#c9a13d";
+  context.fillText(second, 120 + context.measureText(first).width, 35);
 }
 
-function drawTotalScore(context) {
-  const score = elements.totalScore.value.trim();
-  if (!score) {
-    return;
-  }
-
-  const opacity = Number(elements.totalOpacity.value) / 100;
-  const x = elementPositions.total.x;
-  const y = Number(elements.totalY.value);
-  const fontSize = Number(elements.totalFontSize.value);
-
+function drawPreviewSubject(context, template) {
+  const region = template.layout.subject;
+  if (!region) return;
+  const cx = region.x + region.w / 2;
   context.save();
-  context.globalAlpha = opacity;
-  context.fillStyle = elements.totalColor.value;
-  context.font = `950 ${fontSize}px ${getNumberFont()}`;
-  context.textAlign = "center";
-  context.textBaseline = "middle";
-  context.fillText(score, x, y);
-  const region = getActiveLayout().totalRegion;
-  elementBounds.total = {
-    x: x - region.w / 2,
-    y: y - region.h / 2,
-    w: region.w,
-    h: region.h
-  };
+  context.fillStyle = "rgba(235,239,236,0.94)";
+  context.beginPath();
+  context.arc(cx, region.y + region.h * 0.12, region.w * 0.11, 0, Math.PI * 2);
+  context.fill();
+  context.beginPath();
+  context.moveTo(cx - region.w * 0.18, region.y + region.h * 0.23);
+  context.quadraticCurveTo(cx, region.y + region.h * 0.15, cx + region.w * 0.18, region.y + region.h * 0.23);
+  context.lineTo(cx + region.w * 0.27, region.y + region.h * 0.72);
+  context.lineTo(cx + region.w * 0.1, region.y + region.h);
+  context.lineTo(cx - region.w * 0.1, region.y + region.h);
+  context.lineTo(cx - region.w * 0.27, region.y + region.h * 0.72);
+  context.closePath();
+  context.fill();
   context.restore();
 }
 
-function drawSubjectOverlay(context) {
-  if (!uploadedImage || segmentationState !== "person" || !subjectMaskSource) {
+function drawSubject(context, template, model) {
+  if (model.previewSubject) {
+    drawPreviewSubject(context, template);
     return;
   }
-
-  const layerCanvas = document.createElement("canvas");
-  layerCanvas.width = posterSize;
-  layerCanvas.height = getPosterHeight();
-  const layerCtx = layerCanvas.getContext("2d");
-  drawCoverAsset(layerCtx, uploadedImage, 0, topBarHeight, posterSize, getPosterHeight() - topBarHeight);
-  layerCtx.globalCompositeOperation = "destination-in";
-  drawCoverAsset(layerCtx, subjectMaskSource, 0, topBarHeight, posterSize, getPosterHeight() - topBarHeight);
-  context.drawImage(layerCanvas, 0, 0);
+  if (!model.photo || !model.subjectMask || model.segmentationState !== "person") return;
+  const layer = document.createElement("canvas");
+  layer.width = POSTER_WIDTH;
+  layer.height = POSTER_HEIGHT;
+  const layerContext = layer.getContext("2d");
+  drawCover(layerContext, model.photo, model);
+  layerContext.globalCompositeOperation = "destination-in";
+  drawCover(layerContext, model.subjectMask, model);
+  context.drawImage(layer, 0, 0);
 }
 
-function fitText(context, text, maxWidth, startingSize, minimumSize, fontFamily) {
-  let size = startingSize;
-  while (size > minimumSize) {
-    context.font = `900 ${size}px ${fontFamily}`;
-    if (context.measureText(text).width <= maxWidth) {
-      break;
-    }
+function transformedRect(base, transform) {
+  const scale = transform.scale || 1;
+  return {
+    x: transform.x - base.w * scale / 2,
+    y: transform.y - base.h * scale / 2,
+    w: base.w * scale,
+    h: base.h * scale
+  };
+}
+
+function transformSubRect(rect, base, transform) {
+  const scale = transform.scale || 1;
+  const baseCenter = centerOf(base);
+  const rectCenter = centerOf(rect);
+  return {
+    x: transform.x + (rectCenter.x - baseCenter.x) * scale - rect.w * scale / 2,
+    y: transform.y + (rectCenter.y - baseCenter.y) * scale - rect.h * scale / 2,
+    w: rect.w * scale,
+    h: rect.h * scale
+  };
+}
+
+function fitFont(context, text, maxWidth, startSize, minSize, fontId, weight = 900, italic = false) {
+  let size = startSize;
+  const style = italic ? "italic " : "";
+  while (size > minSize) {
+    context.font = `${style}${weight} ${size}px ${fontStack(fontId)}`;
+    if (context.measureText(text).width <= maxWidth) break;
     size -= 2;
   }
-  context.font = `900 ${size}px ${fontFamily}`;
+  context.font = `${style}${weight} ${size}px ${fontStack(fontId)}`;
   return size;
 }
 
-function drawLabels(context) {
-  const nickname = elements.nickname.value.trim();
-  const club = elements.club.value.trim();
-  const extra = elements.extraInfo.value.trim();
-  const layout = getActiveLayout();
-
+function drawTotal(context, template, model, bounds) {
+  if (!model.total.value) return;
   context.save();
-  context.shadowColor = "rgba(0,0,0,0.38)";
-  context.shadowBlur = 10;
-  context.shadowOffsetY = 2;
-  context.textBaseline = "middle";
-
-  if (nickname) {
-    const position = elementPositions.nickname;
-    const region = layout.nicknameRegion;
-    context.fillStyle = elements.nicknameColor.value;
-    context.textAlign = region.align;
-    fitText(
-      context,
-      nickname,
-      region.w,
-      Math.min(Number(elements.nicknameFontSize.value), region.h),
-      14,
-      getEnglishFont()
-    );
-    context.fillText(nickname, position.x, position.y);
-    elementBounds.nickname = {
-      x: region.align === "center" ? position.x - region.w / 2 : position.x,
-      y: position.y - region.h / 2,
-      w: region.w,
-      h: region.h
-    };
-  }
-
-  const info = [club, extra].filter(Boolean).join(" · ");
-  if (info) {
-    const position = elementPositions.club;
-    const region = layout.infoRegion;
-    const infoColor = club ? elements.clubColor.value : elements.extraColor.value;
-    const requestedSize = club
-      ? Number(elements.clubFontSize.value)
-      : Number(elements.extraFontSize.value);
-    context.fillStyle = infoColor;
-    context.textAlign = "center";
-    const maxTextWidth = region.vertical ? region.h : region.w;
-    fitText(
-      context,
-      info,
-      maxTextWidth,
-      Math.min(requestedSize, region.vertical ? region.w : region.h),
-      12,
-      getEnglishFont()
-    );
-
-    if (region.vertical) {
-      context.save();
-      context.translate(position.x, position.y);
-      context.rotate(Math.PI / 2);
-      context.fillText(info, 0, 0);
-      context.restore();
-    } else {
-      context.fillText(info, position.x, position.y);
-    }
-
-    elementBounds.club = {
-      x: position.x - region.w / 2,
-      y: position.y - region.h / 2,
-      w: region.w,
-      h: region.h
-    };
-  }
-  context.restore();
-}
-
-function drawScoreCard(context) {
-  const scores = parseScores();
-  const highlights = parseHighlights();
-  const badge = elements.badgeText.value.trim();
-  const hasScoreContent = scores.some(Boolean) || Boolean(badge);
-  const layout = getActiveLayout();
-  const vertical = layout.scoreDirection === "vertical";
-
-  if (!hasScoreContent) {
-    return;
-  }
-
-  elementBounds.scoreCard = {
-    x: scoreBox.x,
-    y: scoreBox.y,
-    w: scoreBox.w,
-    h: scoreBox.h
-  };
-
-  context.save();
-  context.globalAlpha = 0.82;
-  context.fillStyle = elements.scoreTableColor.value;
-  context.fillRect(scoreBox.x, scoreBox.y, scoreBox.w, scoreBox.h);
-  context.globalAlpha = 1;
-
-  const offsetX = scoreBox.x - layout.scoreBox.x;
-  const offsetY = scoreBox.y - layout.scoreBox.y;
-  if (vertical) {
-    const divider = layout.scoreDivider;
-    context.fillStyle = "rgba(255,255,255,0.76)";
-    context.fillRect(
-      divider.x + offsetX,
-      divider.y + offsetY,
-      divider.w,
-      divider.h
-    );
-  } else {
-    context.strokeStyle = "rgba(255,255,255,0.78)";
-    context.lineWidth = 3;
-    context.beginPath();
-    context.moveTo(scoreBox.x, scoreBox.y + scoreBox.h / 2);
-    context.lineTo(scoreBox.x + scoreBox.w, scoreBox.y + scoreBox.h / 2);
-    context.stroke();
-  }
-
-  const cellW = vertical ? layout.scoreColumns[0].w : scoreBox.w / 9;
-  const cellH = vertical ? layout.scoreColumns[0].h / 9 : scoreBox.h / 2;
-  const scoreFontSize = Math.floor(Math.min(vertical ? 48 : 44, cellH * 0.55, cellW * 0.58));
-  const highlightColor = activePosterTemplate === "template1" ? "#ffd100" : "#ffffff";
-
+  context.globalAlpha = model.total.opacity / 100;
   context.textAlign = "center";
   context.textBaseline = "middle";
-  context.font = `900 ${scoreFontSize}px ${getNumberFont()}`;
+  context.fillStyle = model.style.total;
+  context.font = `900 ${model.total.size}px ${fontStack(model.fonts.total)}`;
+  context.fillText(model.total.value, model.total.x, model.total.y);
+  context.restore();
+  const base = template.layout.total;
+  bounds.total = {
+    x: model.total.x - base.w / 2,
+    y: model.total.y - base.h / 2,
+    w: base.w,
+    h: base.h
+  };
+}
 
-  scores.forEach((score, index) => {
+function scoreGeometry(template, model) {
+  const base = template.layout.score;
+  const transform = model.scorecard;
+  const board = transformedRect(base, transform);
+  let columns = null;
+  if (base.columns) {
+    columns = base.columns.map((column) => transformSubRect(column, base, transform));
+  }
+  return { base, board, columns, scale: transform.scale };
+}
+
+function drawScorecard(context, template, model, bounds) {
+  const geometry = scoreGeometry(template, model);
+  const { board, columns, scale } = geometry;
+  bounds.scorecard = board;
+  context.save();
+  if (template.scoreStyle === "grid") {
+    context.globalAlpha = 0.16;
+    context.fillStyle = model.style.card;
+    context.fillRect(board.x, board.y, board.w, board.h);
+    context.globalAlpha = 1;
+  } else {
+    context.globalAlpha = template.scoreStyle === "sidebar" ? 0.68 : 0.88;
+    context.fillStyle = model.style.card;
+    context.fillRect(board.x, board.y, board.w, board.h);
+    context.globalAlpha = 1;
+  }
+
+  context.strokeStyle = model.style.line;
+  context.fillStyle = model.style.line;
+  const vertical = geometry.base.direction === "vertical";
+  if (vertical) {
+    const dividerWidth = (geometry.base.dividerWidth || 4) * scale;
+    context.fillRect(board.x + board.w / 2 - dividerWidth / 2, board.y, dividerWidth, board.h);
+  } else {
+    context.lineWidth = Math.max(2, 3 * scale);
+    context.beginPath();
+    context.moveTo(board.x, board.y + board.h / 2);
+    context.lineTo(board.x + board.w, board.y + board.h / 2);
+    context.stroke();
+    if (template.scoreStyle === "grid") {
+      for (let index = 1; index < 9; index += 1) {
+        const x = board.x + board.w / 9 * index;
+        context.beginPath();
+        context.moveTo(x, board.y);
+        context.lineTo(x, board.y + board.h);
+        context.stroke();
+      }
+    }
+  }
+
+  const cellWidth = vertical
+    ? (columns ? columns[0].w : board.w / 2)
+    : board.w / 9;
+  const cellHeight = vertical
+    ? (columns ? columns[0].h / 9 : board.h / 9)
+    : board.h / 2;
+  const fontSize = Math.floor(Math.min(vertical ? 48 * scale : 44 * scale, cellHeight * 0.55, cellWidth * 0.58));
+  context.font = `900 ${fontSize}px ${fontStack(model.fonts.score)}`;
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+
+  model.scores.forEach((score, index) => {
     const firstHalf = index < 9;
     const slot = index % 9;
-    const row = firstHalf ? 0 : 1;
-    const column = vertical ? layout.scoreColumns[firstHalf ? 0 : 1] : null;
-    const x = vertical
-      ? column.x + offsetX + column.w / 2
-      : scoreBox.x + cellW * slot + cellW / 2;
-    const y = vertical
-      ? column.y + offsetY + cellH * slot + cellH / 2
-      : scoreBox.y + cellH * row + cellH / 2;
+    let x;
+    let y;
+    if (vertical) {
+      const column = columns ? columns[firstHalf ? 0 : 1] : {
+        x: board.x + (firstHalf ? 0 : board.w / 2),
+        y: board.y,
+        w: board.w / 2,
+        h: board.h
+      };
+      x = column.x + column.w / 2;
+      y = column.y + column.h / 9 * slot + column.h / 18;
+    } else {
+      x = board.x + board.w / 9 * slot + board.w / 18;
+      y = board.y + board.h / 2 * (firstHalf ? 0 : 1) + board.h / 4;
+    }
     const hole = index + 1;
-    const markerRadius = Math.min(29, cellW * 0.34, cellH * 0.36);
-
-    if (score && highlights.has(hole)) {
-      context.strokeStyle = highlightColor;
-      context.lineWidth = 3;
-      context.beginPath();
-      context.arc(x, y, markerRadius, 0, Math.PI * 2);
-      context.stroke();
+    const radius = Math.min(28 * scale, cellWidth * 0.33, cellHeight * 0.35);
+    if (score && model.highlights.has(hole)) {
+      context.strokeStyle = model.style.line;
+      context.lineWidth = Math.max(2, 3 * scale);
+      if (template.highlightShape === "mixed" && hole % 2 === 0) {
+        context.strokeRect(x - radius, y - radius, radius * 2, radius * 2);
+      } else {
+        context.beginPath();
+        context.arc(x, y, radius, 0, Math.PI * 2);
+        context.stroke();
+      }
     }
-
-    if (hole === 1 && badge) {
-      context.strokeStyle = highlightColor;
-      context.lineWidth = 3;
+    if (hole === 1 && model.badge) {
+      context.strokeStyle = model.style.line;
+      context.lineWidth = Math.max(2, 3 * scale);
       context.beginPath();
-      context.arc(x, y, markerRadius, 0, Math.PI * 2);
+      context.arc(x, y, radius, 0, Math.PI * 2);
       context.stroke();
       context.beginPath();
-      context.arc(x, y, markerRadius * 0.68, 0, Math.PI * 2);
+      context.arc(x, y, radius * 0.68, 0, Math.PI * 2);
       context.stroke();
-      context.fillStyle = "#ffffff";
-      context.font = `900 ${Math.max(22, scoreFontSize - 10)}px ${getNumberFont()}`;
-      context.fillText(badge, x, y + 1);
-      context.font = `900 ${scoreFontSize}px ${getNumberFont()}`;
-      return;
-    }
-
-    if (score) {
-      context.fillStyle = "#ffffff";
+      context.fillStyle = model.style.scoreText;
+      context.fillText(model.badge, x, y);
+    } else if (score) {
+      context.fillStyle = model.style.scoreText;
       context.fillText(score, x, y);
     }
   });
-
   context.restore();
 }
 
-function drawStickers(context) {
-  stickers.forEach((sticker) => {
-    const bounds = getStickerBounds(sticker);
-    context.drawImage(sticker.image, bounds.x, bounds.y, bounds.w, bounds.h);
-    elementBounds[stickerElementKey(sticker.id)] = bounds;
-  });
+function formattedDate(value) {
+  return value ? value.replaceAll("-", ".") : "";
 }
 
-function drawSelectionGuide(context) {
-  if (activeEditorTab !== "photo" || !selectedElement || !elementBounds[selectedElement]) {
-    return;
-  }
-
-  const bounds = elementBounds[selectedElement];
-  const x = bounds.x - 5;
-  const y = bounds.y - 5;
-  const w = bounds.w + 10;
-  const h = bounds.h + 10;
-
-  context.save();
-  context.strokeStyle = "rgba(0,29,55,0.88)";
-  context.lineWidth = 8;
-  context.strokeRect(x, y, w, h);
-  context.setLineDash([16, 10]);
-  context.strokeStyle = "#ffd100";
-  context.lineWidth = 4;
-  context.strokeRect(x, y, w, h);
-  context.restore();
-}
-
-function drawTemplateAtmosphere(context) {
-  const posterHeight = getPosterHeight();
-
-  if (activePosterTemplate === "template2") {
-    const sideShade = context.createLinearGradient(0, 0, 430, 0);
-    sideShade.addColorStop(0, "rgba(0,0,0,0.48)");
-    sideShade.addColorStop(0.86, "rgba(0,0,0,0.12)");
-    sideShade.addColorStop(1, "rgba(0,0,0,0)");
-    context.fillStyle = sideShade;
-    context.fillRect(0, topBarHeight, 430, posterHeight - topBarHeight);
-    return;
-  }
-
-  const gradientStart = 500;
-  const bottomGradient = context.createLinearGradient(0, gradientStart, 0, posterHeight);
-  bottomGradient.addColorStop(0, "rgba(0,0,0,0)");
-  bottomGradient.addColorStop(1, "rgba(0,0,0,0.4)");
-  context.fillStyle = bottomGradient;
-  context.fillRect(0, gradientStart, posterSize, posterHeight - gradientStart);
-}
-
-function renderPoster({ exporting = false } = {}) {
-  const posterHeight = getPosterHeight();
-  Object.keys(elementBounds).forEach((key) => delete elementBounds[key]);
-  ctx.clearRect(0, 0, posterSize, posterHeight);
-
-  if (uploadedImage) {
-    drawBackgroundImage(ctx);
-  } else {
-    drawPlaceholder(ctx);
-  }
-
-  drawTemplateAtmosphere(ctx);
-
-  if (elements.totalAboveSubject.checked) {
-    drawSubjectOverlay(ctx);
-    drawTotalScore(ctx);
-  } else {
-    drawTotalScore(ctx);
-    drawSubjectOverlay(ctx);
-  }
-  drawLabels(ctx);
-  drawScoreCard(ctx);
-  drawBrand(ctx);
-  drawStickers(ctx);
-
-  if (!exporting) {
-    drawSelectionGuide(ctx);
-  }
-}
-
-function refreshRecognitionText() {
-  const statusKeys = {
-    idle: "statusIdle",
-    loading: "statusLoading",
-    person: "statusPerson",
-    fallback: "statusFallback"
+function drawIdentityItem(context, region, item, text, model, bounds, key) {
+  if (!region || !text) return;
+  const actualRegion = {
+    x: item.x - region.w / 2,
+    y: item.y - region.h / 2,
+    w: region.w,
+    h: region.h
   };
-  elements.segmentationStatus.textContent = translate(statusKeys[segmentationState]);
-  elements.recognitionDetail.textContent = translate(
-    recognitionDetailState.key,
-    recognitionDetailState.params
+  bounds[key] = actualRegion;
+  context.save();
+  context.fillStyle = item.color;
+  context.textBaseline = "middle";
+  context.textAlign = region.align || "center";
+  const drawX = region.align === "left"
+    ? actualRegion.x
+    : region.align === "right"
+      ? actualRegion.x + actualRegion.w
+      : item.x;
+  fitFont(
+    context,
+    text,
+    region.vertical ? region.h : region.w,
+    Math.min(item.size, region.vertical ? region.w : region.h),
+    10,
+    item.font,
+    key === "nickname" ? 800 : 700,
+    Boolean(region.italic)
+  );
+  if (region.vertical) {
+    context.translate(item.x, item.y);
+    context.rotate(Math.PI / 2);
+    context.textAlign = "center";
+    context.fillText(text, 0, 0);
+  } else {
+    context.fillText(text, drawX, item.y);
+  }
+  context.restore();
+}
+
+function drawIdentity(context, template, model, bounds) {
+  const layout = template.layout;
+  drawIdentityItem(
+    context,
+    layout.nickname,
+    model.identity.nickname,
+    model.identity.nickname.value,
+    model,
+    bounds,
+    "nickname"
+  );
+
+  const courseParts = [model.identity.course.value].filter(Boolean);
+  if (layout.course?.combinesDate && model.identity.date.value) {
+    courseParts.push(formattedDate(model.identity.date.value));
+  }
+  drawIdentityItem(
+    context,
+    layout.course,
+    model.identity.course,
+    courseParts.join(" · "),
+    model,
+    bounds,
+    "course"
+  );
+  if (layout.date) {
+    drawIdentityItem(
+      context,
+      layout.date,
+      model.identity.date,
+      formattedDate(model.identity.date.value),
+      model,
+      bounds,
+      "date"
+    );
+  }
+  drawIdentityItem(
+    context,
+    layout.extra,
+    model.identity.extra,
+    model.identity.extra.value,
+    model,
+    bounds,
+    "extra"
   );
 }
 
-function updateRecognitionStatus(state, detailKey, params = {}) {
-  segmentationState = state;
-  recognitionDetailState = { key: detailKey, params };
-  elements.segmentationStatus.dataset.state = state;
-  refreshRecognitionText();
-  elements.retrySegmentation.disabled = !uploadedImage || state === "loading";
-  renderPoster();
+function drawStickers(context, model, bounds) {
+  model.stickers.forEach((sticker) => {
+    const width = sticker.baseWidth * sticker.scale;
+    const height = sticker.baseHeight * sticker.scale;
+    context.drawImage(sticker.image, sticker.x - width / 2, sticker.y - height / 2, width, height);
+    bounds[`sticker:${sticker.id}`] = {
+      x: sticker.x - width / 2,
+      y: sticker.y - height / 2,
+      w: width,
+      h: height
+    };
+  });
 }
 
-function copySegmentationMask(mask) {
-  const source = document.createElement("canvas");
-  source.width = mask.width || uploadedImage.naturalWidth;
-  source.height = mask.height || uploadedImage.naturalHeight;
-  source.getContext("2d").drawImage(mask, 0, 0, source.width, source.height);
-  return source;
+function drawGuide(context, bounds, target) {
+  const region = bounds[target];
+  if (!region) return;
+  context.save();
+  context.strokeStyle = "rgba(0,31,56,0.95)";
+  context.lineWidth = 8;
+  context.strokeRect(region.x - 5, region.y - 5, region.w + 10, region.h + 10);
+  context.setLineDash([14, 9]);
+  context.strokeStyle = "#ffd100";
+  context.lineWidth = 4;
+  context.strokeRect(region.x - 5, region.y - 5, region.w + 10, region.h + 10);
+  context.restore();
 }
 
-function measureMask(maskCanvas) {
+function renderScene(context, model, options = {}) {
+  const template = posterTemplates[model.templateId];
+  const bounds = {};
+  context.clearRect(0, 0, POSTER_WIDTH, POSTER_HEIGHT);
+  drawBackground(context, template, model);
+  drawAtmosphere(context, template);
+  if (model.total.aboveSubject) {
+    drawSubject(context, template, model);
+    drawTotal(context, template, model, bounds);
+  } else {
+    drawTotal(context, template, model, bounds);
+    drawSubject(context, template, model);
+  }
+  drawIdentity(context, template, model, bounds);
+  drawScorecard(context, template, model, bounds);
+  drawBrand(context, model);
+  drawStickers(context, model, bounds);
+  if (options.showGuide && options.guideTarget) {
+    drawGuide(context, bounds, options.guideTarget);
+  }
+  return bounds;
+}
+
+function currentGuideTarget() {
+  if (currentStep === "scorecard") return "scorecard";
+  if (currentStep === "total") return "total";
+  if (currentStep === "identity") return effectiveIdentityTarget();
+  if (currentStep === "stickers" && state.selectedStickerId) return `sticker:${state.selectedStickerId}`;
+  return null;
+}
+
+function renderMain(exporting = false) {
+  if (!selectedTemplateId) return;
+  renderScene(ctx, state, {
+    showGuide: !exporting && currentStep !== "summary",
+    guideTarget: currentGuideTarget()
+  });
+}
+
+function openTemplatePreview(templateId) {
+  modalMode = "template";
+  modalTemplateId = templateId;
+  const template = posterTemplates[templateId];
+  elements.previewModalTitle.textContent = `${translate("templatePreview")} · ${templateName(template)}`;
+  elements.useTemplateButton.hidden = false;
+  renderScene(modalCtx, createModel(templateId, true), { showGuide: false });
+  elements.previewModal.hidden = false;
+}
+
+function openFullPreview() {
+  if (!selectedTemplateId) return;
+  modalMode = "poster";
+  elements.previewModalTitle.textContent = translate("posterPreview");
+  elements.useTemplateButton.hidden = true;
+  renderScene(modalCtx, state, { showGuide: false });
+  elements.previewModal.hidden = false;
+}
+
+function closePreview() {
+  elements.previewModal.hidden = true;
+}
+
+function effectiveIdentityTarget() {
+  const layout = posterTemplates[state.templateId].layout;
+  return activeIdentityTarget === "date" && !layout.date ? "course" : activeIdentityTarget;
+}
+
+function selectedSticker() {
+  return state.stickers.find((sticker) => sticker.id === state.selectedStickerId) || null;
+}
+
+function setStep(step) {
+  currentStep = step;
+  elements.app.dataset.step = step;
+  const isTemplate = step === "template";
+  elements.templateScreen.hidden = !isTemplate;
+  elements.editorScreen.hidden = isTemplate;
+  if (isTemplate) {
+    elements.templateNext.querySelector("span").textContent = translate(returnToSummary ? "confirmChange" : "next");
+    return;
+  }
+
+  document.querySelectorAll(".control-panel").forEach((panel) => {
+    panel.classList.toggle("is-active", panel.dataset.panel === step);
+  });
+  const index = stepOrder.indexOf(step);
+  elements.stepCounter.textContent = `0${index + 1} / 07`;
+  elements.stepTitle.textContent = translate(editorStepTitles[step]);
+  elements.gestureHint.textContent = translate(gestureKeys[step]);
+  elements.editorScreen.classList.toggle("is-summary", step === "summary");
+  elements.editorScreen.querySelector(".wizard-nav").hidden = step === "summary";
+  elements.nextButton.querySelector("span").textContent = translate(returnToSummary ? "confirmChange" : "next");
+  elements.controlScroller.scrollTop = 0;
+  renderMain();
+}
+
+function nextStep() {
+  if (returnToSummary && currentStep !== "summary") {
+    returnToSummary = false;
+    setStep("summary");
+    return;
+  }
+  const index = stepOrder.indexOf(currentStep);
+  setStep(stepOrder[Math.min(index + 1, stepOrder.length - 1)]);
+}
+
+function previousStep() {
+  if (returnToSummary) {
+    returnToSummary = false;
+    setStep("summary");
+    return;
+  }
+  const index = stepOrder.indexOf(currentStep);
+  setStep(stepOrder[Math.max(0, index - 1)]);
+}
+
+function applyLanguage(nextLanguage, persist = true) {
+  language = nextLanguage === "en" ? "en" : "zh";
+  document.documentElement.lang = language === "zh" ? "zh-CN" : "en";
+  elements.languageSelect.value = language;
+  document.querySelectorAll("[data-i18n]").forEach((node) => {
+    node.textContent = translate(node.dataset.i18n);
+  });
+  elements.scoreInput.placeholder = language === "en"
+    ? "Up to 18 scores, separated by spaces or commas"
+    : "输入最多 18 洞成绩，用空格或逗号分隔";
+  renderTemplateGallery();
+  renderPaletteList();
+  renderStickerList();
+  syncTotalControls();
+  setStep(currentStep);
+  if (persist) {
+    try {
+      localStorage.setItem("golfPosterLanguage", language);
+    } catch {
+      // Language still applies when storage is unavailable.
+    }
+  }
+}
+
+function loadLanguage() {
+  try {
+    return localStorage.getItem("golfPosterLanguage") || "zh";
+  } catch {
+    return "zh";
+  }
+}
+
+function canvasPoint(event) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: (event.clientX - rect.left) / rect.width * POSTER_WIDTH,
+    y: (event.clientY - rect.top) / rect.height * POSTER_HEIGHT
+  };
+}
+
+function gestureCenter(points) {
+  return points.reduce(
+    (center, point) => ({ x: center.x + point.x / points.length, y: center.y + point.y / points.length }),
+    { x: 0, y: 0 }
+  );
+}
+
+function distanceBetween(points) {
+  if (points.length < 2) return 0;
+  return Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y);
+}
+
+function targetForStep() {
+  if (currentStep === "photo") return "photo";
+  if (currentStep === "scorecard") return "scorecard";
+  if (currentStep === "total") return "total";
+  if (currentStep === "identity") return effectiveIdentityTarget();
+  if (currentStep === "stickers" && state.selectedStickerId) return `sticker:${state.selectedStickerId}`;
+  return null;
+}
+
+function translateGestureTarget(target, dx, dy) {
+  if (target === "photo") {
+    state.image.x += dx;
+    state.image.y += dy;
+  } else if (target === "scorecard") {
+    state.scorecard.x += dx;
+    state.scorecard.y += dy;
+  } else if (target === "total") {
+    state.total.x += dx;
+    state.total.y += dy;
+  } else if (["nickname", "course", "date", "extra"].includes(target)) {
+    state.identity[target].x += dx;
+    state.identity[target].y += dy;
+  } else if (target?.startsWith("sticker:")) {
+    const sticker = state.stickers.find((item) => `sticker:${item.id}` === target);
+    if (sticker) {
+      sticker.x += dx;
+      sticker.y += dy;
+    }
+  }
+}
+
+function scaleGestureTarget(target, ratio) {
+  if (!Number.isFinite(ratio) || ratio <= 0) return;
+  if (target === "photo") {
+    state.image.scale = clamp(state.image.scale * ratio, 0.8, 2.6);
+  } else if (target === "scorecard") {
+    state.scorecard.scale = clamp(state.scorecard.scale * ratio, 0.55, 1.8);
+  } else if (target === "total") {
+    state.total.size = clamp(state.total.size * ratio, 100, 1600);
+  } else if (["nickname", "course", "date", "extra"].includes(target)) {
+    state.identity[target].size = clamp(state.identity[target].size * ratio, 12, 100);
+  } else if (target?.startsWith("sticker:")) {
+    const sticker = state.stickers.find((item) => `sticker:${item.id}` === target);
+    if (sticker) sticker.scale = clamp(sticker.scale * ratio, 0.1, 2.6);
+  }
+}
+
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function syncGestureOutputs() {
+  elements.photoScale.value = String(Math.round(state.image.scale * 100));
+  elements.photoScaleValue.textContent = `${Math.round(state.image.scale * 100)}%`;
+  elements.scorecardScale.value = String(Math.round(state.scorecard.scale * 100));
+  elements.scorecardScaleValue.textContent = `${Math.round(state.scorecard.scale * 100)}%`;
+  elements.totalSize.value = String(Math.round(state.total.size));
+  elements.totalSizeValue.textContent = `${Math.round(state.total.size)}px`;
+  syncIdentityControls();
+  syncStickerControls();
+}
+
+function resetGestureBaseline() {
+  const points = [...activePointers.values()];
+  lastGestureCenter = points.length ? gestureCenter(points) : null;
+  lastGestureDistance = points.length >= 2 ? distanceBetween(points) : 0;
+}
+
+function startPointer(event) {
+  gestureTarget = gestureTarget || targetForStep();
+  if (!gestureTarget) return;
+  canvas.setPointerCapture(event.pointerId);
+  activePointers.set(event.pointerId, canvasPoint(event));
+  resetGestureBaseline();
+}
+
+function movePointer(event) {
+  if (!activePointers.has(event.pointerId) || !gestureTarget) return;
+  activePointers.set(event.pointerId, canvasPoint(event));
+  const points = [...activePointers.values()];
+  const center = gestureCenter(points);
+  if (lastGestureCenter) {
+    translateGestureTarget(gestureTarget, center.x - lastGestureCenter.x, center.y - lastGestureCenter.y);
+  }
+  if (points.length >= 2) {
+    const distance = distanceBetween(points);
+    if (lastGestureDistance > 0) scaleGestureTarget(gestureTarget, distance / lastGestureDistance);
+    lastGestureDistance = distance;
+  }
+  lastGestureCenter = center;
+  syncGestureOutputs();
+  renderMain();
+}
+
+function endPointer(event) {
+  activePointers.delete(event.pointerId);
+  if (!activePointers.size) {
+    gestureTarget = null;
+    lastGestureCenter = null;
+    lastGestureDistance = 0;
+  } else {
+    resetGestureBaseline();
+  }
+}
+
+function resetPhoto() {
+  const defaults = createModel(state.templateId, false);
+  state.image = { ...defaults.image };
+  state.scorecard.x = defaults.scorecard.x;
+  state.scorecard.y = defaults.scorecard.y;
+  state.total.x = defaults.total.x;
+  state.total.y = defaults.total.y;
+  ["nickname", "course", "date", "extra"].forEach((key) => {
+    state.identity[key].x = defaults.identity[key].x;
+    state.identity[key].y = defaults.identity[key].y;
+  });
+  state.stickers.forEach((sticker, index) => {
+    sticker.x = 500 + (index % 3 - 1) * 90;
+    sticker.y = 630 + (index % 2) * 90;
+    sticker.scale = 1;
+  });
+  syncAllControls();
+  renderMain();
+}
+
+function loadPhoto(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    const image = new Image();
+    image.onload = () => {
+      state.photo = image;
+      state.subjectMask = null;
+      state.segmentationState = "loading";
+      state.image = { scale: 1, x: 0, y: 0, blur: state.image.blur };
+      syncAllControls();
+      renderMain();
+      requestSegmentation();
+    };
+    image.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function copyMask(mask) {
+  const canvasElement = document.createElement("canvas");
+  canvasElement.width = mask.width || state.photo.naturalWidth;
+  canvasElement.height = mask.height || state.photo.naturalHeight;
+  canvasElement.getContext("2d").drawImage(mask, 0, 0, canvasElement.width, canvasElement.height);
+  return canvasElement;
+}
+
+function measureMask(mask) {
   const sample = document.createElement("canvas");
   sample.width = 160;
   sample.height = 160;
-  const sampleCtx = sample.getContext("2d", { willReadFrequently: true });
-  sampleCtx.drawImage(maskCanvas, 0, 0, sample.width, sample.height);
-  const pixels = sampleCtx.getImageData(0, 0, sample.width, sample.height).data;
-
+  const sampleContext = sample.getContext("2d", { willReadFrequently: true });
+  sampleContext.drawImage(mask, 0, 0, 160, 160);
+  const pixels = sampleContext.getImageData(0, 0, 160, 160).data;
   let varyingAlpha = false;
-  for (let i = 3; i < pixels.length; i += 4) {
-    if (pixels[i] < 250) {
+  for (let index = 3; index < pixels.length; index += 4) {
+    if (pixels[index] < 250) {
       varyingAlpha = true;
       break;
     }
   }
-
-  let strongPixels = 0;
-  let weightedTotal = 0;
-  const pixelCount = pixels.length / 4;
-  for (let i = 0; i < pixels.length; i += 4) {
+  let strong = 0;
+  let mean = 0;
+  for (let index = 0; index < pixels.length; index += 4) {
     const confidence = varyingAlpha
-      ? pixels[i + 3] / 255
-      : (pixels[i] + pixels[i + 1] + pixels[i + 2]) / (255 * 3);
-    weightedTotal += confidence;
-    if (confidence >= 0.55) {
-      strongPixels += 1;
-    }
+      ? pixels[index + 3] / 255
+      : (pixels[index] + pixels[index + 1] + pixels[index + 2]) / (255 * 3);
+    mean += confidence;
+    if (confidence >= 0.55) strong += 1;
   }
-
-  return {
-    strongRatio: strongPixels / pixelCount,
-    meanConfidence: weightedTotal / pixelCount
-  };
+  const count = pixels.length / 4;
+  return { strongRatio: strong / count, meanConfidence: mean / count };
 }
 
 function ensureSegmentationLibrary() {
-  if (typeof window.SelfieSegmentation === "function") {
-    return Promise.resolve();
-  }
-  if (segmentationLibraryPromise) {
-    return segmentationLibraryPromise;
-  }
-
+  if (typeof window.SelfieSegmentation === "function") return Promise.resolve();
+  if (segmentationLibraryPromise) return segmentationLibraryPromise;
   segmentationLibraryPromise = new Promise((resolve, reject) => {
     const script = document.createElement("script");
     script.src = "https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation@0.1/selfie_segmentation.js";
     script.async = true;
-    script.crossOrigin = "anonymous";
-    script.onload = () => {
-      if (typeof window.SelfieSegmentation === "function") {
-        resolve();
-        return;
-      }
-      segmentationLibraryPromise = null;
-      reject(new Error("segmentation library unavailable"));
-    };
-    script.onerror = () => {
-      script.remove();
-      segmentationLibraryPromise = null;
-      reject(new Error("segmentation library unavailable"));
-    };
+    script.onload = resolve;
+    script.onerror = reject;
     document.head.appendChild(script);
   });
-
   return segmentationLibraryPromise;
 }
 
-function getSelfieSegmenter() {
-  if (selfieSegmenter) {
-    return selfieSegmenter;
-  }
-  if (typeof window.SelfieSegmentation !== "function") {
-    throw new Error("segmentation library unavailable");
-  }
-
+function getSegmenter() {
+  if (selfieSegmenter) return selfieSegmenter;
   selfieSegmenter = new window.SelfieSegmentation({
     locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation@0.1/${file}`
   });
-  selfieSegmenter.setOptions({
-    modelSelection: 0,
-    selfieMode: false
-  });
+  selfieSegmenter.setOptions({ modelSelection: 0, selfieMode: false });
   selfieSegmenter.onResults((results) => {
     if (pendingSegmentationResolve) {
       const resolve = pendingSegmentationResolve;
@@ -2646,388 +3057,304 @@ function getSelfieSegmenter() {
 }
 
 async function runSegmentation(token) {
-  if (!uploadedImage || token !== segmentationToken) {
-    return;
-  }
-
-  updateRecognitionStatus("loading", "analyzingPhoto");
-
+  if (!state.photo || token !== segmentationToken) return;
+  state.segmentationState = "loading";
+  updateRecognitionUi();
   try {
     await ensureSegmentationLibrary();
-    const segmenter = getSelfieSegmenter();
-    const resultsPromise = new Promise((resolve) => {
+    const resultPromise = new Promise((resolve) => {
       pendingSegmentationResolve = resolve;
     });
-    await segmenter.send({ image: uploadedImage });
+    await getSegmenter().send({ image: state.photo });
     const results = await Promise.race([
-      resultsPromise,
-      new Promise((_, reject) => window.setTimeout(() => reject(new Error("segmentation timeout")), 30000))
+      resultPromise,
+      new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 30000))
     ]);
-
-    if (token !== segmentationToken) {
-      return;
-    }
-
-    const mask = copySegmentationMask(results.segmentationMask);
+    if (token !== segmentationToken) return;
+    const mask = copyMask(results.segmentationMask);
     const metrics = measureMask(mask);
-    const looksLikePerson =
-      metrics.strongRatio >= 0.012 &&
+    const person = metrics.strongRatio >= 0.012 &&
       metrics.strongRatio <= 0.82 &&
       metrics.meanConfidence >= 0.018;
-
-    if (looksLikePerson) {
-      subjectMaskSource = mask;
-      updateRecognitionStatus("person", "personRatio", {
-        percent: Math.round(metrics.strongRatio * 100)
-      });
-    } else {
-      subjectMaskSource = null;
-      updateRecognitionStatus("fallback", "noClearPerson");
-    }
-  } catch (error) {
-    if (token !== segmentationToken) {
-      return;
-    }
+    state.subjectMask = person ? mask : null;
+    state.segmentationState = person ? "person" : "fallback";
+  } catch {
+    if (token !== segmentationToken) return;
+    state.subjectMask = null;
+    state.segmentationState = "fallback";
     pendingSegmentationResolve = null;
-    if (selfieSegmenter && typeof selfieSegmenter.close === "function") {
-      selfieSegmenter.close();
-    }
+    if (selfieSegmenter?.close) selfieSegmenter.close();
     selfieSegmenter = null;
-    subjectMaskSource = null;
-    updateRecognitionStatus("fallback", "recognitionUnavailable");
   }
+  updateRecognitionUi();
+  renderMain();
 }
 
 function requestSegmentation() {
+  if (!state.photo) return;
   const token = ++segmentationToken;
-  subjectMaskSource = null;
-  segmentationQueue = segmentationQueue
-    .catch(() => undefined)
-    .then(() => runSegmentation(token));
+  state.subjectMask = null;
+  segmentationQueue = segmentationQueue.catch(() => undefined).then(() => runSegmentation(token));
 }
 
-function canvasPoint(event) {
-  const rect = canvas.getBoundingClientRect();
-  return {
-    x: ((event.clientX - rect.left) / rect.width) * posterSize,
-    y: ((event.clientY - rect.top) / rect.height) * getPosterHeight()
+function updateRecognitionUi() {
+  const keys = {
+    idle: "waitingPhoto",
+    loading: "analyzingPhoto",
+    person: "personDetected",
+    fallback: "noPerson"
   };
+  elements.recognitionDetail.textContent = translate(keys[state.segmentationState] || "waitingPhoto");
+  elements.retrySegmentation.disabled = !state.photo || state.segmentationState === "loading";
 }
 
-function pointInsideBounds(point, bounds) {
-  return (
-    point.x >= bounds.x &&
-    point.x <= bounds.x + bounds.w &&
-    point.y >= bounds.y &&
-    point.y <= bounds.y + bounds.h
-  );
-}
-
-function hitTestElement(point) {
-  const stickerHitOrder = stickers
-    .slice()
-    .reverse()
-    .map((sticker) => stickerElementKey(sticker.id));
-  const hitOrder = [...stickerHitOrder, "nickname", "club", "extra", "scoreCard", "total"];
-  return hitOrder.find((key) => elementBounds[key] && pointInsideBounds(point, elementBounds[key])) || null;
-}
-
-function getElementAnchor(key) {
-  const sticker = getStickerFromElementKey(key);
-  if (sticker) {
-    return { x: sticker.x, y: sticker.y };
-  }
-  if (key === "scoreCard") {
-    return { x: scoreBox.x, y: scoreBox.y };
-  }
-  if (key === "total") {
-    return { x: elementPositions.total.x, y: Number(elements.totalY.value) };
-  }
-  return { ...elementPositions[key] };
-}
-
-function setElementAnchor(key, x, y) {
-  const sticker = getStickerFromElementKey(key);
-  if (sticker) {
-    sticker.x = x;
-    sticker.y = y;
-    return;
-  }
-  if (key === "scoreCard") {
-    scoreBox.x = x;
-    scoreBox.y = y;
-    return;
-  }
-  if (key === "total") {
-    elementPositions.total.x = x;
-    elements.totalY.value = String(Math.round(y));
-    return;
-  }
-  elementPositions[key].x = x;
-  elementPositions[key].y = y;
-}
-
-function startPointer(event) {
-  if (activeEditorTab !== "photo") {
-    return;
-  }
-
-  const point = canvasPoint(event);
-
-  const target = hitTestElement(point);
-  if (target) {
-    canvas.setPointerCapture(event.pointerId);
-    selectedElement = target;
-    elementDragState = {
-      target,
-      x: point.x,
-      y: point.y,
-      anchor: getElementAnchor(target)
-    };
-    dragState = null;
-    const sticker = getStickerFromElementKey(target);
-    if (sticker) {
-      selectedStickerId = sticker.id;
-      updateStickerControls();
-    }
-    renderPoster();
-    return;
-  }
-  selectedElement = null;
-
-  if (!uploadedImage) {
-    renderPoster();
-    return;
-  }
-
-  canvas.setPointerCapture(event.pointerId);
-  dragState = {
-    x: point.x,
-    y: point.y,
-    offsetX: imageState.offsetX,
-    offsetY: imageState.offsetY
-  };
-}
-
-function movePointer(event) {
-  if (activeEditorTab !== "photo") {
-    return;
-  }
-
-  if (elementDragState) {
-    const point = canvasPoint(event);
-    const deltaX = point.x - elementDragState.x;
-    const deltaY = point.y - elementDragState.y;
-    setElementAnchor(
-      elementDragState.target,
-      elementDragState.anchor.x + deltaX,
-      elementDragState.anchor.y + deltaY
-    );
-    renderPoster();
-    return;
-  }
-
-  if (!dragState) {
-    return;
-  }
-
-  const point = canvasPoint(event);
-  imageState.offsetX = dragState.offsetX + point.x - dragState.x;
-  imageState.offsetY = dragState.offsetY + point.y - dragState.y;
-  renderPoster();
-}
-
-function endPointer() {
-  dragState = null;
-  elementDragState = null;
-}
-
-function loadImage(file) {
-  if (!file) {
-    return;
-  }
-
-  const reader = new FileReader();
-  reader.onload = () => {
-    const img = new Image();
-    img.onload = () => {
-      uploadedImage = img;
-      imageState = {
-        scale: Number(elements.zoomRange.value) / 100,
-        offsetX: 0,
-        offsetY: 0
+function addStickerFiles(files) {
+  const available = MAX_STICKERS - state.stickers.length;
+  [...files].slice(0, available).forEach((file, index) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const image = new Image();
+      image.onload = () => {
+        const maxSide = 220;
+        const scale = Math.min(maxSide / image.naturalWidth, maxSide / image.naturalHeight, 1);
+        const sticker = {
+          id: String(++stickerIdCounter),
+          image,
+          url: reader.result,
+          baseWidth: image.naturalWidth * scale,
+          baseHeight: image.naturalHeight * scale,
+          x: 500 + (state.stickers.length % 3 - 1) * 90,
+          y: 630 + (state.stickers.length % 2) * 90,
+          scale: 1
+        };
+        state.stickers.push(sticker);
+        state.selectedStickerId = sticker.id;
+        renderStickerList();
+        syncStickerControls();
+        renderMain();
       };
-      renderPoster();
-      requestSegmentation();
+      image.src = reader.result;
     };
-    img.src = reader.result;
-  };
-  reader.readAsDataURL(file);
+    reader.readAsDataURL(file);
+  });
+  elements.stickerInput.value = "";
+}
+
+function removeSelectedSticker() {
+  if (!state.selectedStickerId) return;
+  state.stickers = state.stickers.filter((sticker) => sticker.id !== state.selectedStickerId);
+  state.selectedStickerId = state.stickers.at(-1)?.id || null;
+  renderStickerList();
+  syncStickerControls();
+  renderMain();
 }
 
 function downloadPoster() {
-  renderPoster({ exporting: true });
+  if (!selectedTemplateId) return;
+  renderMain(true);
   const link = document.createElement("a");
-  const safeName = (elements.nickname.value.trim() || "golf").replace(/[^\w\u4e00-\u9fa5-]+/g, "-");
-  link.download = `${safeName}-golf-poster.png`;
-  link.href = canvas.toDataURL("image/png");
-  renderPoster();
+  link.download = `golf-poster-${Date.now()}.png`;
+  link.href = canvas.toDataURL("image/png", 1);
   link.click();
+  renderMain();
 }
 
-function resetCanvasLayout({ render = true } = {}) {
-  elements.zoomRange.value = "100";
-  elements.backgroundBlur.value = "0";
-  imageState = { scale: 1, offsetX: 0, offsetY: 0 };
-  resetElementPositions();
-  resetStickerPositions();
-  updateZoomOutput();
-  updateBackgroundBlurOutput();
-  if (render) {
-    renderPoster();
-  }
-}
-
-function resetPoster() {
+function resetAll() {
   segmentationToken += 1;
-  stickerLoadToken += 1;
-  uploadedImage = null;
-  subjectMaskSource = null;
-  stickers = [];
-  selectedStickerId = null;
+  selectedTemplateId = null;
+  state = createModel("academy", false);
+  returnToSummary = false;
+  activeIdentityTarget = "nickname";
   elements.photoInput.value = "";
   elements.stickerInput.value = "";
-  Object.entries(emptyValues).forEach(([key, value]) => {
-    elements[key].value = value;
-  });
-  elements.totalOpacity.value = "88";
-  elements.autoTotal.checked = true;
-  elements.totalAboveSubject.checked = false;
-  resetCanvasLayout({ render: false });
-  updateStickerControls();
-  updateAutoTotal();
-  updateRecognitionStatus("idle", "waitingPhoto");
+  elements.templateNext.disabled = true;
+  syncAllControls();
+  renderTemplateGallery();
+  setStep("template");
 }
 
-document.querySelectorAll(".tab").forEach((tab) => {
-  tab.addEventListener("click", () => {
-    const target = tab.dataset.tab;
-    activeEditorTab = target;
-    dragState = null;
-    elementDragState = null;
-    if (target !== "photo") {
-      selectedElement = null;
-    } else if (selectedStickerId) {
-      selectedElement = stickerElementKey(selectedStickerId);
+function bindEvents() {
+  elements.templateNext.addEventListener("click", () => {
+    if (!selectedTemplateId) return;
+    if (returnToSummary) {
+      returnToSummary = false;
+      setStep("summary");
+    } else {
+      setStep("photo");
     }
-    canvas.classList.toggle("is-layout-mode", target === "photo");
-    document.querySelectorAll(".tab").forEach((item) => item.classList.toggle("is-active", item === tab));
-    document.querySelectorAll(".tab-panel").forEach((panel) => {
-      panel.classList.toggle("is-active", panel.dataset.panel === target);
+  });
+  elements.backButton.addEventListener("click", previousStep);
+  elements.nextButton.addEventListener("click", nextStep);
+  elements.languageSelect.addEventListener("change", (event) => applyLanguage(event.target.value));
+  elements.resetPoster.addEventListener("click", resetAll);
+  elements.openPosterPreview.addEventListener("click", openFullPreview);
+  elements.closePreviewModal.addEventListener("click", closePreview);
+  elements.previewModal.querySelector(".modal-backdrop").addEventListener("click", closePreview);
+  elements.useTemplateButton.addEventListener("click", () => {
+    if (modalMode === "template" && modalTemplateId) activateTemplate(modalTemplateId, true);
+    closePreview();
+  });
+
+  elements.photoInput.addEventListener("change", (event) => loadPhoto(event.target.files[0]));
+  elements.resetPhoto.addEventListener("click", resetPhoto);
+  elements.photoScale.addEventListener("input", () => {
+    state.image.scale = Number(elements.photoScale.value) / 100;
+    elements.photoScaleValue.textContent = `${elements.photoScale.value}%`;
+    renderMain();
+  });
+  elements.backgroundBlur.addEventListener("input", () => {
+    state.image.blur = Number(elements.backgroundBlur.value);
+    elements.backgroundBlurValue.textContent = `${state.image.blur}px`;
+    renderMain();
+  });
+  elements.retrySegmentation.addEventListener("click", requestSegmentation);
+
+  elements.scoreInput.addEventListener("input", () => {
+    state.scores = parseScores(elements.scoreInput.value);
+    updateAutoTotal();
+  });
+  elements.highlightInput.addEventListener("input", () => {
+    state.highlights = parseHighlights(elements.highlightInput.value);
+    renderMain();
+  });
+  elements.badgeText.addEventListener("input", () => {
+    state.badge = elements.badgeText.value.trim();
+    renderMain();
+  });
+  elements.scoreFont.addEventListener("change", () => {
+    state.fonts.score = elements.scoreFont.value;
+    renderMain();
+  });
+  elements.scorecardScale.addEventListener("input", () => {
+    state.scorecard.scale = Number(elements.scorecardScale.value) / 100;
+    elements.scorecardScaleValue.textContent = `${elements.scorecardScale.value}%`;
+    renderMain();
+  });
+  [
+    ["cardColor", "card"],
+    ["lineColor", "line"],
+    ["scoreTextColor", "scoreText"],
+    ["totalColor", "total"]
+  ].forEach(([elementKey, styleKey]) => {
+    elements[elementKey].addEventListener("input", () => {
+      state.paletteId = "custom";
+      state.style[styleKey] = elements[elementKey].value;
+      renderPaletteList();
+      renderMain();
     });
-    renderPoster();
   });
-});
-
-[
-  elements.nickname,
-  elements.club,
-  elements.badgeText,
-  elements.highlightInput,
-  elements.totalScore,
-  elements.totalOpacity,
-  elements.totalY,
-  elements.extraInfo,
-  elements.brandText
-].forEach((element) => {
-  element.addEventListener("input", renderPoster);
-});
-
-elements.scoreInput.addEventListener("input", updateAutoTotal);
-elements.autoTotal.addEventListener("change", updateAutoTotal);
-elements.totalAboveSubject.addEventListener("change", renderPoster);
-elements.languageSelect.addEventListener("change", (event) => {
-  applyLanguage(event.target.value);
-});
-document.querySelectorAll(".template-option").forEach((button) => {
-  button.addEventListener("click", () => {
-    applyPosterTemplate(button.dataset.template);
+  elements.textColor.addEventListener("input", () => {
+    state.paletteId = "custom";
+    state.identity[effectiveIdentityTarget()].color = elements.textColor.value;
+    renderPaletteList();
+    renderMain();
   });
-});
-elements.englishFont.addEventListener("change", () => {
-  updateFontPreviews();
-  renderPoster();
-});
-elements.numberFont.addEventListener("change", () => {
-  updateFontPreviews();
-  renderPoster();
-});
-elements.stickerInput.addEventListener("change", (event) => {
-  addStickerFiles(event.target.files);
-});
-elements.stickerScale.addEventListener("input", () => {
-  const sticker = getStickerById(selectedStickerId);
-  if (!sticker) {
-    return;
-  }
-  sticker.scale = Number(elements.stickerScale.value) / 100;
-  elements.stickerScaleValue.textContent = `${elements.stickerScale.value}%`;
-  renderPoster();
-});
-elements.removeSticker.addEventListener("click", removeSelectedSticker);
-[
-  elements.nicknameFontSize,
-  elements.clubFontSize,
-  elements.totalFontSize,
-  elements.extraFontSize
-].forEach((element) => {
-  element.addEventListener("input", () => {
-    updateStyleOutputs();
-    renderPoster();
+
+  elements.autoTotal.addEventListener("change", () => {
+    state.autoTotal = elements.autoTotal.checked;
+    updateAutoTotal();
   });
-});
-[
-  elements.nicknameColor,
-  elements.clubColor,
-  elements.totalColor,
-  elements.extraColor,
-  elements.scoreTableColor
-].forEach((element) => {
-  element.addEventListener("input", renderPoster);
-});
-elements.zoomRange.addEventListener("input", () => {
-  imageState.scale = Number(elements.zoomRange.value) / 100;
-  updateZoomOutput();
-  renderPoster();
-});
-elements.backgroundBlur.addEventListener("input", () => {
-  updateBackgroundBlurOutput();
-  renderPoster();
-});
-elements.resetZoom.addEventListener("click", () => {
-  resetCanvasLayout();
-});
+  elements.totalScore.addEventListener("input", () => {
+    if (!state.autoTotal) {
+      state.total.value = elements.totalScore.value;
+      renderMain();
+    }
+  });
+  elements.numberFont.addEventListener("change", () => {
+    state.fonts.total = elements.numberFont.value;
+    renderMain();
+  });
+  elements.totalOpacity.addEventListener("input", () => {
+    state.total.opacity = Number(elements.totalOpacity.value);
+    elements.totalOpacityValue.textContent = `${elements.totalOpacity.value}%`;
+    renderMain();
+  });
+  elements.totalSize.addEventListener("input", () => {
+    state.total.size = Number(elements.totalSize.value);
+    elements.totalSizeValue.textContent = `${elements.totalSize.value}px`;
+    renderMain();
+  });
+  elements.totalAboveSubject.addEventListener("change", () => {
+    state.total.aboveSubject = elements.totalAboveSubject.checked;
+    renderMain();
+  });
 
-elements.photoInput.addEventListener("change", (event) => loadImage(event.target.files[0]));
-elements.downloadPoster.addEventListener("click", downloadPoster);
-elements.resetPoster.addEventListener("click", resetPoster);
-elements.retrySegmentation.addEventListener("click", requestSegmentation);
-canvas.addEventListener("pointerdown", startPointer);
-canvas.addEventListener("pointermove", movePointer);
-canvas.addEventListener("pointerup", endPointer);
-canvas.addEventListener("pointercancel", endPointer);
+  document.querySelectorAll(".identity-target").forEach((button) => {
+    button.addEventListener("click", () => {
+      activeIdentityTarget = button.dataset.target;
+      syncIdentityControls();
+      renderMain();
+    });
+  });
+  elements.nickname.addEventListener("input", () => {
+    state.identity.nickname.value = elements.nickname.value;
+    renderMain();
+  });
+  elements.course.addEventListener("input", () => {
+    state.identity.course.value = elements.course.value;
+    renderMain();
+  });
+  elements.dateInput.addEventListener("input", () => {
+    state.identity.date.value = elements.dateInput.value;
+    renderMain();
+  });
+  elements.extraInfo.addEventListener("input", () => {
+    state.identity.extra.value = elements.extraInfo.value;
+    renderMain();
+  });
+  elements.brandText.addEventListener("input", () => {
+    state.identity.brand = elements.brandText.value;
+    renderMain();
+  });
+  elements.textFont.addEventListener("change", () => {
+    state.identity[effectiveIdentityTarget()].font = elements.textFont.value;
+    renderMain();
+  });
+  elements.identitySize.addEventListener("input", () => {
+    const target = effectiveIdentityTarget();
+    state.identity[target].size = Number(elements.identitySize.value);
+    elements.identitySizeValue.textContent = `${elements.identitySize.value}px`;
+    renderMain();
+  });
 
-currentLanguage = loadLanguagePreference();
-applyPosterTemplate("template1");
-updateAutoTotal();
-updateZoomOutput();
-updateBackgroundBlurOutput();
-updateStyleOutputs();
-updateStickerControls();
-applyLanguage(currentLanguage, false);
-if (document.fonts && document.fonts.ready) {
-  document.fonts.ready.then(renderPoster);
+  elements.stickerInput.addEventListener("change", (event) => addStickerFiles(event.target.files));
+  elements.stickerScale.addEventListener("input", () => {
+    const sticker = selectedSticker();
+    if (!sticker) return;
+    sticker.scale = Number(elements.stickerScale.value) / 100;
+    elements.stickerScaleValue.textContent = `${elements.stickerScale.value}%`;
+    renderMain();
+  });
+  elements.removeSticker.addEventListener("click", removeSelectedSticker);
+  elements.downloadPoster.addEventListener("click", downloadPoster);
+
+  document.querySelectorAll(".summary-edit").forEach((button) => {
+    button.addEventListener("click", () => {
+      returnToSummary = true;
+      setStep(button.dataset.editStep);
+    });
+  });
+
+  canvas.addEventListener("pointerdown", startPointer);
+  canvas.addEventListener("pointermove", movePointer);
+  canvas.addEventListener("pointerup", endPointer);
+  canvas.addEventListener("pointercancel", endPointer);
 }
-</script>
+
+function initialize() {
+  populateFontSelect(elements.scoreFont);
+  populateFontSelect(elements.numberFont);
+  populateFontSelect(elements.textFont);
+  bindEvents();
+  language = loadLanguage();
+  applyLanguage(language, false);
+  syncAllControls();
+  renderTemplateGallery();
+  setStep("template");
+}
+
+initialize();
+
+    </script>
   </body>
 </html>

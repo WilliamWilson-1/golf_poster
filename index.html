@@ -3,302 +3,363 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="#002b50">
+    <meta name="theme-color" content="#001f38">
     <title>GOLFBROTHERS Poster Studio</title>
-    <meta name="description" content="上传照片并生成可下载的高尔夫成绩海报">
+    <meta name="description" content="上传照片并按模板生成可下载的高尔夫成绩海报">
     <link rel="stylesheet" href="./styles.css">
   </head>
   <body>
-    <main class="app-shell">
-      <section class="hero-panel" aria-label="海报预览" data-i18n-aria="posterPreview">
-        <div class="topbar">
-          <div class="brand-lockup">
-            <span class="club-mark" aria-hidden="true"></span>
-            <div>
-              <p class="eyebrow">GOLFBROTHERS</p>
-              <h1>POSTER STUDIO</h1>
-            </div>
-          </div>
-          <div class="top-actions">
-            <select id="languageSelect" class="language-menu" aria-label="界面语言" data-i18n-aria="languageLabel">
-              <option value="zh">中</option>
-              <option value="en">EN</option>
-            </select>
-            <button class="icon-button" id="resetPoster" type="button" aria-label="清空海报" title="清空海报" data-i18n-title="resetPoster">↻</button>
+    <main id="app" class="app-shell" data-step="template">
+      <header class="app-header">
+        <div class="brand-lockup">
+          <span class="brand-flag" aria-hidden="true"></span>
+          <div>
+            <strong>GOLFBROTHERS</strong>
+            <span>POSTER STUDIO</span>
           </div>
         </div>
-
-        <div class="tournament-strip">
-          <strong>GB INTERNATIONAL</strong>
-          <span>TOURNAMENT GRAPHICS / 01</span>
+        <div class="header-actions">
+          <select id="languageSelect" class="language-menu" aria-label="界面语言">
+            <option value="zh">中文</option>
+            <option value="en">EN</option>
+          </select>
+          <button id="resetPoster" class="icon-button reset-icon" type="button" aria-label="重置海报" title="重置海报"></button>
         </div>
+      </header>
 
-        <div class="template-library">
-          <div class="template-library__header">
-            <div>
-              <span class="section-kicker">01 / TEMPLATE</span>
-              <strong data-i18n="templateLibrary">选择模板</strong>
-            </div>
-          </div>
-          <div class="template-gallery" aria-label="海报模板" data-i18n-aria="templateLibrary">
-            <button class="template-option is-active" type="button" data-template="template1" aria-pressed="true">
-              <span class="template-art template-art--template1" aria-hidden="true">
-                <i class="template-art__score">68</i>
-                <i class="template-art__subject"></i>
-                <i class="template-art__table"></i>
-              </span>
-              <strong data-i18n="templateOne">模板 1</strong>
-            </button>
-            <button class="template-option" type="button" data-template="template2" aria-pressed="false">
-              <span class="template-art template-art--template2" aria-hidden="true">
-                <i class="template-art__score">62</i>
-                <i class="template-art__subject"></i>
-                <i class="template-art__table"></i>
-              </span>
-              <strong data-i18n="templateTwo">模板 2</strong>
-            </button>
-          </div>
+      <section id="templateScreen" class="template-screen">
+        <div class="template-intro">
+          <span class="step-index">01 / 07</span>
+          <h1 data-i18n="chooseTemplate">选择海报模板</h1>
+          <p data-i18n="chooseTemplateHint">点击模板可放大查看，选择后进入编辑。</p>
         </div>
-
-        <div class="poster-stage">
-          <canvas id="posterCanvas" class="is-layout-mode" width="1000" height="1265" aria-label="海报预览画布" data-i18n-aria="posterCanvas"></canvas>
-        </div>
-
-        <div class="primary-actions">
-          <label class="file-button">
-            <input id="photoInput" type="file" accept="image/*">
-            <span class="upload-icon" aria-hidden="true"></span>
-            <span data-i18n="uploadPhoto">上传照片</span>
-          </label>
-          <button id="downloadPoster" class="download-button" type="button">
-            <span class="download-icon" aria-hidden="true"></span>
-            <span data-i18n="downloadPoster">下载海报</span>
+        <div id="templateGallery" class="template-gallery" role="radiogroup" aria-label="海报模板"></div>
+        <footer class="template-footer">
+          <button id="templateNext" class="primary-button next-button" type="button" disabled>
+            <span data-i18n="next">下一步</span>
+            <i aria-hidden="true"></i>
           </button>
-        </div>
-        <p id="segmentationStatus" class="recognition-status" data-state="idle" aria-live="polite" data-i18n="statusIdle">上传照片后自动识别人像</p>
+        </footer>
       </section>
 
-      <section class="controls-panel" aria-label="海报编辑" data-i18n-aria="posterEditor">
-        <div class="tabs" role="tablist" aria-label="编辑项目" data-i18n-aria="editorSections">
-          <button class="tab is-active" type="button" data-tab="photo" role="tab" data-i18n="tabPhoto">图片</button>
-          <button class="tab" type="button" data-tab="scores" role="tab" data-i18n="tabScores">成绩表</button>
-          <button class="tab" type="button" data-tab="total" role="tab" data-i18n="tabTotal">总成绩</button>
-          <button class="tab" type="button" data-tab="profile" role="tab" data-i18n="tabProfile">昵称</button>
-          <button class="tab" type="button" data-tab="extra" role="tab" data-i18n="tabExtra">额外信息</button>
+      <section id="editorScreen" class="editor-screen" hidden>
+        <div class="preview-zone">
+          <div class="preview-toolbar">
+            <div>
+              <span id="stepCounter" class="step-index">02 / 07</span>
+              <strong id="stepTitle">调整照片</strong>
+            </div>
+            <button id="openPosterPreview" class="preview-button" type="button" data-i18n="preview">预览</button>
+          </div>
+          <div class="canvas-stage">
+            <canvas id="posterCanvas" width="1000" height="1265" aria-label="海报预览画布"></canvas>
+          </div>
+          <div id="gestureHint" class="gesture-hint" data-i18n="photoGesture">拖动移动照片，双指缩放</div>
         </div>
 
-        <div class="tab-panel" data-panel="profile">
-          <label class="field">
-            <span data-i18n="nickname">昵称</span>
-            <input id="nickname" type="text" value="" maxlength="18" autocomplete="off">
-          </label>
-          <div class="style-row">
-            <label class="field">
-              <div class="field-heading">
-                <span data-i18n="nicknameSize">昵称字号</span>
-                <output id="nicknameFontSizeValue" for="nicknameFontSize">34px</output>
+        <div id="controlScroller" class="control-scroller">
+          <section class="control-panel is-active" data-panel="photo">
+            <div class="panel-heading">
+              <span class="panel-number">02</span>
+              <div>
+                <h2 data-i18n="photoStep">照片</h2>
+                <p data-i18n="photoStepHint">当前画布手势仅调整照片。</p>
               </div>
-              <input id="nicknameFontSize" type="range" min="18" max="54" value="34">
-            </label>
-            <label class="field color-field">
-              <span data-i18n="nicknameColor">昵称颜色</span>
-              <input id="nicknameColor" type="color" value="#ffffff">
-            </label>
-          </div>
-          <label class="field">
-            <span data-i18n="club">球场信息 / 赛事名称</span>
-            <input id="club" type="text" value="" maxlength="26" autocomplete="off">
-          </label>
-          <div class="style-row">
-            <label class="field">
-              <div class="field-heading">
-                <span data-i18n="clubSize">赛事信息字号</span>
-                <output id="clubFontSizeValue" for="clubFontSize">34px</output>
+            </div>
+
+            <div class="action-row">
+              <label class="upload-button">
+                <input id="photoInput" type="file" accept="image/*">
+                <span class="upload-symbol" aria-hidden="true"></span>
+                <span data-i18n="uploadPhoto">上传照片</span>
+              </label>
+              <button id="resetPhoto" class="secondary-button" type="button" data-i18n="resetPhoto">复位画布</button>
+            </div>
+
+            <label class="control-field">
+              <span data-i18n="photoScale">照片大小</span>
+              <div class="range-line">
+                <input id="photoScale" type="range" min="80" max="260" value="100">
+                <output id="photoScaleValue">100%</output>
               </div>
-              <input id="clubFontSize" type="range" min="18" max="54" value="34">
             </label>
-            <label class="field color-field">
-              <span data-i18n="clubColor">赛事信息颜色</span>
-              <input id="clubColor" type="color" value="#ffffff">
-            </label>
-          </div>
-        </div>
 
-        <div class="tab-panel" data-panel="scores">
-          <label class="field">
-            <span data-i18n="scoreTable">成绩表</span>
-            <textarea id="scoreInput" rows="4" spellcheck="false" placeholder="输入最多 18 洞成绩，用空格或逗号分隔" data-i18n-placeholder="scorePlaceholder"></textarea>
-          </label>
-          <div class="field-grid">
-            <label class="field">
-              <span data-i18n="badge">圆形标记</span>
-              <input id="badgeText" type="text" value="" maxlength="2" inputmode="numeric">
+            <label class="control-field">
+              <span data-i18n="backgroundBlur">背景模糊</span>
+              <div class="range-line">
+                <input id="backgroundBlur" type="range" min="0" max="30" value="0">
+                <output id="backgroundBlurValue">0px</output>
+              </div>
             </label>
-            <label class="field">
-              <span data-i18n="highlightHoles">高亮洞号</span>
-              <input id="highlightInput" type="text" value="" placeholder="例如 3,6" inputmode="numeric" data-i18n-placeholder="highlightPlaceholder">
-            </label>
-          </div>
-          <div class="color-line">
-            <label for="scoreTableColor" data-i18n="scoreTableColor">成绩表颜色</label>
-            <input id="scoreTableColor" type="color" value="#006337">
-          </div>
-        </div>
 
-        <div class="tab-panel" data-panel="total">
-          <div class="field total-field">
-            <div class="field-heading">
-              <label for="totalScore" data-i18n="totalScore">总成绩</label>
-              <label class="toggle-control">
-                <span data-i18n="autoTotal">自动统计</span>
-                <input id="autoTotal" type="checkbox" role="switch" checked>
+            <div class="recognition-line">
+              <div>
+                <strong data-i18n="subjectDepth">人物景深</strong>
+                <span id="recognitionDetail" data-i18n="waitingPhoto">等待上传照片</span>
+              </div>
+              <button id="retrySegmentation" type="button" disabled data-i18n="retryRecognition">重新识别</button>
+            </div>
+          </section>
+
+          <section class="control-panel" data-panel="scorecard">
+            <div class="panel-heading">
+              <span class="panel-number">03</span>
+              <div>
+                <h2 data-i18n="scorecardStep">成绩卡</h2>
+                <p data-i18n="scorecardStepHint">当前画布手势仅调整成绩卡。</p>
+              </div>
+            </div>
+
+            <div class="control-field">
+              <span data-i18n="palette">模板配色</span>
+              <div id="paletteList" class="palette-list"></div>
+            </div>
+
+            <label class="control-field">
+              <span data-i18n="scores">逐洞成绩</span>
+              <textarea id="scoreInput" rows="3" spellcheck="false" placeholder="输入最多 18 洞成绩，用空格或逗号分隔"></textarea>
+            </label>
+
+            <div class="two-column">
+              <label class="control-field">
+                <span data-i18n="highlightHoles">高亮洞号</span>
+                <input id="highlightInput" type="text" inputmode="numeric" placeholder="3,6">
+              </label>
+              <label class="control-field">
+                <span data-i18n="badge">首洞标记</span>
+                <input id="badgeText" type="text" maxlength="2" inputmode="numeric">
+              </label>
+            </div>
+
+            <label class="control-field">
+              <span data-i18n="scoreFont">成绩字体</span>
+              <select id="scoreFont"></select>
+            </label>
+
+            <div class="color-grid">
+              <label>
+                <span data-i18n="cardColor">底板</span>
+                <input id="cardColor" type="color">
+              </label>
+              <label>
+                <span data-i18n="lineColor">分隔线</span>
+                <input id="lineColor" type="color">
+              </label>
+              <label>
+                <span data-i18n="scoreTextColor">数字</span>
+                <input id="scoreTextColor" type="color">
+              </label>
+            </div>
+
+            <label class="control-field">
+              <span data-i18n="scorecardScale">成绩卡大小</span>
+              <div class="range-line">
+                <input id="scorecardScale" type="range" min="55" max="180" value="100">
+                <output id="scorecardScaleValue">100%</output>
+              </div>
+            </label>
+          </section>
+
+          <section class="control-panel" data-panel="total">
+            <div class="panel-heading">
+              <span class="panel-number">04</span>
+              <div>
+                <h2 data-i18n="totalStep">总成绩</h2>
+                <p data-i18n="totalStepHint">当前画布手势仅调整总成绩。</p>
+              </div>
+            </div>
+
+            <div class="total-input-block">
+              <div class="field-heading">
+                <label for="totalScore" data-i18n="totalScore">总成绩</label>
+                <label class="switch-control">
+                  <span data-i18n="autoTotal">自动统计</span>
+                  <input id="autoTotal" type="checkbox" checked>
+                  <i aria-hidden="true"></i>
+                </label>
+              </div>
+              <input id="totalScore" type="text" maxlength="4" inputmode="numeric" readonly>
+              <small id="totalHint" data-i18n="totalHintEmpty">录入成绩后自动合计</small>
+            </div>
+
+            <label class="control-field">
+              <span data-i18n="numberFont">数字字体</span>
+              <select id="numberFont"></select>
+            </label>
+
+            <div class="two-column">
+              <label class="control-field">
+                <span data-i18n="totalColor">总成绩颜色</span>
+                <input id="totalColor" type="color">
+              </label>
+              <label class="control-field">
+                <span data-i18n="totalOpacity">透明度</span>
+                <div class="range-line">
+                  <input id="totalOpacity" type="range" min="35" max="100" value="90">
+                  <output id="totalOpacityValue">90%</output>
+                </div>
+              </label>
+            </div>
+
+            <label class="control-field">
+              <span data-i18n="totalSize">总成绩大小</span>
+              <div class="range-line">
+                <input id="totalSize" type="range" min="100" max="1600" value="500">
+                <output id="totalSizeValue">500px</output>
+              </div>
+            </label>
+
+            <div class="switch-row">
+              <label class="switch-control">
+                <span data-i18n="totalAboveSubject">总成绩置于人物上方</span>
+                <input id="totalAboveSubject" type="checkbox">
                 <i aria-hidden="true"></i>
               </label>
             </div>
-            <input id="totalScore" type="text" value="" maxlength="4" inputmode="numeric" readonly>
-            <small id="totalHint" data-i18n="totalHintEmpty">录入成绩后自动合计</small>
-          </div>
-          <div class="style-row">
-            <label class="field">
-              <div class="field-heading">
-                <span data-i18n="totalSize">总分字号</span>
-                <output id="totalFontSizeValue" for="totalFontSize">335px</output>
-              </div>
-              <input id="totalFontSize" type="range" min="160" max="1600" value="335">
-            </label>
-            <label class="field color-field">
-              <span data-i18n="totalColor">总分颜色</span>
-              <input id="totalColor" type="color" value="#083728">
-            </label>
-          </div>
-          <label class="field">
-            <span data-i18n="totalOpacity">总成绩透明度</span>
-            <input id="totalOpacity" type="range" min="45" max="95" value="88">
-          </label>
-          <label class="field">
-            <span data-i18n="totalHeight">总成绩高度</span>
-            <input id="totalY" type="range" min="-420" max="1500" value="300">
-          </label>
-          <div class="layer-toggle-field">
-            <label class="toggle-control">
-              <span data-i18n="totalAboveSubject">总成绩置于人物上方</span>
-              <input id="totalAboveSubject" type="checkbox" role="switch">
-              <i aria-hidden="true"></i>
-            </label>
-          </div>
-        </div>
+          </section>
 
-        <div class="tab-panel" data-panel="extra">
-          <label class="field">
-            <span data-i18n="extraInfo">额外信息</span>
-            <textarea id="extraInfo" rows="3" maxlength="56"></textarea>
-          </label>
-          <div class="style-row">
-            <label class="field">
-              <div class="field-heading">
-                <span data-i18n="extraSize">额外信息字号</span>
-                <output id="extraFontSizeValue" for="extraFontSize">21px</output>
+          <section class="control-panel" data-panel="identity">
+            <div class="panel-heading">
+              <span class="panel-number">05</span>
+              <div>
+                <h2 data-i18n="identityStep">文字信息</h2>
+                <p data-i18n="identityStepHint">选择一个文字元素后在画布中移动。</p>
               </div>
-              <input id="extraFontSize" type="range" min="14" max="36" value="21">
-            </label>
-            <label class="field color-field">
-              <span data-i18n="extraColor">信息颜色</span>
-              <input id="extraColor" type="color" value="#ffffff">
-            </label>
-          </div>
-          <div class="sticker-panel">
-            <div class="field-heading">
-              <strong data-i18n="stickers">贴纸</strong>
-              <output id="stickerCount">0/5</output>
             </div>
-            <div class="sticker-actions">
-              <label id="stickerUploadButton" class="sticker-upload-button">
+
+            <div class="segmented-control" role="group" aria-label="当前文字元素">
+              <button class="identity-target is-active" type="button" data-target="nickname" data-i18n="nickname">昵称</button>
+              <button class="identity-target" type="button" data-target="course" data-i18n="course">球场</button>
+              <button class="identity-target" type="button" data-target="date" data-i18n="date">日期</button>
+              <button class="identity-target" type="button" data-target="extra" data-i18n="extraInfo">补充信息</button>
+            </div>
+
+            <label class="control-field">
+              <span data-i18n="nickname">昵称</span>
+              <input id="nickname" type="text" maxlength="24" autocomplete="off">
+            </label>
+            <label class="control-field">
+              <span data-i18n="course">球场 / 赛事</span>
+              <input id="course" type="text" maxlength="40" autocomplete="off">
+            </label>
+            <label class="control-field">
+              <span data-i18n="date">日期</span>
+              <input id="dateInput" type="date">
+            </label>
+            <label class="control-field">
+              <span data-i18n="extraInfo">补充信息</span>
+              <input id="extraInfo" type="text" maxlength="48" autocomplete="off">
+            </label>
+
+            <label class="control-field">
+              <span data-i18n="textFont">文字字体</span>
+              <select id="textFont"></select>
+            </label>
+
+            <div class="two-column">
+              <label class="control-field">
+                <span data-i18n="textColor">文字颜色</span>
+                <input id="textColor" type="color">
+              </label>
+              <label class="control-field">
+                <span data-i18n="textSize">当前文字大小</span>
+                <div class="range-line">
+                  <input id="identitySize" type="range" min="12" max="100" value="38">
+                  <output id="identitySizeValue">38px</output>
+                </div>
+              </label>
+            </div>
+
+            <label class="control-field">
+              <span data-i18n="brandText">品牌文字</span>
+              <input id="brandText" type="text" value="GOLFBROTHERS" maxlength="24">
+            </label>
+          </section>
+
+          <section class="control-panel" data-panel="stickers">
+            <div class="panel-heading">
+              <span class="panel-number">06</span>
+              <div>
+                <h2 data-i18n="stickerStep">贴纸</h2>
+                <p data-i18n="stickerStepHint">上传后选择贴纸，在画布中移动或缩放。</p>
+              </div>
+            </div>
+
+            <div class="action-row">
+              <label id="stickerUploadButton" class="upload-button">
                 <input id="stickerInput" type="file" accept="image/*" multiple>
-                <span class="upload-icon" aria-hidden="true"></span>
+                <span class="upload-symbol" aria-hidden="true"></span>
                 <span data-i18n="uploadSticker">上传贴纸</span>
               </label>
-              <button id="removeSticker" class="sticker-remove-button" type="button" disabled title="删除选中贴纸" data-i18n-title="removeSticker">
-                <span aria-hidden="true">×</span>
-              </button>
+              <output id="stickerCount">0 / 5</output>
             </div>
-            <div id="stickerList" class="sticker-list" aria-label="贴纸列表" data-i18n-aria="stickerList"></div>
-            <label class="field">
-              <div class="field-heading">
-                <span data-i18n="stickerScale">贴纸大小</span>
-                <output id="stickerScaleValue" for="stickerScale">100%</output>
+
+            <div id="stickerList" class="sticker-list" aria-label="贴纸列表"></div>
+
+            <label class="control-field">
+              <span data-i18n="stickerScale">贴纸大小</span>
+              <div class="range-line">
+                <input id="stickerScale" type="range" min="10" max="260" value="100" disabled>
+                <output id="stickerScaleValue">100%</output>
               </div>
-              <input id="stickerScale" type="range" min="20" max="250" value="100" disabled>
             </label>
-          </div>
-          <label class="field">
-            <span data-i18n="brandText">品牌文字</span>
-            <input id="brandText" type="text" value="GOLFBROTHERS" maxlength="22" autocomplete="off">
-          </label>
-          <div class="font-grid">
-            <label class="field">
-              <span data-i18n="englishFont">英文字体</span>
-              <select id="englishFont">
-                <option value="arial">Arial</option>
-                <option value="impact">Impact</option>
-                <option value="arialBlack">Arial Black</option>
-                <option value="bebasNeue">Bebas Neue</option>
-                <option value="oswald">Oswald</option>
-                <option value="montserrat">Montserrat</option>
-                <option value="playfairDisplay">Playfair Display</option>
-                <option value="georgia">Georgia</option>
-                <option value="timesNewRoman">Times New Roman</option>
-                <option value="franklinGothic">Franklin Gothic Medium</option>
-                <option value="arialRounded">Arial Rounded MT Bold</option>
-                <option value="spaceMono">Space Mono</option>
-                <option value="courierNew">Courier New</option>
-              </select>
-            </label>
-            <label class="field">
-              <span data-i18n="numberFont">数字字体</span>
-              <select id="numberFont">
-                <option value="arialBlack">Arial Black</option>
-                <option value="impact">Impact</option>
-                <option value="bebasNeue">Bebas Neue</option>
-                <option value="oswald">Oswald</option>
-                <option value="montserrat">Montserrat</option>
-                <option value="playfairDisplay">Playfair Display</option>
-                <option value="georgia">Georgia</option>
-                <option value="timesNewRoman">Times New Roman</option>
-                <option value="spaceMono">Space Mono</option>
-                <option value="courierNew">Courier New</option>
-              </select>
-            </label>
-          </div>
+            <button id="removeSticker" class="danger-button" type="button" disabled data-i18n="removeSticker">删除选中贴纸</button>
+          </section>
+
+          <section class="control-panel summary-panel" data-panel="summary">
+            <div class="panel-heading">
+              <span class="panel-number">07</span>
+              <div>
+                <h2 data-i18n="summaryStep">完成海报</h2>
+                <p data-i18n="summaryStepHint">可直接跳回任意步骤修改，确认后自动返回这里。</p>
+              </div>
+            </div>
+
+            <div class="summary-actions">
+              <button class="summary-edit" type="button" data-edit-step="template" data-i18n="editTemplate">修改模板</button>
+              <button class="summary-edit" type="button" data-edit-step="photo" data-i18n="editPhoto">修改照片</button>
+              <button class="summary-edit" type="button" data-edit-step="scorecard" data-i18n="editScorecard">修改成绩卡</button>
+              <button class="summary-edit" type="button" data-edit-step="total" data-i18n="editTotal">修改总成绩</button>
+              <button class="summary-edit" type="button" data-edit-step="identity" data-i18n="editIdentity">修改文字</button>
+              <button class="summary-edit" type="button" data-edit-step="stickers" data-i18n="editStickers">修改贴纸</button>
+            </div>
+
+            <button id="downloadPoster" class="download-button" type="button">
+              <span class="download-symbol" aria-hidden="true"></span>
+              <span data-i18n="downloadPoster">下载完整海报</span>
+            </button>
+          </section>
         </div>
 
-        <div class="tab-panel is-active" data-panel="photo">
-          <div class="field">
-            <div class="field-heading">
-              <label for="zoomRange" data-i18n="backgroundSize">背景大小</label>
-              <output id="zoomValue" for="zoomRange">100%</output>
-            </div>
-            <div class="range-row">
-              <input id="zoomRange" type="range" min="80" max="220" value="100">
-              <button id="resetZoom" class="range-reset" type="button" aria-label="复位背景与海报元素" title="复位背景与海报元素" data-i18n-title="resetLayout">↺</button>
-            </div>
-          </div>
-          <label class="field">
-            <div class="field-heading">
-              <span data-i18n="backgroundBlur">背景模糊</span>
-              <output id="backgroundBlurValue" for="backgroundBlur">0px</output>
-            </div>
-            <input id="backgroundBlur" type="range" min="0" max="30" value="0">
-          </label>
-          <div class="photo-tools">
-            <div>
-              <strong data-i18n="subjectDepth">人物景深</strong>
-              <span id="recognitionDetail" data-i18n="waitingPhoto">等待上传照片</span>
-            </div>
-            <button id="retrySegmentation" type="button" disabled data-i18n="retryRecognition">重新识别</button>
-          </div>
-        </div>
+        <footer class="wizard-nav">
+          <button id="backButton" class="back-button" type="button">
+            <i aria-hidden="true"></i>
+            <span data-i18n="back">上一步</span>
+          </button>
+          <button id="nextButton" class="primary-button next-button" type="button">
+            <span data-i18n="next">下一步</span>
+            <i aria-hidden="true"></i>
+          </button>
+        </footer>
       </section>
     </main>
+
+    <div id="previewModal" class="preview-modal" hidden>
+      <button class="modal-backdrop" type="button" aria-label="关闭预览"></button>
+      <section class="preview-dialog" role="dialog" aria-modal="true" aria-labelledby="previewModalTitle">
+        <header>
+          <div>
+            <span class="step-index">GOLFBROTHERS</span>
+            <h2 id="previewModalTitle">模板预览</h2>
+          </div>
+          <button id="closePreviewModal" class="icon-button close-icon" type="button" aria-label="关闭"></button>
+        </header>
+        <div class="modal-canvas-stage">
+          <canvas id="modalCanvas" width="1000" height="1265"></canvas>
+        </div>
+        <button id="useTemplateButton" class="primary-button" type="button" data-i18n="useTemplate">选择此模板</button>
+      </section>
+    </div>
 
     <script src="./app.js"></script>
   </body>
