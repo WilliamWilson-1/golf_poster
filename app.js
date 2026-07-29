@@ -1046,26 +1046,28 @@ function setElementAnchor(key, x, y) {
 }
 
 function startPointer(event) {
+  if (activeEditorTab !== "photo") {
+    return;
+  }
+
   const point = canvasPoint(event);
 
-  if (activeEditorTab === "photo") {
-    const target = hitTestElement(point);
-    if (target) {
-      canvas.setPointerCapture(event.pointerId);
-      selectedElement = target;
-      elementDragState = {
-        target,
-        x: point.x,
-        y: point.y,
-        anchor: getElementAnchor(target),
-        bounds: { ...elementBounds[target] }
-      };
-      dragState = null;
-      renderPoster();
-      return;
-    }
-    selectedElement = null;
+  const target = hitTestElement(point);
+  if (target) {
+    canvas.setPointerCapture(event.pointerId);
+    selectedElement = target;
+    elementDragState = {
+      target,
+      x: point.x,
+      y: point.y,
+      anchor: getElementAnchor(target),
+      bounds: { ...elementBounds[target] }
+    };
+    dragState = null;
+    renderPoster();
+    return;
   }
+  selectedElement = null;
 
   if (!uploadedImage) {
     renderPoster();
@@ -1082,6 +1084,10 @@ function startPointer(event) {
 }
 
 function movePointer(event) {
+  if (activeEditorTab !== "photo") {
+    return;
+  }
+
   if (elementDragState) {
     const point = canvasPoint(event);
     const bounds = elementDragState.bounds;
@@ -1177,6 +1183,8 @@ document.querySelectorAll(".tab").forEach((tab) => {
   tab.addEventListener("click", () => {
     const target = tab.dataset.tab;
     activeEditorTab = target;
+    dragState = null;
+    elementDragState = null;
     if (target !== "photo") {
       selectedElement = null;
     }

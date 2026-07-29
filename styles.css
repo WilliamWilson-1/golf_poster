@@ -285,7 +285,7 @@ h1 {
   display: block;
   width: 100%;
   aspect-ratio: 1 / 1;
-  touch-action: none;
+  touch-action: pan-y;
   background: var(--navy-deep);
 }
 
@@ -295,6 +295,7 @@ h1 {
 
 #posterCanvas.is-layout-mode {
   cursor: grab;
+  touch-action: none;
 }
 
 #posterCanvas.is-layout-mode:active {
