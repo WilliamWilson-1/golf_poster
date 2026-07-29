@@ -1,0 +1,1658 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#002b50">
+    <title>GOLFBROTHERS Poster Studio</title>
+    <meta name="description" content="上传照片并生成可下载的高尔夫成绩海报">
+    <style>
+:root {
+  color-scheme: light;
+  --navy: #002b50;
+  --navy-deep: #001d37;
+  --navy-soft: #17486b;
+  --yellow: #ffd100;
+  --yellow-deep: #d9a900;
+  --ink: #092b45;
+  --muted: #6c7d8b;
+  --line: #cfd7dd;
+  --surface: #ffffff;
+  --work: #eef1f3;
+  --white: #ffffff;
+  --success: #08755b;
+  --shadow: 0 18px 44px rgba(0, 29, 55, 0.16);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: #dfe5e9;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Arial Narrow", "Roboto Condensed", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  color: var(--ink);
+  background: #dfe5e9;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  border: 0;
+  cursor: pointer;
+}
+
+.app-shell {
+  width: min(100%, 560px);
+  min-height: 100vh;
+  margin: 0 auto;
+  overflow: hidden;
+  background: var(--work);
+  box-shadow: 0 0 64px rgba(0, 29, 55, 0.2);
+}
+
+.hero-panel,
+.controls-panel {
+  width: 100%;
+}
+
+.hero-panel {
+  background: var(--work);
+}
+
+.topbar {
+  display: flex;
+  min-height: 106px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: calc(18px + env(safe-area-inset-top)) 20px 18px;
+  color: var(--white);
+  background: var(--navy);
+  border-bottom: 4px solid var(--yellow);
+}
+
+.brand-lockup {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 13px;
+}
+
+.club-mark {
+  position: relative;
+  flex: 0 0 auto;
+  width: 31px;
+  height: 42px;
+  border-left: 4px solid var(--white);
+}
+
+.club-mark::before {
+  position: absolute;
+  top: 2px;
+  left: 3px;
+  width: 26px;
+  height: 17px;
+  background: var(--yellow);
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+  content: "";
+}
+
+.eyebrow {
+  margin: 0 0 3px;
+  color: var(--yellow);
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+h1 {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--white);
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  font-size: 29px;
+  font-style: italic;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.icon-button {
+  flex: 0 0 auto;
+  width: 46px;
+  height: 46px;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  border-radius: 50%;
+  color: var(--white);
+  background: transparent;
+  font-size: 25px;
+  line-height: 1;
+}
+
+.icon-button:active {
+  color: var(--navy);
+  background: var(--yellow);
+  border-color: var(--yellow);
+}
+
+.tournament-strip {
+  display: flex;
+  min-height: 52px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 20px;
+  color: var(--navy);
+  background: var(--white);
+  border-bottom: 1px solid var(--line);
+}
+
+.tournament-strip strong {
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  font-size: 15px;
+  font-style: italic;
+}
+
+.tournament-strip span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 900;
+  text-align: right;
+}
+
+.poster-stage {
+  position: relative;
+  overflow: hidden;
+  margin: 18px 18px 14px;
+  border: 2px solid var(--navy);
+  border-radius: 6px;
+  background: var(--navy-deep);
+  box-shadow: var(--shadow);
+}
+
+#posterCanvas {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  touch-action: none;
+  background: var(--navy-deep);
+}
+
+.primary-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 0 18px;
+}
+
+.file-button,
+.download-button {
+  display: flex;
+  min-height: 50px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 950;
+}
+
+.file-button {
+  color: var(--navy-deep);
+  background: var(--yellow);
+  border: 1px solid var(--yellow);
+}
+
+.file-button input {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.download-button {
+  color: var(--white);
+  background: var(--navy);
+  border: 1px solid var(--navy);
+}
+
+.file-button:active,
+.download-button:active {
+  transform: translateY(1px);
+}
+
+.action-icon {
+  font-family: Arial, sans-serif;
+  font-size: 21px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.download-icon {
+  position: relative;
+  display: inline-block;
+  width: 20px;
+  height: 22px;
+  border-bottom: 3px solid currentColor;
+}
+
+.download-icon::before {
+  position: absolute;
+  top: 0;
+  left: 8px;
+  width: 4px;
+  height: 12px;
+  background: currentColor;
+  content: "";
+}
+
+.download-icon::after {
+  position: absolute;
+  top: 8px;
+  left: 2px;
+  border-top: 9px solid currentColor;
+  border-right: 8px solid transparent;
+  border-left: 8px solid transparent;
+  content: "";
+}
+
+.recognition-status {
+  min-height: 38px;
+  margin: 0;
+  padding: 10px 20px 11px;
+  color: var(--muted);
+  background: var(--white);
+  border-bottom: 1px solid var(--line);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.recognition-status::before {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 8px;
+  border-radius: 50%;
+  background: #94a3ad;
+  content: "";
+  vertical-align: 1px;
+}
+
+.recognition-status[data-state="loading"] {
+  color: #8f6c00;
+}
+
+.recognition-status[data-state="loading"]::before {
+  background: var(--yellow-deep);
+}
+
+.recognition-status[data-state="person"] {
+  color: var(--success);
+}
+
+.recognition-status[data-state="person"]::before {
+  background: var(--success);
+}
+
+.recognition-status[data-state="fallback"]::before {
+  background: #a84d3f;
+}
+
+.controls-panel {
+  background: var(--work);
+}
+
+.tabs {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  min-height: 70px;
+  background: var(--navy);
+  border-bottom: 1px solid var(--navy-deep);
+}
+
+.tab {
+  position: relative;
+  min-width: 0;
+  min-height: 70px;
+  padding: 0 4px;
+  color: #91a9ba;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+.tab::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 5px;
+  background: transparent;
+  content: "";
+}
+
+.tab.is-active {
+  color: var(--white);
+}
+
+.tab.is-active::after {
+  background: var(--yellow);
+}
+
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.is-active {
+  display: grid;
+  gap: 16px;
+  padding: 20px 18px calc(34px + env(safe-area-inset-bottom));
+  background: var(--work);
+}
+
+.field {
+  display: grid;
+  min-width: 0;
+  gap: 7px;
+}
+
+.field span,
+.field-heading > label:first-child {
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.field-heading {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.field-heading output {
+  color: var(--navy-soft);
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.field input,
+.field textarea,
+.field select {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 11px 12px;
+  color: var(--ink);
+  background: var(--white);
+  outline: none;
+}
+
+.field input::placeholder,
+.field textarea::placeholder {
+  color: #99a6af;
+}
+
+.field textarea {
+  resize: vertical;
+  line-height: 1.45;
+}
+
+.field input:focus,
+.field textarea:focus,
+.field select:focus {
+  border-color: var(--navy);
+  box-shadow: 0 0 0 3px rgba(255, 209, 0, 0.4);
+}
+
+.field select {
+  appearance: auto;
+  font-size: 14px;
+  font-weight: 850;
+}
+
+.style-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 84px;
+  align-items: end;
+  gap: 12px;
+  padding: 12px;
+  border-top: 3px solid var(--navy);
+  background: var(--surface);
+}
+
+.field input[type="color"],
+.color-line input[type="color"] {
+  width: 48px;
+  height: 48px;
+  min-height: 48px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--white);
+  cursor: pointer;
+}
+
+.color-field input[type="color"] {
+  justify-self: start;
+}
+
+.color-line {
+  display: flex;
+  min-height: 62px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 12px;
+  border-left: 4px solid var(--yellow);
+  background: var(--surface);
+}
+
+.color-line label {
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.total-field {
+  padding: 14px;
+  color: var(--white);
+  background: var(--navy);
+  border-bottom: 4px solid var(--yellow);
+}
+
+.total-field .field-heading > label:first-child,
+.total-field .toggle-control span {
+  color: var(--white);
+}
+
+.total-field input {
+  min-height: 62px;
+  border-color: rgba(255, 255, 255, 0.28);
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  font-size: 34px;
+  font-weight: 950;
+}
+
+.total-field input.is-auto {
+  color: var(--navy-deep);
+  background: var(--yellow);
+}
+
+.total-field small {
+  color: #b7c7d3;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.toggle-control {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.toggle-control span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.toggle-control input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  min-height: 1px;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+}
+
+.toggle-control i {
+  position: relative;
+  width: 42px;
+  height: 24px;
+  border-radius: 12px;
+  background: #9caab4;
+  transition: background 160ms ease;
+}
+
+.toggle-control i::after {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--white);
+  box-shadow: 0 1px 4px rgba(0, 29, 55, 0.24);
+  content: "";
+  transition: transform 160ms ease;
+}
+
+.toggle-control input:checked + i {
+  background: var(--yellow);
+}
+
+.toggle-control input:checked + i::after {
+  background: var(--navy-deep);
+  transform: translateX(18px);
+}
+
+.toggle-control input:focus-visible + i {
+  outline: 3px solid rgba(255, 209, 0, 0.42);
+  outline-offset: 2px;
+}
+
+input[type="range"] {
+  padding: 0;
+  accent-color: var(--yellow-deep);
+}
+
+.range-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px;
+  align-items: center;
+  gap: 10px;
+}
+
+.range-reset {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--navy);
+  border-radius: 50%;
+  color: var(--white);
+  background: var(--navy);
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.field-grid,
+.font-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.photo-tools {
+  display: flex;
+  min-height: 68px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 12px;
+  color: var(--white);
+  background: var(--navy);
+  border-left: 4px solid var(--yellow);
+}
+
+.photo-tools div {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.photo-tools strong {
+  color: var(--white);
+  font-size: 13px;
+}
+
+.photo-tools span {
+  overflow-wrap: anywhere;
+  color: #a9bcc9;
+  font-size: 11px;
+}
+
+.photo-tools button {
+  flex: 0 0 auto;
+  min-height: 38px;
+  border-radius: 4px;
+  padding: 0 12px;
+  color: var(--navy-deep);
+  background: var(--yellow);
+  border: 1px solid var(--yellow);
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.photo-tools button:disabled {
+  cursor: default;
+  filter: grayscale(1);
+  opacity: 0.46;
+}
+
+@media (max-width: 380px) {
+  .topbar {
+    padding-inline: 16px;
+  }
+
+  h1 {
+    font-size: 25px;
+  }
+
+  .tournament-strip {
+    padding-inline: 16px;
+  }
+
+  .poster-stage {
+    margin-inline: 12px;
+  }
+
+  .primary-actions {
+    padding-inline: 12px;
+  }
+
+  .tab {
+    font-size: 11px;
+  }
+
+  .tab-panel.is-active {
+    padding-inline: 12px;
+  }
+
+  .font-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 700px) {
+  body {
+    padding-block: 24px;
+  }
+
+  .app-shell {
+    min-height: calc(100vh - 48px);
+    border: 1px solid rgba(0, 43, 80, 0.16);
+  }
+}
+
+    </style>
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="hero-panel" aria-label="海报预览">
+        <div class="topbar">
+          <div class="brand-lockup">
+            <span class="club-mark" aria-hidden="true"></span>
+            <div>
+              <p class="eyebrow">GOLFBROTHERS</p>
+              <h1>POSTER STUDIO</h1>
+            </div>
+          </div>
+          <button class="icon-button" id="resetPoster" type="button" aria-label="清空海报" title="清空海报">↻</button>
+        </div>
+
+        <div class="tournament-strip">
+          <strong>GB INTERNATIONAL</strong>
+          <span>TOURNAMENT GRAPHICS / 01</span>
+        </div>
+
+        <div class="poster-stage">
+          <canvas id="posterCanvas" width="1080" height="1080" aria-label="海报预览画布"></canvas>
+        </div>
+
+        <div class="primary-actions">
+          <label class="file-button">
+            <input id="photoInput" type="file" accept="image/*">
+            <span class="action-icon" aria-hidden="true">＋</span>
+            <span>上传照片</span>
+          </label>
+          <button id="downloadPoster" class="download-button" type="button">
+            <span class="download-icon" aria-hidden="true"></span>
+            <span>下载海报</span>
+          </button>
+        </div>
+        <p id="segmentationStatus" class="recognition-status" data-state="idle" aria-live="polite">上传照片后自动识别人像</p>
+      </section>
+
+      <section class="controls-panel" aria-label="海报编辑">
+        <div class="tabs" role="tablist" aria-label="编辑项目">
+          <button class="tab is-active" type="button" data-tab="profile" role="tab">昵称</button>
+          <button class="tab" type="button" data-tab="scores" role="tab">成绩表</button>
+          <button class="tab" type="button" data-tab="total" role="tab">总成绩</button>
+          <button class="tab" type="button" data-tab="extra" role="tab">额外信息</button>
+          <button class="tab" type="button" data-tab="photo" role="tab">图片</button>
+        </div>
+
+        <div class="tab-panel is-active" data-panel="profile">
+          <label class="field">
+            <span>昵称</span>
+            <input id="nickname" type="text" value="" maxlength="18" autocomplete="off">
+          </label>
+          <div class="style-row">
+            <label class="field">
+              <div class="field-heading">
+                <span>昵称字号</span>
+                <output id="nicknameFontSizeValue" for="nicknameFontSize">34px</output>
+              </div>
+              <input id="nicknameFontSize" type="range" min="18" max="54" value="34">
+            </label>
+            <label class="field color-field">
+              <span>昵称颜色</span>
+              <input id="nicknameColor" type="color" value="#ffffff">
+            </label>
+          </div>
+          <label class="field">
+            <span>俱乐部</span>
+            <input id="club" type="text" value="" maxlength="26" autocomplete="off">
+          </label>
+          <div class="style-row">
+            <label class="field">
+              <div class="field-heading">
+                <span>俱乐部字号</span>
+                <output id="clubFontSizeValue" for="clubFontSize">34px</output>
+              </div>
+              <input id="clubFontSize" type="range" min="18" max="54" value="34">
+            </label>
+            <label class="field color-field">
+              <span>俱乐部颜色</span>
+              <input id="clubColor" type="color" value="#ffffff">
+            </label>
+          </div>
+        </div>
+
+        <div class="tab-panel" data-panel="scores">
+          <label class="field">
+            <span>成绩表</span>
+            <textarea id="scoreInput" rows="4" spellcheck="false" placeholder="输入最多 18 洞成绩，用空格或逗号分隔"></textarea>
+          </label>
+          <div class="field-grid">
+            <label class="field">
+              <span>圆形标记</span>
+              <input id="badgeText" type="text" value="" maxlength="2" inputmode="numeric">
+            </label>
+            <label class="field">
+              <span>高亮洞号</span>
+              <input id="highlightInput" type="text" value="" placeholder="例如 3,6" inputmode="numeric">
+            </label>
+          </div>
+          <div class="color-line">
+            <label for="scoreTableColor">成绩表底色</label>
+            <input id="scoreTableColor" type="color" value="#006337">
+          </div>
+        </div>
+
+        <div class="tab-panel" data-panel="total">
+          <div class="field total-field">
+            <div class="field-heading">
+              <label for="totalScore">总成绩</label>
+              <label class="toggle-control">
+                <span>自动统计</span>
+                <input id="autoTotal" type="checkbox" role="switch" checked>
+                <i aria-hidden="true"></i>
+              </label>
+            </div>
+            <input id="totalScore" type="text" value="" maxlength="4" inputmode="numeric" readonly>
+            <small id="totalHint">录入成绩后自动合计</small>
+          </div>
+          <div class="style-row">
+            <label class="field">
+              <div class="field-heading">
+                <span>总分字号</span>
+                <output id="totalFontSizeValue" for="totalFontSize">335px</output>
+              </div>
+              <input id="totalFontSize" type="range" min="160" max="420" value="335">
+            </label>
+            <label class="field color-field">
+              <span>总分颜色</span>
+              <input id="totalColor" type="color" value="#083728">
+            </label>
+          </div>
+          <label class="field">
+            <span>总成绩透明度</span>
+            <input id="totalOpacity" type="range" min="45" max="95" value="88">
+          </label>
+          <label class="field">
+            <span>总成绩高度</span>
+            <input id="totalY" type="range" min="130" max="430" value="300">
+          </label>
+        </div>
+
+        <div class="tab-panel" data-panel="extra">
+          <label class="field">
+            <span>额外信息</span>
+            <textarea id="extraInfo" rows="3" maxlength="56"></textarea>
+          </label>
+          <div class="style-row">
+            <label class="field">
+              <div class="field-heading">
+                <span>额外信息字号</span>
+                <output id="extraFontSizeValue" for="extraFontSize">21px</output>
+              </div>
+              <input id="extraFontSize" type="range" min="14" max="36" value="21">
+            </label>
+            <label class="field color-field">
+              <span>信息颜色</span>
+              <input id="extraColor" type="color" value="#ffffff">
+            </label>
+          </div>
+          <label class="field">
+            <span>品牌文字</span>
+            <input id="brandText" type="text" value="GOLFBROTHERS" maxlength="22" autocomplete="off">
+          </label>
+          <div class="font-grid">
+            <label class="field">
+              <span>英文字体</span>
+              <select id="englishFont">
+                <option value="clean">清晰无衬线</option>
+                <option value="sport">竞技窄体</option>
+                <option value="rounded">轻快圆体</option>
+                <option value="classic">经典衬线</option>
+                <option value="mono">等宽字形</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>数字字体</span>
+              <select id="numberFont">
+                <option value="power">力量黑体</option>
+                <option value="condensed">紧凑比分</option>
+                <option value="geometric">几何数字</option>
+                <option value="classic">经典数字</option>
+                <option value="mono">等宽记分</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="tab-panel" data-panel="photo">
+          <div class="field">
+            <div class="field-heading">
+              <label for="zoomRange">图片缩放</label>
+              <output id="zoomValue" for="zoomRange">100%</output>
+            </div>
+            <div class="range-row">
+              <input id="zoomRange" type="range" min="80" max="220" value="100">
+              <button id="resetZoom" class="range-reset" type="button" aria-label="图片缩放复位" title="图片缩放复位">↺</button>
+            </div>
+          </div>
+          <div class="photo-tools">
+            <div>
+              <strong>人物景深</strong>
+              <span id="recognitionDetail">等待上传照片</span>
+            </div>
+            <button id="retrySegmentation" type="button" disabled>重新识别</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+const canvas = document.getElementById("posterCanvas");
+const ctx = canvas.getContext("2d");
+
+const elements = {
+  photoInput: document.getElementById("photoInput"),
+  nickname: document.getElementById("nickname"),
+  nicknameFontSize: document.getElementById("nicknameFontSize"),
+  nicknameFontSizeValue: document.getElementById("nicknameFontSizeValue"),
+  nicknameColor: document.getElementById("nicknameColor"),
+  club: document.getElementById("club"),
+  clubFontSize: document.getElementById("clubFontSize"),
+  clubFontSizeValue: document.getElementById("clubFontSizeValue"),
+  clubColor: document.getElementById("clubColor"),
+  scoreInput: document.getElementById("scoreInput"),
+  badgeText: document.getElementById("badgeText"),
+  highlightInput: document.getElementById("highlightInput"),
+  scoreTableColor: document.getElementById("scoreTableColor"),
+  totalScore: document.getElementById("totalScore"),
+  totalFontSize: document.getElementById("totalFontSize"),
+  totalFontSizeValue: document.getElementById("totalFontSizeValue"),
+  totalColor: document.getElementById("totalColor"),
+  autoTotal: document.getElementById("autoTotal"),
+  totalHint: document.getElementById("totalHint"),
+  totalOpacity: document.getElementById("totalOpacity"),
+  totalY: document.getElementById("totalY"),
+  extraInfo: document.getElementById("extraInfo"),
+  extraFontSize: document.getElementById("extraFontSize"),
+  extraFontSizeValue: document.getElementById("extraFontSizeValue"),
+  extraColor: document.getElementById("extraColor"),
+  brandText: document.getElementById("brandText"),
+  englishFont: document.getElementById("englishFont"),
+  numberFont: document.getElementById("numberFont"),
+  zoomRange: document.getElementById("zoomRange"),
+  zoomValue: document.getElementById("zoomValue"),
+  resetZoom: document.getElementById("resetZoom"),
+  downloadPoster: document.getElementById("downloadPoster"),
+  resetPoster: document.getElementById("resetPoster"),
+  segmentationStatus: document.getElementById("segmentationStatus"),
+  recognitionDetail: document.getElementById("recognitionDetail"),
+  retrySegmentation: document.getElementById("retrySegmentation")
+};
+
+const posterSize = 1080;
+const topBarHeight = 72;
+const scoreBox = { x: 128, y: 840, w: 824, h: 168 };
+const fontStacks = {
+  english: {
+    clean: '"Trebuchet MS", ui-sans-serif, system-ui, Arial, sans-serif',
+    sport: 'Impact, Haettenschweiler, "Arial Narrow Bold", fantasy',
+    rounded: '"Arial Rounded MT Bold", ui-rounded, "Trebuchet MS", sans-serif',
+    classic: 'Georgia, "Times New Roman", ui-serif, serif',
+    mono: 'Consolas, "Courier New", ui-monospace, monospace'
+  },
+  number: {
+    power: '"Arial Black", Impact, ui-sans-serif, sans-serif',
+    condensed: 'Impact, Haettenschweiler, "Arial Narrow Bold", fantasy',
+    geometric: '"Trebuchet MS", ui-rounded, ui-sans-serif, sans-serif',
+    classic: 'Georgia, "Times New Roman", ui-serif, serif',
+    mono: 'Consolas, "Courier New", ui-monospace, monospace'
+  }
+};
+const emptyValues = {
+  nickname: "",
+  club: "",
+  scoreInput: "",
+  badgeText: "",
+  highlightInput: "",
+  totalScore: "",
+  extraInfo: ""
+};
+
+let uploadedImage = null;
+let subjectMaskSource = null;
+let segmentationState = "idle";
+let segmentationToken = 0;
+let selfieSegmenter = null;
+let segmentationLibraryPromise = null;
+let pendingSegmentationResolve = null;
+let segmentationQueue = Promise.resolve();
+let dragState = null;
+let imageState = {
+  scale: 1,
+  offsetX: 0,
+  offsetY: 0
+};
+
+function getEnglishFont() {
+  return fontStacks.english[elements.englishFont.value] || fontStacks.english.clean;
+}
+
+function getNumberFont() {
+  return fontStacks.number[elements.numberFont.value] || fontStacks.number.power;
+}
+
+function updateFontPreviews() {
+  elements.englishFont.style.fontFamily = getEnglishFont();
+  elements.numberFont.style.fontFamily = getNumberFont();
+}
+
+function updateStyleOutputs() {
+  elements.nicknameFontSizeValue.textContent = `${elements.nicknameFontSize.value}px`;
+  elements.clubFontSizeValue.textContent = `${elements.clubFontSize.value}px`;
+  elements.totalFontSizeValue.textContent = `${elements.totalFontSize.value}px`;
+  elements.extraFontSizeValue.textContent = `${elements.extraFontSize.value}px`;
+}
+
+function roundedRect(context, x, y, w, h, radius) {
+  const r = Math.min(radius, w / 2, h / 2);
+  context.beginPath();
+  context.moveTo(x + r, y);
+  context.arcTo(x + w, y, x + w, y + h, r);
+  context.arcTo(x + w, y + h, x, y + h, r);
+  context.arcTo(x, y + h, x, y, r);
+  context.arcTo(x, y, x + w, y, r);
+  context.closePath();
+}
+
+function parseScores() {
+  const values = elements.scoreInput.value
+    .split(/[\s,，、|]+/)
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .slice(0, 18);
+
+  while (values.length < 18) {
+    values.push("");
+  }
+
+  return values;
+}
+
+function updateAutoTotal() {
+  const automatic = elements.autoTotal.checked;
+  elements.totalScore.readOnly = automatic;
+  elements.totalScore.classList.toggle("is-auto", automatic);
+
+  if (!automatic) {
+    elements.totalHint.textContent = "自动统计已关闭，可手动输入";
+    renderPoster();
+    return;
+  }
+
+  const numericScores = elements.scoreInput.value
+    .split(/[\s,，、|]+/)
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .slice(0, 18)
+    .map((item) => Number(item))
+    .filter((score) => Number.isFinite(score));
+
+  const total = numericScores.reduce((sum, score) => sum + score, 0);
+  elements.totalScore.value = numericScores.length ? String(Math.round(total * 10) / 10) : "";
+  elements.totalHint.textContent = numericScores.length
+    ? `已统计 ${numericScores.length} 洞`
+    : "录入成绩后自动合计";
+  renderPoster();
+}
+
+function updateZoomOutput() {
+  elements.zoomValue.textContent = `${elements.zoomRange.value}%`;
+}
+
+function parseHighlights() {
+  return new Set(
+    elements.highlightInput.value
+      .split(/[\s,，、|]+/)
+      .map((item) => Number.parseInt(item, 10))
+      .filter((num) => Number.isFinite(num) && num >= 1 && num <= 18)
+  );
+}
+
+function drawCoverAsset(context, asset, x, y, w, h) {
+  const assetWidth = asset.naturalWidth || asset.videoWidth || asset.width;
+  const assetHeight = asset.naturalHeight || asset.videoHeight || asset.height;
+  const cover = Math.max(w / assetWidth, h / assetHeight) * imageState.scale;
+  const drawW = assetWidth * cover;
+  const drawH = assetHeight * cover;
+  const drawX = x + (w - drawW) / 2 + imageState.offsetX;
+  const drawY = y + (h - drawH) / 2 + imageState.offsetY;
+  context.drawImage(asset, drawX, drawY, drawW, drawH);
+}
+
+function drawPlaceholder(context) {
+  context.fillStyle = "#082e4c";
+  context.fillRect(0, topBarHeight, posterSize, posterSize - topBarHeight);
+
+  context.fillStyle = "#0d3c5e";
+  context.fillRect(0, 660, posterSize, posterSize - 660);
+  context.fillStyle = "#ffd100";
+  context.fillRect(74, 618, 160, 7);
+  context.fillStyle = "rgba(255,255,255,0.12)";
+  context.fillRect(74, 638, 330, 3);
+}
+
+function drawBrand(context) {
+  context.fillStyle = "#000";
+  context.fillRect(0, 0, posterSize, topBarHeight);
+
+  context.save();
+  context.translate(74, 20);
+  context.fillStyle = "#fff";
+  context.fillRect(0, -4, 5, 43);
+  context.fillStyle = "#c59c35";
+  context.beginPath();
+  context.moveTo(7, -2);
+  context.lineTo(52, 11);
+  context.lineTo(7, 24);
+  context.closePath();
+  context.fill();
+  context.restore();
+
+  const brand = elements.brandText.value.trim() || "GOLFBROTHERS";
+  const splitPoint = brand.toUpperCase().startsWith("GOLF") ? 4 : Math.max(4, Math.floor(brand.length * 0.45));
+  const first = brand.slice(0, splitPoint).toUpperCase();
+  const second = brand.slice(splitPoint).toUpperCase();
+
+  context.textBaseline = "middle";
+  context.textAlign = "left";
+  context.font = "italic 900 40px Arial, sans-serif";
+  context.fillStyle = "#fff";
+  context.fillText(first, 146, 37);
+  context.fillStyle = "#c99c32";
+  context.fillText(second, 146 + context.measureText(first).width, 37);
+}
+
+function drawTotalScore(context) {
+  const score = elements.totalScore.value.trim();
+  if (!score) {
+    return;
+  }
+
+  const opacity = Number(elements.totalOpacity.value) / 100;
+  const y = Number(elements.totalY.value);
+  let fontSize = Number(elements.totalFontSize.value);
+
+  context.save();
+  context.globalAlpha = opacity;
+  context.fillStyle = elements.totalColor.value;
+  context.font = `950 ${fontSize}px ${getNumberFont()}`;
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  while (fontSize > 120 && context.measureText(score).width > posterSize - 140) {
+    fontSize -= 4;
+    context.font = `950 ${fontSize}px ${getNumberFont()}`;
+  }
+  context.fillText(score, posterSize / 2, y);
+  context.restore();
+}
+
+function drawSubjectOverlay(context) {
+  if (!uploadedImage || segmentationState !== "person" || !subjectMaskSource) {
+    return;
+  }
+
+  const layerCanvas = document.createElement("canvas");
+  layerCanvas.width = posterSize;
+  layerCanvas.height = posterSize;
+  const layerCtx = layerCanvas.getContext("2d");
+  drawCoverAsset(layerCtx, uploadedImage, 0, topBarHeight, posterSize, posterSize - topBarHeight);
+  layerCtx.globalCompositeOperation = "destination-in";
+  drawCoverAsset(layerCtx, subjectMaskSource, 0, topBarHeight, posterSize, posterSize - topBarHeight);
+  context.drawImage(layerCanvas, 0, 0);
+}
+
+function fitText(context, text, maxWidth, startingSize, minimumSize, fontFamily) {
+  let size = startingSize;
+  while (size > minimumSize) {
+    context.font = `900 ${size}px ${fontFamily}`;
+    if (context.measureText(text).width <= maxWidth) {
+      break;
+    }
+    size -= 2;
+  }
+  context.font = `900 ${size}px ${fontFamily}`;
+  return size;
+}
+
+function drawLabels(context) {
+  const nickname = elements.nickname.value.trim();
+  const club = elements.club.value.trim();
+  const extra = elements.extraInfo.value.trim();
+  const labelY = scoreBox.y - 30;
+
+  context.save();
+  context.shadowColor = "rgba(0,0,0,0.38)";
+  context.shadowBlur = 10;
+  context.shadowOffsetY = 2;
+  context.textBaseline = "alphabetic";
+
+  if (nickname) {
+    context.fillStyle = elements.nicknameColor.value;
+    context.textAlign = "left";
+    fitText(context, nickname, 270, Number(elements.nicknameFontSize.value), 14, getEnglishFont());
+    context.fillText(nickname, scoreBox.x + 12, labelY);
+  }
+
+  if (club) {
+    context.fillStyle = elements.clubColor.value;
+    context.textAlign = "right";
+    fitText(context, club, 460, Number(elements.clubFontSize.value), 14, getEnglishFont());
+    context.fillText(club, scoreBox.x + scoreBox.w - 12, labelY);
+  }
+
+  if (extra) {
+    context.fillStyle = elements.extraColor.value;
+    fitText(context, extra.toUpperCase(), 860, Number(elements.extraFontSize.value), 12, getEnglishFont());
+    context.globalAlpha = 0.9;
+    context.textAlign = "center";
+    context.fillText(extra.toUpperCase(), posterSize / 2, scoreBox.y + scoreBox.h + 39);
+  }
+  context.restore();
+}
+
+function drawScoreCard(context) {
+  const scores = parseScores();
+  const highlights = parseHighlights();
+  const badge = elements.badgeText.value.trim();
+  const hasScoreContent = scores.some(Boolean) || Boolean(badge);
+
+  if (!hasScoreContent) {
+    return;
+  }
+
+  context.save();
+  context.globalAlpha = 0.84;
+  context.fillStyle = elements.scoreTableColor.value;
+  context.fillRect(scoreBox.x, scoreBox.y, scoreBox.w, scoreBox.h);
+  context.globalAlpha = 1;
+
+  context.strokeStyle = "rgba(215, 197, 75, 0.92)";
+  context.lineWidth = 3;
+  context.beginPath();
+  context.moveTo(scoreBox.x, scoreBox.y + scoreBox.h / 2);
+  context.lineTo(scoreBox.x + scoreBox.w, scoreBox.y + scoreBox.h / 2);
+  context.stroke();
+
+  const cellW = scoreBox.w / 9;
+  const rowYs = [scoreBox.y + 55, scoreBox.y + 136];
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  context.font = `900 42px ${getNumberFont()}`;
+
+  scores.forEach((score, index) => {
+    const row = index < 9 ? 0 : 1;
+    const col = index % 9;
+    const x = scoreBox.x + cellW * col + cellW / 2;
+    const y = rowYs[row];
+    const hole = index + 1;
+
+    if (score && highlights.has(hole)) {
+      context.strokeStyle = "rgba(215, 197, 75, 0.95)";
+      context.lineWidth = 3;
+      context.strokeRect(x - 28, y - 31, 56, 62);
+    }
+
+    if (hole === 1 && badge) {
+      context.strokeStyle = "rgba(221, 226, 78, 0.95)";
+      context.lineWidth = 3;
+      context.beginPath();
+      context.arc(x, y, 29, 0, Math.PI * 2);
+      context.stroke();
+      context.beginPath();
+      context.arc(x, y, 20, 0, Math.PI * 2);
+      context.stroke();
+      context.fillStyle = "#fff";
+      context.font = `900 30px ${getNumberFont()}`;
+      context.fillText(badge, x, y + 1);
+      context.font = `900 42px ${getNumberFont()}`;
+      return;
+    }
+
+    if (score) {
+      context.fillStyle = "#fff";
+      context.fillText(score, x, y);
+    }
+  });
+
+  context.restore();
+}
+
+function renderPoster() {
+  ctx.clearRect(0, 0, posterSize, posterSize);
+  ctx.save();
+  roundedRect(ctx, 0, 0, posterSize, posterSize, 26);
+  ctx.clip();
+
+  if (uploadedImage) {
+    drawCoverAsset(ctx, uploadedImage, 0, topBarHeight, posterSize, posterSize - topBarHeight);
+  } else {
+    drawPlaceholder(ctx);
+  }
+
+  const bottomGradient = ctx.createLinearGradient(0, 610, 0, posterSize);
+  bottomGradient.addColorStop(0, "rgba(0,0,0,0)");
+  bottomGradient.addColorStop(1, "rgba(0,0,0,0.44)");
+  ctx.fillStyle = bottomGradient;
+  ctx.fillRect(0, 610, posterSize, 470);
+
+  drawTotalScore(ctx);
+  drawSubjectOverlay(ctx);
+  drawLabels(ctx);
+  drawScoreCard(ctx);
+  drawBrand(ctx);
+
+  ctx.strokeStyle = "rgba(255,255,255,0.8)";
+  ctx.lineWidth = 4;
+  roundedRect(ctx, 2, 2, posterSize - 4, posterSize - 4, 26);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function updateRecognitionStatus(state, detail) {
+  segmentationState = state;
+  elements.segmentationStatus.dataset.state = state;
+  elements.recognitionDetail.textContent = detail;
+
+  const statusText = {
+    idle: "上传照片后自动识别人像",
+    loading: "正在自动识别人像…",
+    person: "已识别人像，总成绩将置于人物后方",
+    fallback: "未识别到人物，总成绩将直接覆盖照片"
+  };
+
+  elements.segmentationStatus.textContent = statusText[state];
+  elements.retrySegmentation.disabled = !uploadedImage || state === "loading";
+  renderPoster();
+}
+
+function copySegmentationMask(mask) {
+  const source = document.createElement("canvas");
+  source.width = mask.width || uploadedImage.naturalWidth;
+  source.height = mask.height || uploadedImage.naturalHeight;
+  source.getContext("2d").drawImage(mask, 0, 0, source.width, source.height);
+  return source;
+}
+
+function measureMask(maskCanvas) {
+  const sample = document.createElement("canvas");
+  sample.width = 160;
+  sample.height = 160;
+  const sampleCtx = sample.getContext("2d", { willReadFrequently: true });
+  sampleCtx.drawImage(maskCanvas, 0, 0, sample.width, sample.height);
+  const pixels = sampleCtx.getImageData(0, 0, sample.width, sample.height).data;
+
+  let varyingAlpha = false;
+  for (let i = 3; i < pixels.length; i += 4) {
+    if (pixels[i] < 250) {
+      varyingAlpha = true;
+      break;
+    }
+  }
+
+  let strongPixels = 0;
+  let weightedTotal = 0;
+  const pixelCount = pixels.length / 4;
+  for (let i = 0; i < pixels.length; i += 4) {
+    const confidence = varyingAlpha
+      ? pixels[i + 3] / 255
+      : (pixels[i] + pixels[i + 1] + pixels[i + 2]) / (255 * 3);
+    weightedTotal += confidence;
+    if (confidence >= 0.55) {
+      strongPixels += 1;
+    }
+  }
+
+  return {
+    strongRatio: strongPixels / pixelCount,
+    meanConfidence: weightedTotal / pixelCount
+  };
+}
+
+function ensureSegmentationLibrary() {
+  if (typeof window.SelfieSegmentation === "function") {
+    return Promise.resolve();
+  }
+  if (segmentationLibraryPromise) {
+    return segmentationLibraryPromise;
+  }
+
+  segmentationLibraryPromise = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = "https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation@0.1/selfie_segmentation.js";
+    script.async = true;
+    script.crossOrigin = "anonymous";
+    script.onload = () => {
+      if (typeof window.SelfieSegmentation === "function") {
+        resolve();
+        return;
+      }
+      segmentationLibraryPromise = null;
+      reject(new Error("segmentation library unavailable"));
+    };
+    script.onerror = () => {
+      script.remove();
+      segmentationLibraryPromise = null;
+      reject(new Error("segmentation library unavailable"));
+    };
+    document.head.appendChild(script);
+  });
+
+  return segmentationLibraryPromise;
+}
+
+function getSelfieSegmenter() {
+  if (selfieSegmenter) {
+    return selfieSegmenter;
+  }
+  if (typeof window.SelfieSegmentation !== "function") {
+    throw new Error("segmentation library unavailable");
+  }
+
+  selfieSegmenter = new window.SelfieSegmentation({
+    locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation@0.1/${file}`
+  });
+  selfieSegmenter.setOptions({
+    modelSelection: 1,
+    selfieMode: false
+  });
+  selfieSegmenter.onResults((results) => {
+    if (pendingSegmentationResolve) {
+      const resolve = pendingSegmentationResolve;
+      pendingSegmentationResolve = null;
+      resolve(results);
+    }
+  });
+  return selfieSegmenter;
+}
+
+async function runSegmentation(token) {
+  if (!uploadedImage || token !== segmentationToken) {
+    return;
+  }
+
+  updateRecognitionStatus("loading", "正在分析照片中的人物主体");
+
+  try {
+    await ensureSegmentationLibrary();
+    const segmenter = getSelfieSegmenter();
+    const resultsPromise = new Promise((resolve) => {
+      pendingSegmentationResolve = resolve;
+    });
+    await segmenter.send({ image: uploadedImage });
+    const results = await Promise.race([
+      resultsPromise,
+      new Promise((_, reject) => window.setTimeout(() => reject(new Error("segmentation timeout")), 30000))
+    ]);
+
+    if (token !== segmentationToken) {
+      return;
+    }
+
+    const mask = copySegmentationMask(results.segmentationMask);
+    const metrics = measureMask(mask);
+    const looksLikePerson =
+      metrics.strongRatio >= 0.012 &&
+      metrics.strongRatio <= 0.82 &&
+      metrics.meanConfidence >= 0.018;
+
+    if (looksLikePerson) {
+      subjectMaskSource = mask;
+      updateRecognitionStatus("person", `人物占画面约 ${Math.round(metrics.strongRatio * 100)}%`);
+    } else {
+      subjectMaskSource = null;
+      updateRecognitionStatus("fallback", "画面中没有足够清晰的人物主体");
+    }
+  } catch (error) {
+    if (token !== segmentationToken) {
+      return;
+    }
+    pendingSegmentationResolve = null;
+    if (selfieSegmenter && typeof selfieSegmenter.close === "function") {
+      selfieSegmenter.close();
+    }
+    selfieSegmenter = null;
+    subjectMaskSource = null;
+    updateRecognitionStatus("fallback", "自动识别不可用，已切换为普通叠加");
+  }
+}
+
+function requestSegmentation() {
+  const token = ++segmentationToken;
+  subjectMaskSource = null;
+  segmentationQueue = segmentationQueue
+    .catch(() => undefined)
+    .then(() => runSegmentation(token));
+}
+
+function canvasPoint(event) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: ((event.clientX - rect.left) / rect.width) * posterSize,
+    y: ((event.clientY - rect.top) / rect.height) * posterSize
+  };
+}
+
+function startPointer(event) {
+  if (!uploadedImage) {
+    return;
+  }
+  canvas.setPointerCapture(event.pointerId);
+  const point = canvasPoint(event);
+  dragState = {
+    x: point.x,
+    y: point.y,
+    offsetX: imageState.offsetX,
+    offsetY: imageState.offsetY
+  };
+}
+
+function movePointer(event) {
+  if (!dragState) {
+    return;
+  }
+
+  const point = canvasPoint(event);
+  imageState.offsetX = dragState.offsetX + point.x - dragState.x;
+  imageState.offsetY = dragState.offsetY + point.y - dragState.y;
+  renderPoster();
+}
+
+function endPointer() {
+  dragState = null;
+}
+
+function loadImage(file) {
+  if (!file) {
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      uploadedImage = img;
+      imageState = {
+        scale: Number(elements.zoomRange.value) / 100,
+        offsetX: 0,
+        offsetY: 0
+      };
+      renderPoster();
+      requestSegmentation();
+    };
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function downloadPoster() {
+  renderPoster();
+  const link = document.createElement("a");
+  const safeName = (elements.nickname.value.trim() || "golf").replace(/[^\w\u4e00-\u9fa5-]+/g, "-");
+  link.download = `${safeName}-golf-poster.png`;
+  link.href = canvas.toDataURL("image/png");
+  link.click();
+}
+
+function resetPoster() {
+  segmentationToken += 1;
+  uploadedImage = null;
+  subjectMaskSource = null;
+  elements.photoInput.value = "";
+  Object.entries(emptyValues).forEach(([key, value]) => {
+    elements[key].value = value;
+  });
+  elements.zoomRange.value = "100";
+  elements.totalOpacity.value = "88";
+  elements.totalY.value = "300";
+  elements.autoTotal.checked = true;
+  imageState = { scale: 1, offsetX: 0, offsetY: 0 };
+  updateZoomOutput();
+  updateAutoTotal();
+  updateRecognitionStatus("idle", "等待上传照片");
+}
+
+document.querySelectorAll(".tab").forEach((tab) => {
+  tab.addEventListener("click", () => {
+    const target = tab.dataset.tab;
+    document.querySelectorAll(".tab").forEach((item) => item.classList.toggle("is-active", item === tab));
+    document.querySelectorAll(".tab-panel").forEach((panel) => {
+      panel.classList.toggle("is-active", panel.dataset.panel === target);
+    });
+  });
+});
+
+[
+  elements.nickname,
+  elements.club,
+  elements.badgeText,
+  elements.highlightInput,
+  elements.totalScore,
+  elements.totalOpacity,
+  elements.totalY,
+  elements.extraInfo,
+  elements.brandText
+].forEach((element) => {
+  element.addEventListener("input", renderPoster);
+});
+
+elements.scoreInput.addEventListener("input", updateAutoTotal);
+elements.autoTotal.addEventListener("change", updateAutoTotal);
+elements.englishFont.addEventListener("change", () => {
+  updateFontPreviews();
+  renderPoster();
+});
+elements.numberFont.addEventListener("change", () => {
+  updateFontPreviews();
+  renderPoster();
+});
+[
+  elements.nicknameFontSize,
+  elements.clubFontSize,
+  elements.totalFontSize,
+  elements.extraFontSize
+].forEach((element) => {
+  element.addEventListener("input", () => {
+    updateStyleOutputs();
+    renderPoster();
+  });
+});
+[
+  elements.nicknameColor,
+  elements.clubColor,
+  elements.totalColor,
+  elements.extraColor,
+  elements.scoreTableColor
+].forEach((element) => {
+  element.addEventListener("input", renderPoster);
+});
+elements.zoomRange.addEventListener("input", () => {
+  imageState.scale = Number(elements.zoomRange.value) / 100;
+  updateZoomOutput();
+  renderPoster();
+});
+elements.resetZoom.addEventListener("click", () => {
+  elements.zoomRange.value = "100";
+  imageState.scale = 1;
+  updateZoomOutput();
+  renderPoster();
+});
+
+elements.photoInput.addEventListener("change", (event) => loadImage(event.target.files[0]));
+elements.downloadPoster.addEventListener("click", downloadPoster);
+elements.resetPoster.addEventListener("click", resetPoster);
+elements.retrySegmentation.addEventListener("click", requestSegmentation);
+canvas.addEventListener("pointerdown", startPointer);
+canvas.addEventListener("pointermove", movePointer);
+canvas.addEventListener("pointerup", endPointer);
+canvas.addEventListener("pointercancel", endPointer);
+
+updateAutoTotal();
+updateZoomOutput();
+updateFontPreviews();
+updateStyleOutputs();
+renderPoster();
+
+    </script>
+  </body>
+</html>
+

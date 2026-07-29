@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#002b50">
+    <title>GOLFBROTHERS Poster Studio</title>
+    <meta name="description" content="上传照片并生成可下载的高尔夫成绩海报">
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="hero-panel" aria-label="海报预览">
+        <div class="topbar">
+          <div class="brand-lockup">
+            <span class="club-mark" aria-hidden="true"></span>
+            <div>
+              <p class="eyebrow">GOLFBROTHERS</p>
+              <h1>POSTER STUDIO</h1>
+            </div>
+          </div>
+          <button class="icon-button" id="resetPoster" type="button" aria-label="清空海报" title="清空海报">↻</button>
+        </div>
+
+        <div class="tournament-strip">
+          <strong>GB INTERNATIONAL</strong>
+          <span>TOURNAMENT GRAPHICS / 01</span>
+        </div>
+
+        <div class="poster-stage">
+          <canvas id="posterCanvas" width="1080" height="1080" aria-label="海报预览画布"></canvas>
+        </div>
+
+        <div class="primary-actions">
+          <label class="file-button">
+            <input id="photoInput" type="file" accept="image/*">
+            <span class="action-icon" aria-hidden="true">＋</span>
+            <span>上传照片</span>
+          </label>
+          <button id="downloadPoster" class="download-button" type="button">
+            <span class="download-icon" aria-hidden="true"></span>
+            <span>下载海报</span>
+          </button>
+        </div>
+        <p id="segmentationStatus" class="recognition-status" data-state="idle" aria-live="polite">上传照片后自动识别人像</p>
+      </section>
+
+      <section class="controls-panel" aria-label="海报编辑">
+        <div class="tabs" role="tablist" aria-label="编辑项目">
+          <button class="tab is-active" type="button" data-tab="profile" role="tab">昵称</button>
+          <button class="tab" type="button" data-tab="scores" role="tab">成绩表</button>
+          <button class="tab" type="button" data-tab="total" role="tab">总成绩</button>
+          <button class="tab" type="button" data-tab="extra" role="tab">额外信息</button>
+          <button class="tab" type="button" data-tab="photo" role="tab">图片</button>
+        </div>
+
+        <div class="tab-panel is-active" data-panel="profile">
+          <label class="field">
+            <span>昵称</span>
+            <input id="nickname" type="text" value="" maxlength="18" autocomplete="off">
+          </label>
+          <div class="style-row">
+            <label class="field">
+              <div class="field-heading">
+                <span>昵称字号</span>
+                <output id="nicknameFontSizeValue" for="nicknameFontSize">34px</output>
+              </div>
+              <input id="nicknameFontSize" type="range" min="18" max="54" value="34">
+            </label>
+            <label class="field color-field">
+              <span>昵称颜色</span>
+              <input id="nicknameColor" type="color" value="#ffffff">
+            </label>
+          </div>
+          <label class="field">
+            <span>俱乐部</span>
+            <input id="club" type="text" value="" maxlength="26" autocomplete="off">
+          </label>
+          <div class="style-row">
+            <label class="field">
+              <div class="field-heading">
+                <span>俱乐部字号</span>
+                <output id="clubFontSizeValue" for="clubFontSize">34px</output>
+              </div>
+              <input id="clubFontSize" type="range" min="18" max="54" value="34">
+            </label>
+            <label class="field color-field">
+              <span>俱乐部颜色</span>
+              <input id="clubColor" type="color" value="#ffffff">
+            </label>
+          </div>
+        </div>
+
+        <div class="tab-panel" data-panel="scores">
+          <label class="field">
+            <span>成绩表</span>
+            <textarea id="scoreInput" rows="4" spellcheck="false" placeholder="输入最多 18 洞成绩，用空格或逗号分隔"></textarea>
+          </label>
+          <div class="field-grid">
+            <label class="field">
+              <span>圆形标记</span>
+              <input id="badgeText" type="text" value="" maxlength="2" inputmode="numeric">
+            </label>
+            <label class="field">
+              <span>高亮洞号</span>
+              <input id="highlightInput" type="text" value="" placeholder="例如 3,6" inputmode="numeric">
+            </label>
+          </div>
+          <div class="color-line">
+            <label for="scoreTableColor">成绩表底色</label>
+            <input id="scoreTableColor" type="color" value="#006337">
+          </div>
+        </div>
+
+        <div class="tab-panel" data-panel="total">
+          <div class="field total-field">
+            <div class="field-heading">
+              <label for="totalScore">总成绩</label>
+              <label class="toggle-control">
+                <span>自动统计</span>
+                <input id="autoTotal" type="checkbox" role="switch" checked>
+                <i aria-hidden="true"></i>
+              </label>
+            </div>
+            <input id="totalScore" type="text" value="" maxlength="4" inputmode="numeric" readonly>
+            <small id="totalHint">录入成绩后自动合计</small>
+          </div>
+          <div class="style-row">
+            <label class="field">
+              <div class="field-heading">
+                <span>总分字号</span>
+                <output id="totalFontSizeValue" for="totalFontSize">335px</output>
+              </div>
+              <input id="totalFontSize" type="range" min="160" max="420" value="335">
+            </label>
+            <label class="field color-field">
+              <span>总分颜色</span>
+              <input id="totalColor" type="color" value="#083728">
+            </label>
+          </div>
+          <label class="field">
+            <span>总成绩透明度</span>
+            <input id="totalOpacity" type="range" min="45" max="95" value="88">
+          </label>
+          <label class="field">
+            <span>总成绩高度</span>
+            <input id="totalY" type="range" min="130" max="430" value="300">
+          </label>
+        </div>
+
+        <div class="tab-panel" data-panel="extra">
+          <label class="field">
+            <span>额外信息</span>
+            <textarea id="extraInfo" rows="3" maxlength="56"></textarea>
+          </label>
+          <div class="style-row">
+            <label class="field">
+              <div class="field-heading">
+                <span>额外信息字号</span>
+                <output id="extraFontSizeValue" for="extraFontSize">21px</output>
+              </div>
+              <input id="extraFontSize" type="range" min="14" max="36" value="21">
+            </label>
+            <label class="field color-field">
+              <span>信息颜色</span>
+              <input id="extraColor" type="color" value="#ffffff">
+            </label>
+          </div>
+          <label class="field">
+            <span>品牌文字</span>
+            <input id="brandText" type="text" value="GOLFBROTHERS" maxlength="22" autocomplete="off">
+          </label>
+          <div class="font-grid">
+            <label class="field">
+              <span>英文字体</span>
+              <select id="englishFont">
+                <option value="clean">清晰无衬线</option>
+                <option value="sport">竞技窄体</option>
+                <option value="rounded">轻快圆体</option>
+                <option value="classic">经典衬线</option>
+                <option value="mono">等宽字形</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>数字字体</span>
+              <select id="numberFont">
+                <option value="power">力量黑体</option>
+                <option value="condensed">紧凑比分</option>
+                <option value="geometric">几何数字</option>
+                <option value="classic">经典数字</option>
+                <option value="mono">等宽记分</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="tab-panel" data-panel="photo">
+          <div class="field">
+            <div class="field-heading">
+              <label for="zoomRange">图片缩放</label>
+              <output id="zoomValue" for="zoomRange">100%</output>
+            </div>
+            <div class="range-row">
+              <input id="zoomRange" type="range" min="80" max="220" value="100">
+              <button id="resetZoom" class="range-reset" type="button" aria-label="图片缩放复位" title="图片缩放复位">↺</button>
+            </div>
+          </div>
+          <div class="photo-tools">
+            <div>
+              <strong>人物景深</strong>
+              <span id="recognitionDetail">等待上传照片</span>
+            </div>
+            <button id="retrySegmentation" type="button" disabled>重新识别</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
