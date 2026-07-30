@@ -79,6 +79,17 @@ const paletteCatalog = {
   }
 };
 
+const fixedColorOptions = [
+  { value: "#ffffff", zh: "白色", en: "White" },
+  { value: "#101820", zh: "墨黑", en: "Black" },
+  { value: "#dc3f4d", zh: "巡回红", en: "Tour Red" },
+  { value: "#f28aa5", zh: "玫瑰粉", en: "Rose" },
+  { value: "#d8bd55", zh: "冠军金", en: "Gold" },
+  { value: "#f4df3b", zh: "大师黄", en: "Yellow" },
+  { value: "#15533a", zh: "松柏绿", en: "Green" },
+  { value: "#1c5fa8", zh: "宝石蓝", en: "Blue" }
+];
+
 const sharedBrand = { x: 0, y: 0, w: 1000, h: 70 };
 
 const posterTemplates = {
@@ -282,6 +293,8 @@ const translations = {
     cardColor: "底板",
     lineColor: "分隔线",
     scoreTextColor: "数字",
+    underMarkerColor: "鸟 / 鹰标记",
+    overMarkerColor: "+1 / +2标记",
     scorecardScale: "成绩卡大小",
     totalStep: "总成绩",
     totalStepHint: "当前画布手势仅调整总成绩。",
@@ -313,8 +326,8 @@ const translations = {
     removeSticker: "删除选中贴纸",
     summaryStep: "完成海报",
     summaryStepHint: "可直接跳回任意步骤修改，确认后自动返回这里。",
-    summaryFreeEdit: "自由编辑",
-    summaryFreeEditHint: "开启后可直接点选并拖动海报元素。",
+    summaryFreeEdit: "大图自由编辑",
+    summaryFreeEditHint: "进入大图预览，直接点选并调整元素。",
     summaryElementSize: "当前元素大小",
     summaryNoSelection: "未选择",
     editTemplate: "修改模板",
@@ -372,6 +385,8 @@ const translations = {
     cardColor: "Board",
     lineColor: "Rules",
     scoreTextColor: "Numbers",
+    underMarkerColor: "Birdie / eagle",
+    overMarkerColor: "+1 / +2",
     scorecardScale: "Scorecard size",
     totalStep: "Total",
     totalStepHint: "Canvas gestures adjust only the total.",
@@ -403,8 +418,8 @@ const translations = {
     removeSticker: "REMOVE STICKER",
     summaryStep: "Poster complete",
     summaryStepHint: "Jump directly to any step; confirm to return here.",
-    summaryFreeEdit: "Free edit",
-    summaryFreeEditHint: "Enable to select and drag poster elements directly.",
+    summaryFreeEdit: "LARGE PREVIEW EDIT",
+    summaryFreeEditHint: "Open the full-size poster to select, drag and resize elements.",
     summaryElementSize: "Active element size",
     summaryNoSelection: "Nothing selected",
     editTemplate: "EDIT TEMPLATE",
@@ -452,18 +467,19 @@ const elements = Object.fromEntries(
     "edgeShrink", "edgeShrinkValue", "edgeFeather", "edgeFeatherValue",
     "recognitionDetail", "retrySegmentation", "paletteList", "scoreStyleControl",
     "scoreInputLabel", "scoreInput", "highlightControl", "highlightInput",
-    "badgeText", "scoreFont", "cardColor", "lineColor",
-    "scoreTextColor", "scorecardScale", "scorecardScaleValue", "totalScore",
-    "autoTotal", "totalHint", "numberFont", "totalColor", "totalOpacity",
+    "badgeText", "scoreFont", "cardColorOptions", "lineColorOptions",
+    "scoreTextColorOptions", "underMarkerColorOptions", "overMarkerColorOptions",
+    "scorecardScale", "scorecardScaleValue", "totalScore",
+    "autoTotal", "totalHint", "numberFont", "totalColorOptions", "totalOpacity",
     "totalOpacityValue", "totalSize", "totalSizeValue", "totalAboveSubject",
     "nickname", "course", "dateInput", "extraInfo", "textFont", "textColor",
     "identitySize", "identitySizeValue", "brandText", "stickerUploadButton",
     "stickerInput", "stickerCount", "stickerList", "stickerScale",
     "stickerScaleValue", "removeSticker", "downloadPoster", "backButton",
-    "summaryEditToggle", "summarySelectedLabel", "summaryElementScale",
+    "openFreeEdit", "summarySelectedLabel", "summaryElementScale",
     "summaryElementScaleValue",
     "nextButton", "previewModal", "closePreviewModal", "previewModalTitle",
-    "modalCanvas", "useTemplateButton"
+    "previewDialog", "modalCanvas", "modalEditControls", "useTemplateButton"
   ].map((id) => [id, document.getElementById(id)])
 );
 
@@ -493,6 +509,8 @@ const activePointers = new Map();
 let lastGestureCenter = null;
 let lastGestureDistance = 0;
 let sceneBounds = {};
+let modalSceneBounds = {};
+let activeGestureCanvas = null;
 
 function translate(key, params = {}) {
   const dictionary = translations[language] || translations.zh;
@@ -604,7 +622,9 @@ function createModel(templateId, sample) {
       card: palette.card,
       line: palette.line,
       scoreText: palette.scoreText,
-      text: palette.text
+      text: palette.text,
+      underMarker: "#dc3f4d",
+      overMarker: "#1c5fa8"
     },
     fonts: {
       score: templateId === "client1" ? "arialBlack" : "georgia",
@@ -665,7 +685,9 @@ function applyPalette(paletteId) {
     card: palette.card,
     line: palette.line,
     scoreText: palette.scoreText,
-    text: palette.text
+    text: palette.text,
+    underMarker: "#dc3f4d",
+    overMarker: "#1c5fa8"
   };
   ["nickname", "course", "date", "extra"].forEach((key) => {
     state.identity[key].color = palette.text;
@@ -777,11 +799,48 @@ function renderStickerList() {
   elements.stickerUploadButton.classList.toggle("is-disabled", state.stickers.length >= MAX_STICKERS);
 }
 
+function fixedColorName(option) {
+  return language === "en" ? option.en : option.zh;
+}
+
+function renderFixedColorOptions(container, styleKey) {
+  container.innerHTML = "";
+  const current = state.style[styleKey].toLowerCase();
+  const hasCurrent = fixedColorOptions.some((option) => option.value.toLowerCase() === current);
+  const options = hasCurrent
+    ? fixedColorOptions
+    : [{ value: current, zh: "当前配色", en: "Current palette" }, ...fixedColorOptions];
+  options.forEach((option) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = `fixed-color-option${option.value.toLowerCase() === current ? " is-active" : ""}`;
+    button.style.background = option.value;
+    button.title = fixedColorName(option);
+    button.setAttribute("aria-label", fixedColorName(option));
+    button.addEventListener("click", () => {
+      state.paletteId = "custom";
+      state.style[styleKey] = option.value;
+      renderFixedColorControls();
+      renderPaletteList();
+      renderMain();
+    });
+    container.appendChild(button);
+  });
+}
+
+function renderFixedColorControls() {
+  [
+    [elements.cardColorOptions, "card"],
+    [elements.lineColorOptions, "line"],
+    [elements.scoreTextColorOptions, "scoreText"],
+    [elements.underMarkerColorOptions, "underMarker"],
+    [elements.overMarkerColorOptions, "overMarker"],
+    [elements.totalColorOptions, "total"]
+  ].forEach(([container, styleKey]) => renderFixedColorOptions(container, styleKey));
+}
+
 function syncColorControls() {
-  elements.cardColor.value = state.style.card;
-  elements.lineColor.value = state.style.line;
-  elements.scoreTextColor.value = state.style.scoreText;
-  elements.totalColor.value = state.style.total;
+  renderFixedColorControls();
   elements.textColor.value = state.identity[effectiveIdentityTarget()].color;
 }
 
@@ -842,7 +901,6 @@ function syncTotalControls() {
   elements.totalScore.readOnly = state.autoTotal;
   elements.totalScore.classList.toggle("is-auto", state.autoTotal);
   elements.autoTotal.checked = state.autoTotal;
-  elements.totalColor.value = state.style.total;
   elements.totalOpacity.value = String(state.total.opacity);
   elements.totalOpacityValue.textContent = `${Math.round(state.total.opacity)}%`;
   elements.totalSize.value = String(Math.round(state.total.size));
@@ -936,7 +994,7 @@ function scoreDifference(value) {
 
 function formatRelativeScore(value) {
   if (!Number.isFinite(value)) return "";
-  if (value === 0) return "E";
+  if (value === 0) return "0";
   return value > 0 ? `+${value}` : String(value).replace("-", "−");
 }
 
@@ -1205,26 +1263,40 @@ function scoreGeometry(template, model) {
 }
 
 function drawScoreMarker(context, x, y, radius, difference, scoringStyle, modelStyle, scale) {
-  if (difference === 0) return;
-  const markerColor = scoringStyle === "dp"
-    ? difference < 0 ? "#ef4e59" : "#4b8fe2"
-    : modelStyle.line;
-  const rings = Math.min(2, Math.abs(difference));
+  if (difference === 0) return modelStyle.scoreText;
+  const markerColor = difference < 0
+    ? modelStyle.underMarker
+    : modelStyle.overMarker;
+  const markerCount = Math.min(2, Math.abs(difference));
   context.save();
   context.strokeStyle = markerColor;
+  context.fillStyle = markerColor;
   context.lineWidth = Math.max(2, 3 * scale);
-  for (let ring = 0; ring < rings; ring += 1) {
+
+  if (scoringStyle === "dp") {
+    const filled = markerCount === 2;
+    context.beginPath();
+    if (difference < 0) {
+      context.arc(x, y, radius, 0, Math.PI * 2);
+    } else {
+      context.rect(x - radius, y - radius, radius * 2, radius * 2);
+    }
+    if (filled) context.fill();
+    else context.stroke();
+    context.restore();
+    return filled ? "#ffffff" : markerColor;
+  }
+
+  for (let ring = 0; ring < markerCount; ring += 1) {
     const inset = ring * radius * 0.26;
     const size = Math.max(radius * 0.58, radius - inset);
     context.beginPath();
-    if (difference < 0) {
-      context.arc(x, y, size, 0, Math.PI * 2);
-    } else {
-      context.rect(x - size, y - size, size * 2, size * 2);
-    }
+    if (difference < 0) context.arc(x, y, size, 0, Math.PI * 2);
+    else context.rect(x - size, y - size, size * 2, size * 2);
     context.stroke();
   }
   context.restore();
+  return modelStyle.scoreText;
 }
 
 function drawScorecard(context, template, model, bounds) {
@@ -1303,7 +1375,7 @@ function drawScorecard(context, template, model, bounds) {
     if (model.scoreMode === "relative") {
       const difference = scoreDifference(score);
       if (difference === null) return;
-      drawScoreMarker(
+      scoreColor = drawScoreMarker(
         context,
         x,
         y,
@@ -1316,18 +1388,11 @@ function drawScorecard(context, template, model, bounds) {
       label = hole === 1 && model.badge
         ? model.badge
         : formatRelativeScore(difference);
-      if (model.scoringStyle === "dp") {
-        scoreColor = difference < 0
-          ? "#ef4e59"
-          : difference > 0
-            ? "#4b8fe2"
-            : model.style.scoreText;
-      }
     } else {
       const strokes = strokeScore(score);
       if (strokes === null) return;
       label = hole === 1 && model.badge ? model.badge : String(strokes);
-      context.strokeStyle = model.style.line;
+      context.strokeStyle = model.style.underMarker;
       context.lineWidth = Math.max(2, 3 * scale);
       if (hole === 1 && model.badge) {
         context.beginPath();
@@ -1504,7 +1569,6 @@ function renderScene(context, model, options = {}) {
 }
 
 function currentGuideTarget() {
-  if (currentStep === "summary" && summaryEditEnabled) return summaryEditTarget;
   if (currentStep === "scorecard") return "scorecard";
   if (currentStep === "total") return "total";
   if (currentStep === "identity") return effectiveIdentityTarget();
@@ -1515,32 +1579,71 @@ function currentGuideTarget() {
 function renderMain(exporting = false) {
   if (!selectedTemplateId) return;
   sceneBounds = renderScene(ctx, state, {
-    showGuide: !exporting && (currentStep !== "summary" || summaryEditEnabled),
+    showGuide: !exporting && currentStep !== "summary",
     guideTarget: currentGuideTarget()
   });
 }
 
+function configurePreviewDialog(editing) {
+  elements.previewModal.classList.toggle("is-editing", editing);
+  elements.previewDialog.classList.toggle("is-editing", editing);
+  elements.modalEditControls.hidden = !editing;
+  elements.useTemplateButton.hidden = editing || modalMode !== "template";
+}
+
 function openTemplatePreview(templateId) {
+  summaryEditEnabled = false;
   modalMode = "template";
   modalTemplateId = templateId;
   const template = posterTemplates[templateId];
   elements.previewModalTitle.textContent = `${translate("templatePreview")} · ${templateName(template)}`;
-  elements.useTemplateButton.hidden = false;
+  configurePreviewDialog(false);
   renderScene(modalCtx, createModel(templateId, true), { showGuide: false });
   elements.previewModal.hidden = false;
 }
 
 function openFullPreview() {
   if (!selectedTemplateId) return;
+  summaryEditEnabled = false;
   modalMode = "poster";
   elements.previewModalTitle.textContent = translate("posterPreview");
-  elements.useTemplateButton.hidden = true;
+  configurePreviewDialog(false);
   renderScene(modalCtx, state, { showGuide: false });
   elements.previewModal.hidden = false;
 }
 
+function renderEditModal() {
+  if (modalMode !== "edit") return;
+  modalSceneBounds = renderScene(modalCtx, state, {
+    showGuide: true,
+    guideTarget: summaryEditTarget
+  });
+}
+
+function openFreeEdit() {
+  if (!selectedTemplateId) return;
+  modalMode = "edit";
+  summaryEditEnabled = true;
+  if (!summaryTargetExists(summaryEditTarget)) {
+    summaryEditTarget = state.total.value ? "total" : "scorecard";
+  }
+  elements.previewModalTitle.textContent = translate("summaryFreeEdit");
+  configurePreviewDialog(true);
+  elements.previewModal.hidden = false;
+  syncSummaryEditControls();
+  renderEditModal();
+}
+
 function closePreview() {
+  summaryEditEnabled = false;
+  activePointers.clear();
+  gestureTarget = null;
+  activeGestureCanvas = null;
+  lastGestureCenter = null;
+  lastGestureDistance = 0;
+  configurePreviewDialog(false);
   elements.previewModal.hidden = true;
+  renderMain();
 }
 
 function effectiveIdentityTarget() {
@@ -1627,13 +1730,12 @@ function setSummaryTargetScale(target, value) {
 
 function syncSummaryEditControls() {
   if (!summaryTargetExists(summaryEditTarget)) summaryEditTarget = null;
-  elements.summaryEditToggle.checked = summaryEditEnabled;
-  elements.editorScreen.classList.toggle(
-    "is-free-edit",
-    currentStep === "summary" && summaryEditEnabled
-  );
   const config = summaryScaleConfig(summaryEditTarget);
-  const available = currentStep === "summary" && summaryEditEnabled && Boolean(config);
+  const available =
+    modalMode === "edit" &&
+    summaryEditEnabled &&
+    !elements.previewModal.hidden &&
+    Boolean(config);
   elements.summarySelectedLabel.textContent = summaryTargetName(summaryEditTarget);
   elements.summaryElementScale.disabled = !available;
   if (config) {
@@ -1650,11 +1752,6 @@ function syncSummaryEditControls() {
     elements.summaryElementScale.value = "100";
     elements.summaryElementScaleValue.textContent = "--";
   }
-  if (currentStep === "summary") {
-    elements.gestureHint.textContent = translate(
-      summaryEditEnabled ? "summaryEditGesture" : "summaryGesture"
-    );
-  }
 }
 
 function selectSummaryTarget(target) {
@@ -1669,6 +1766,7 @@ function selectSummaryTarget(target) {
   }
   syncSummaryEditControls();
   renderMain();
+  renderEditModal();
 }
 
 function pointInsideRegion(point, region, padding = 10) {
@@ -1679,7 +1777,7 @@ function pointInsideRegion(point, region, padding = 10) {
     point.y <= region.y + region.h + padding;
 }
 
-function hitTestSummaryTarget(point) {
+function hitTestSummaryTarget(point, bounds = sceneBounds) {
   const targets = [
     ...state.stickers.slice().reverse().map((sticker) => `sticker:${sticker.id}`),
     "scorecard",
@@ -1689,7 +1787,7 @@ function hitTestSummaryTarget(point) {
     "nickname",
     "total"
   ];
-  const matched = targets.find((target) => pointInsideRegion(point, sceneBounds[target]));
+  const matched = targets.find((target) => pointInsideRegion(point, bounds[target]));
   if (matched) return matched;
   return state.photo ? "photo" : null;
 }
@@ -1701,7 +1799,6 @@ function setStep(step) {
   elements.templateScreen.hidden = !isTemplate;
   elements.editorScreen.hidden = isTemplate;
   if (isTemplate) {
-    elements.editorScreen.classList.remove("is-free-edit");
     elements.templateNext.querySelector("span").textContent = translate(returnToSummary ? "confirmChange" : "next");
     return;
   }
@@ -1751,8 +1848,22 @@ function applyLanguage(nextLanguage, persist = true) {
   syncScoreModeControls();
   renderTemplateGallery();
   renderPaletteList();
+  renderFixedColorControls();
   renderStickerList();
   syncTotalControls();
+  if (!elements.previewModal.hidden) {
+    if (modalMode === "edit") {
+      elements.previewModalTitle.textContent = translate("summaryFreeEdit");
+      syncSummaryEditControls();
+      renderEditModal();
+    } else if (modalMode === "poster") {
+      elements.previewModalTitle.textContent = translate("posterPreview");
+    } else if (modalTemplateId) {
+      const template = posterTemplates[modalTemplateId];
+      elements.previewModalTitle.textContent =
+        `${translate("templatePreview")} · ${templateName(template)}`;
+    }
+  }
   setStep(currentStep);
   if (persist) {
     try {
@@ -1771,8 +1882,8 @@ function loadLanguage() {
   }
 }
 
-function canvasPoint(event) {
-  const rect = canvas.getBoundingClientRect();
+function canvasPoint(event, targetCanvas = canvas) {
+  const rect = targetCanvas.getBoundingClientRect();
   return {
     x: (event.clientX - rect.left) / rect.width * POSTER_WIDTH,
     y: (event.clientY - rect.top) / rect.height * POSTER_HEIGHT
@@ -1792,7 +1903,6 @@ function distanceBetween(points) {
 }
 
 function targetForStep() {
-  if (currentStep === "summary" && summaryEditEnabled) return summaryEditTarget;
   if (currentStep === "photo") return "photo";
   if (currentStep === "scorecard") return "scorecard";
   if (currentStep === "total") return "total";
@@ -1862,22 +1972,34 @@ function resetGestureBaseline() {
 }
 
 function startPointer(event) {
-  if (currentStep === "summary" && summaryEditEnabled && !activePointers.size) {
-    selectSummaryTarget(hitTestSummaryTarget(canvasPoint(event)));
+  const sourceCanvas = event.currentTarget;
+  const editingModal =
+    sourceCanvas === elements.modalCanvas &&
+    modalMode === "edit" &&
+    summaryEditEnabled;
+  if (sourceCanvas === elements.modalCanvas && !editingModal) return;
+  if (activeGestureCanvas && activeGestureCanvas !== sourceCanvas) return;
+
+  if (editingModal && !activePointers.size) {
+    selectSummaryTarget(
+      hitTestSummaryTarget(canvasPoint(event, sourceCanvas), modalSceneBounds)
+    );
     gestureTarget = summaryEditTarget;
   } else {
     gestureTarget = gestureTarget || targetForStep();
   }
   if (!gestureTarget) return;
   event.preventDefault();
-  canvas.setPointerCapture(event.pointerId);
-  activePointers.set(event.pointerId, canvasPoint(event));
+  activeGestureCanvas = sourceCanvas;
+  sourceCanvas.setPointerCapture(event.pointerId);
+  activePointers.set(event.pointerId, canvasPoint(event, sourceCanvas));
   resetGestureBaseline();
 }
 
 function movePointer(event) {
   if (!activePointers.has(event.pointerId) || !gestureTarget) return;
-  activePointers.set(event.pointerId, canvasPoint(event));
+  const sourceCanvas = activeGestureCanvas || event.currentTarget;
+  activePointers.set(event.pointerId, canvasPoint(event, sourceCanvas));
   const points = [...activePointers.values()];
   const center = gestureCenter(points);
   if (lastGestureCenter) {
@@ -1890,13 +2012,18 @@ function movePointer(event) {
   }
   lastGestureCenter = center;
   syncGestureOutputs();
-  renderMain();
+  if (sourceCanvas === elements.modalCanvas && modalMode === "edit") {
+    renderEditModal();
+  } else {
+    renderMain();
+  }
 }
 
 function endPointer(event) {
   activePointers.delete(event.pointerId);
   if (!activePointers.size) {
     gestureTarget = null;
+    activeGestureCanvas = null;
     lastGestureCenter = null;
     lastGestureDistance = 0;
   } else {
@@ -2830,19 +2957,6 @@ function bindEvents() {
     elements.scorecardScaleValue.textContent = `${elements.scorecardScale.value}%`;
     renderMain();
   });
-  [
-    ["cardColor", "card"],
-    ["lineColor", "line"],
-    ["scoreTextColor", "scoreText"],
-    ["totalColor", "total"]
-  ].forEach(([elementKey, styleKey]) => {
-    elements[elementKey].addEventListener("input", () => {
-      state.paletteId = "custom";
-      state.style[styleKey] = elements[elementKey].value;
-      renderPaletteList();
-      renderMain();
-    });
-  });
   elements.textColor.addEventListener("input", () => {
     state.paletteId = "custom";
     state.identity[effectiveIdentityTarget()].color = elements.textColor.value;
@@ -2942,20 +3056,12 @@ function bindEvents() {
   });
   elements.removeSticker.addEventListener("click", removeSelectedSticker);
   elements.downloadPoster.addEventListener("click", downloadPoster);
-  elements.summaryEditToggle.addEventListener("change", () => {
-    summaryEditEnabled = elements.summaryEditToggle.checked;
-    if (!summaryEditEnabled) {
-      gestureTarget = null;
-      activePointers.clear();
-    }
-    syncSummaryEditControls();
-    renderMain();
-  });
+  elements.openFreeEdit.addEventListener("click", openFreeEdit);
   elements.summaryElementScale.addEventListener("input", () => {
-    if (!summaryEditEnabled || !summaryEditTarget) return;
+    if (modalMode !== "edit" || !summaryEditEnabled || !summaryEditTarget) return;
     setSummaryTargetScale(summaryEditTarget, Number(elements.summaryElementScale.value));
     syncGestureOutputs();
-    renderMain();
+    renderEditModal();
   });
 
   document.querySelectorAll(".summary-edit").forEach((button) => {
@@ -2970,6 +3076,10 @@ function bindEvents() {
   canvas.addEventListener("pointermove", movePointer);
   canvas.addEventListener("pointerup", endPointer);
   canvas.addEventListener("pointercancel", endPointer);
+  elements.modalCanvas.addEventListener("pointerdown", startPointer);
+  elements.modalCanvas.addEventListener("pointermove", movePointer);
+  elements.modalCanvas.addEventListener("pointerup", endPointer);
+  elements.modalCanvas.addEventListener("pointercancel", endPointer);
 }
 
 function initialize() {

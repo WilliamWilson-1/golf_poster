@@ -170,19 +170,27 @@
               <select id="scoreFont"></select>
             </label>
 
-            <div class="color-grid">
-              <label>
+            <div class="color-grid fixed-color-grid">
+              <div class="color-choice-field">
                 <span data-i18n="cardColor">底板</span>
-                <input id="cardColor" type="color">
-              </label>
-              <label>
+                <div id="cardColorOptions" class="fixed-color-options"></div>
+              </div>
+              <div class="color-choice-field">
                 <span data-i18n="lineColor">分隔线</span>
-                <input id="lineColor" type="color">
-              </label>
-              <label>
+                <div id="lineColorOptions" class="fixed-color-options"></div>
+              </div>
+              <div class="color-choice-field">
                 <span data-i18n="scoreTextColor">数字</span>
-                <input id="scoreTextColor" type="color">
-              </label>
+                <div id="scoreTextColorOptions" class="fixed-color-options"></div>
+              </div>
+              <div class="color-choice-field">
+                <span data-i18n="underMarkerColor">鸟 / 鹰</span>
+                <div id="underMarkerColorOptions" class="fixed-color-options"></div>
+              </div>
+              <div class="color-choice-field">
+                <span data-i18n="overMarkerColor">+1 / +2</span>
+                <div id="overMarkerColorOptions" class="fixed-color-options"></div>
+              </div>
             </div>
 
             <label class="control-field">
@@ -222,10 +230,10 @@
             </label>
 
             <div class="two-column">
-              <label class="control-field">
-                <span data-i18n="totalColor">总成绩颜色</span>
-                <input id="totalColor" type="color">
-              </label>
+            <div class="control-field">
+              <span data-i18n="totalColor">总成绩颜色</span>
+              <div id="totalColorOptions" class="fixed-color-options"></div>
+            </div>
               <label class="control-field">
                 <span data-i18n="totalOpacity">透明度</span>
                 <div class="range-line">
@@ -349,29 +357,13 @@
               </div>
             </div>
 
-            <div class="summary-free-edit">
-              <div class="switch-row">
-                <label class="switch-control">
-                  <span>
-                    <strong data-i18n="summaryFreeEdit">自由编辑</strong>
-                    <small data-i18n="summaryFreeEditHint">开启后可直接点选并拖动海报元素。</small>
-                  </span>
-                  <input id="summaryEditToggle" type="checkbox">
-                  <i aria-hidden="true"></i>
-                </label>
-              </div>
-
-              <label class="control-field">
-                <span class="summary-element-heading">
-                  <span data-i18n="summaryElementSize">当前元素大小</span>
-                  <output id="summarySelectedLabel" data-i18n="summaryNoSelection">未选择</output>
-                </span>
-                <div class="range-line">
-                  <input id="summaryElementScale" type="range" min="10" max="260" value="100" disabled>
-                  <output id="summaryElementScaleValue">--</output>
-                </div>
-              </label>
-            </div>
+            <button id="openFreeEdit" class="free-edit-button" type="button">
+              <span class="free-edit-symbol" aria-hidden="true"></span>
+              <span>
+                <strong data-i18n="summaryFreeEdit">大图自由编辑</strong>
+                <small data-i18n="summaryFreeEditHint">进入大图预览，直接点选并调整元素。</small>
+              </span>
+            </button>
 
             <div class="summary-actions">
               <button class="summary-edit" type="button" data-edit-step="template" data-i18n="editTemplate">修改模板</button>
@@ -404,7 +396,7 @@
 
     <div id="previewModal" class="preview-modal" hidden>
       <button class="modal-backdrop" type="button" aria-label="关闭预览"></button>
-      <section class="preview-dialog" role="dialog" aria-modal="true" aria-labelledby="previewModalTitle">
+      <section id="previewDialog" class="preview-dialog" role="dialog" aria-modal="true" aria-labelledby="previewModalTitle">
         <header>
           <div>
             <span class="step-index">GOLFBROTHERS</span>
@@ -414,6 +406,17 @@
         </header>
         <div class="modal-canvas-stage">
           <canvas id="modalCanvas" width="1000" height="1265"></canvas>
+        </div>
+        <div id="modalEditControls" class="modal-edit-controls" hidden>
+          <span class="summary-element-heading">
+            <span data-i18n="summaryElementSize">当前元素大小</span>
+            <output id="summarySelectedLabel" data-i18n="summaryNoSelection">未选择</output>
+          </span>
+          <div class="range-line">
+            <input id="summaryElementScale" type="range" min="10" max="260" value="100" disabled>
+            <output id="summaryElementScaleValue">--</output>
+          </div>
+          <small data-i18n="summaryEditGesture">点选并拖动元素，下方滑杆调整大小</small>
         </div>
         <button id="useTemplateButton" class="primary-button" type="button" data-i18n="useTemplate">选择此模板</button>
       </section>
