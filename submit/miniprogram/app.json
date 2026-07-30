@@ -1,0 +1,15 @@
+{
+  "pages": [
+    "pages/poster/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "高尔夫海报",
+    "navigationBarBackgroundColor": "#00233f",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#11171b",
+    "backgroundTextStyle": "light"
+  },
+  "style": "v2",
+  "lazyCodeLoading": "requiredComponents",
+  "sitemapLocation": "sitemap.json"
+}

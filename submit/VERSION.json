@@ -1,0 +1,11 @@
+{
+  "packageVersion": "1.0.0",
+  "updatedAt": "2026-07-31",
+  "webBaselineCommit": "f49ba9b",
+  "deliveryType": "native-wechat-miniprogram",
+  "templateCount": 6,
+  "posterSize": {
+    "width": 1000,
+    "height": 1265
+  }
+}

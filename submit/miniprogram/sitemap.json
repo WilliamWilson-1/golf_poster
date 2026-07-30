@@ -1,0 +1,9 @@
+{
+  "desc": "GOLFBROTHERS poster editor demo page",
+  "rules": [
+    {
+      "action": "disallow",
+      "page": "*"
+    }
+  ]
+}

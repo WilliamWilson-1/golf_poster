@@ -1,0 +1,8 @@
+<golf-poster
+  id="golfPoster"
+  brand="GOLFBROTHERS"
+  initial-language="zh"
+  segmentation-endpoint=""
+  save-to-album="{{true}}"
+  bindexport="onPosterExport"
+/>
