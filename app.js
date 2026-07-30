@@ -1089,8 +1089,22 @@ function drawBrand(context, model) {
   context.font = 'italic 900 37px Arial, sans-serif';
   context.fillStyle = "#fff";
   context.fillText(first, 120, 35);
+  const firstWidth = context.measureText(first).width;
   context.fillStyle = "#c9a13d";
-  context.fillText(second, 120 + context.measureText(first).width, 35);
+  context.fillText(second, 120 + firstWidth, 35);
+  const brandEnd = 120 + firstWidth + context.measureText(second).width;
+  const lineStart = brandEnd + 32;
+  const lineEnd = POSTER_WIDTH - 48;
+  if (lineEnd - lineStart >= 28) {
+    context.save();
+    context.beginPath();
+    context.moveTo(lineStart, 35);
+    context.lineTo(lineEnd, 35);
+    context.strokeStyle = "rgba(226,232,236,0.72)";
+    context.lineWidth = 1.5;
+    context.stroke();
+    context.restore();
+  }
 }
 
 function drawPreviewSubject(context, template) {
