@@ -821,39 +821,62 @@ function fixedColorName(option) {
   return language === "en" ? option.en : option.zh;
 }
 
-function renderFixedColorOptions(container, styleKey) {
+function renderFixedColorOptions(container, styleKey, whiteLocked = false) {
   container.innerHTML = "";
   const current = state.style[styleKey].toLowerCase();
   const hasCurrent = fixedColorOptions.some((option) => option.value.toLowerCase() === current);
-  const options = hasCurrent
+  const options = whiteLocked || hasCurrent
     ? fixedColorOptions
     : [{ value: current, zh: "当前配色", en: "Current palette" }, ...fixedColorOptions];
   options.forEach((option) => {
+    const optionValue = option.value.toLowerCase();
+    const lockedWhite = whiteLocked && optionValue === "#ffffff";
     const button = document.createElement("button");
     button.type = "button";
-    button.className = `fixed-color-option${option.value.toLowerCase() === current ? " is-active" : ""}`;
+    button.className = [
+      "fixed-color-option",
+      optionValue === current && !whiteLocked ? "is-active" : "",
+      lockedWhite ? "is-active is-locked-white" : "",
+      whiteLocked && !lockedWhite ? "is-unavailable" : ""
+    ].filter(Boolean).join(" ");
     button.style.background = option.value;
-    button.title = fixedColorName(option);
-    button.setAttribute("aria-label", fixedColorName(option));
-    button.addEventListener("click", () => {
-      state.paletteId = "custom";
-      state.style[styleKey] = option.value;
-      renderFixedColorControls();
-      renderPaletteList();
-      renderMain();
-    });
+    if (whiteLocked) {
+      button.disabled = true;
+      const status = language === "en"
+        ? lockedWhite ? "locked" : "unavailable on this board"
+        : lockedWhite ? "已锁定" : "当前底板不可用";
+      button.title = `${fixedColorName(option)} · ${status}`;
+      button.setAttribute("aria-label", `${fixedColorName(option)}，${status}`);
+      if (lockedWhite) {
+        const lock = document.createElement("span");
+        lock.className = "color-lock-icon";
+        lock.setAttribute("aria-hidden", "true");
+        button.appendChild(lock);
+      }
+    } else {
+      button.title = fixedColorName(option);
+      button.setAttribute("aria-label", fixedColorName(option));
+      button.addEventListener("click", () => {
+        state.paletteId = "custom";
+        state.style[styleKey] = option.value;
+        renderFixedColorControls();
+        renderPaletteList();
+        renderMain();
+      });
+    }
     container.appendChild(button);
   });
 }
 
 function renderFixedColorControls() {
-  const markerStyleKeys = new Set([
+  const whiteOnlyStyleKeys = new Set([
+    "scoreText",
     "underMarker",
     "eagleMarker",
     "overMarker",
     "doubleBogeyMarker"
   ]);
-  const showTourMarkerColors = isLightNeutralBoard(state.style.card);
+  const lockScoreColors = !isLightNeutralBoard(state.style.card);
   [
     [elements.cardColorOptions, "card"],
     [elements.lineColorOptions, "line"],
@@ -865,10 +888,12 @@ function renderFixedColorControls() {
     [elements.totalColorOptions, "total"]
   ].forEach(([container, styleKey]) => {
     const field = container.closest(".color-choice-field");
-    if (field && markerStyleKeys.has(styleKey)) {
-      field.hidden = !showTourMarkerColors;
-    }
-    renderFixedColorOptions(container, styleKey);
+    if (field) field.hidden = false;
+    renderFixedColorOptions(
+      container,
+      styleKey,
+      lockScoreColors && whiteOnlyStyleKeys.has(styleKey)
+    );
   });
 }
 

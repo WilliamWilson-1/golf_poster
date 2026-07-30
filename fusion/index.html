@@ -817,6 +817,56 @@ button:disabled {
   box-shadow: 0 0 0 1px var(--navy);
 }
 
+.fixed-color-option.is-unavailable:disabled {
+  filter: grayscale(1);
+  opacity: 0.24;
+  box-shadow: 0 0 0 1px #9ba4aa;
+}
+
+.fixed-color-option.is-locked-white:disabled {
+  filter: none;
+  opacity: 1;
+}
+
+.fixed-color-option.is-locked-white::after {
+  display: none;
+}
+
+.color-lock-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 10px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--navy);
+  box-shadow: 0 0 0 1px var(--white);
+  transform: translate(-50%, -26%);
+}
+
+.color-lock-icon::before {
+  position: absolute;
+  top: -6px;
+  left: 2px;
+  width: 6px;
+  height: 7px;
+  border: 2px solid var(--navy);
+  border-bottom: 0;
+  border-radius: 6px 6px 0 0;
+  content: "";
+}
+
+.color-lock-icon::after {
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  width: 2px;
+  height: 3px;
+  border-radius: 1px;
+  background: var(--yellow);
+  content: "";
+}
+
 input[type="color"] {
   width: 100%;
   height: 36px;
@@ -2461,39 +2511,62 @@ function fixedColorName(option) {
   return language === "en" ? option.en : option.zh;
 }
 
-function renderFixedColorOptions(container, styleKey) {
+function renderFixedColorOptions(container, styleKey, whiteLocked = false) {
   container.innerHTML = "";
   const current = state.style[styleKey].toLowerCase();
   const hasCurrent = fixedColorOptions.some((option) => option.value.toLowerCase() === current);
-  const options = hasCurrent
+  const options = whiteLocked || hasCurrent
     ? fixedColorOptions
     : [{ value: current, zh: "当前配色", en: "Current palette" }, ...fixedColorOptions];
   options.forEach((option) => {
+    const optionValue = option.value.toLowerCase();
+    const lockedWhite = whiteLocked && optionValue === "#ffffff";
     const button = document.createElement("button");
     button.type = "button";
-    button.className = `fixed-color-option${option.value.toLowerCase() === current ? " is-active" : ""}`;
+    button.className = [
+      "fixed-color-option",
+      optionValue === current && !whiteLocked ? "is-active" : "",
+      lockedWhite ? "is-active is-locked-white" : "",
+      whiteLocked && !lockedWhite ? "is-unavailable" : ""
+    ].filter(Boolean).join(" ");
     button.style.background = option.value;
-    button.title = fixedColorName(option);
-    button.setAttribute("aria-label", fixedColorName(option));
-    button.addEventListener("click", () => {
-      state.paletteId = "custom";
-      state.style[styleKey] = option.value;
-      renderFixedColorControls();
-      renderPaletteList();
-      renderMain();
-    });
+    if (whiteLocked) {
+      button.disabled = true;
+      const status = language === "en"
+        ? lockedWhite ? "locked" : "unavailable on this board"
+        : lockedWhite ? "已锁定" : "当前底板不可用";
+      button.title = `${fixedColorName(option)} · ${status}`;
+      button.setAttribute("aria-label", `${fixedColorName(option)}，${status}`);
+      if (lockedWhite) {
+        const lock = document.createElement("span");
+        lock.className = "color-lock-icon";
+        lock.setAttribute("aria-hidden", "true");
+        button.appendChild(lock);
+      }
+    } else {
+      button.title = fixedColorName(option);
+      button.setAttribute("aria-label", fixedColorName(option));
+      button.addEventListener("click", () => {
+        state.paletteId = "custom";
+        state.style[styleKey] = option.value;
+        renderFixedColorControls();
+        renderPaletteList();
+        renderMain();
+      });
+    }
     container.appendChild(button);
   });
 }
 
 function renderFixedColorControls() {
-  const markerStyleKeys = new Set([
+  const whiteOnlyStyleKeys = new Set([
+    "scoreText",
     "underMarker",
     "eagleMarker",
     "overMarker",
     "doubleBogeyMarker"
   ]);
-  const showTourMarkerColors = isLightNeutralBoard(state.style.card);
+  const lockScoreColors = !isLightNeutralBoard(state.style.card);
   [
     [elements.cardColorOptions, "card"],
     [elements.lineColorOptions, "line"],
@@ -2505,10 +2578,12 @@ function renderFixedColorControls() {
     [elements.totalColorOptions, "total"]
   ].forEach(([container, styleKey]) => {
     const field = container.closest(".color-choice-field");
-    if (field && markerStyleKeys.has(styleKey)) {
-      field.hidden = !showTourMarkerColors;
-    }
-    renderFixedColorOptions(container, styleKey);
+    if (field) field.hidden = false;
+    renderFixedColorOptions(
+      container,
+      styleKey,
+      lockScoreColors && whiteOnlyStyleKeys.has(styleKey)
+    );
   });
 }
 
