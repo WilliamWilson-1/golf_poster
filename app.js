@@ -270,8 +270,13 @@ const translations = {
     scorecardStep: "成绩卡",
     scorecardStepHint: "当前画布手势仅调整成绩卡。",
     palette: "模板配色",
+    scoreMode: "成绩类型",
+    strokesMode: "普通成绩",
+    relativeMode: "杆差成绩",
     scoringStyle: "记分方式",
-    scores: "逐洞杆差",
+    scoresStrokes: "逐洞成绩",
+    scoresRelative: "逐洞杆差",
+    highlightHoles: "高亮洞号",
     badge: "首洞标记",
     scoreFont: "成绩字体",
     cardColor: "底板",
@@ -282,7 +287,8 @@ const translations = {
     totalStepHint: "当前画布手势仅调整总成绩。",
     totalScore: "总成绩",
     autoTotal: "自动统计",
-    totalHintEmpty: "录入杆差后自动合计",
+    totalHintEmptyStrokes: "录入逐洞成绩后自动合计",
+    totalHintEmptyRelative: "录入杆差后自动合计",
     totalHintManual: "自动统计已关闭，可手动输入",
     totalHintCount: "已统计 {count} 洞",
     numberFont: "数字字体",
@@ -354,8 +360,13 @@ const translations = {
     scorecardStep: "Scorecard",
     scorecardStepHint: "Canvas gestures adjust only the scorecard.",
     palette: "Template palette",
+    scoreMode: "Score input",
+    strokesMode: "Hole scores",
+    relativeMode: "To par",
     scoringStyle: "Scoring style",
-    scores: "Hole-by-hole to par",
+    scoresStrokes: "Hole scores",
+    scoresRelative: "Hole-by-hole to par",
+    highlightHoles: "Highlight holes",
     badge: "First-hole badge",
     scoreFont: "Score font",
     cardColor: "Board",
@@ -366,7 +377,8 @@ const translations = {
     totalStepHint: "Canvas gestures adjust only the total.",
     totalScore: "Total score",
     autoTotal: "Auto total",
-    totalHintEmpty: "Scores to par will be totaled automatically",
+    totalHintEmptyStrokes: "Hole scores will be totaled automatically",
+    totalHintEmptyRelative: "Scores to par will be totaled automatically",
     totalHintManual: "Auto total is off; enter a value",
     totalHintCount: "{count} holes counted",
     numberFont: "Number font",
@@ -438,7 +450,8 @@ const elements = Object.fromEntries(
     "posterCanvas", "gestureHint", "controlScroller", "photoInput", "resetPhoto",
     "photoScale", "photoScaleValue", "backgroundBlur", "backgroundBlurValue",
     "edgeShrink", "edgeShrinkValue", "edgeFeather", "edgeFeatherValue",
-    "recognitionDetail", "retrySegmentation", "paletteList", "scoreInput",
+    "recognitionDetail", "retrySegmentation", "paletteList", "scoreStyleControl",
+    "scoreInputLabel", "scoreInput", "highlightControl", "highlightInput",
     "badgeText", "scoreFont", "cardColor", "lineColor",
     "scoreTextColor", "scorecardScale", "scorecardScaleValue", "totalScore",
     "autoTotal", "totalHint", "numberFont", "totalColor", "totalOpacity",
@@ -528,10 +541,17 @@ function createModel(templateId, sample) {
     segmentationState: "idle",
     image: { scale: 1, x: 0, y: 0, blur: 0 },
     edge: { shrink: 2, feather: 1 },
-    scores: sample
-      ? ["-1", "0", "0", "+1", "-1", "-2", "0", "+1", "0", "0", "-1", "+1", "0", "0", "-1", "0", "+1", "0"]
-      : Array(18).fill(""),
+    scoreMode: "relative",
+    scoreSets: {
+      strokes: sample
+        ? ["4", "4", "5", "3", "4", "3", "4", "4", "5", "4", "3", "4", "4", "4", "3", "4", "3", "5"]
+        : Array(18).fill(""),
+      relative: sample
+        ? ["-1", "0", "0", "+1", "-1", "-2", "0", "+1", "0", "0", "-1", "+1", "0", "0", "-1", "0", "+1", "0"]
+        : Array(18).fill("")
+    },
     scoringStyle: "pga",
+    highlights: sample ? new Set([3, 6, 14]) : new Set(),
     badge: "",
     autoTotal: true,
     total: {
@@ -603,8 +623,13 @@ function preserveContent(next, previous) {
   next.segmentationState = previous.segmentationState;
   next.image = { ...previous.image };
   next.edge = { ...previous.edge };
-  next.scores = [...previous.scores];
+  next.scoreMode = previous.scoreMode;
+  next.scoreSets = {
+    strokes: [...previous.scoreSets.strokes],
+    relative: [...previous.scoreSets.relative]
+  };
   next.scoringStyle = previous.scoringStyle;
+  next.highlights = new Set(previous.highlights);
   next.badge = previous.badge;
   next.autoTotal = previous.autoTotal;
   next.total.value = previous.total.value;
@@ -826,6 +851,34 @@ function syncTotalControls() {
   updateTotalHint();
 }
 
+function activeScores(model = state) {
+  return model.scoreSets[model.scoreMode];
+}
+
+function syncScoreModeControls() {
+  const relative = state.scoreMode === "relative";
+  elements.scoreInput.value = activeScores().filter(Boolean).join(" ");
+  elements.scoreInputLabel.textContent = translate(
+    relative ? "scoresRelative" : "scoresStrokes"
+  );
+  elements.scoreInput.placeholder = language === "en"
+    ? relative
+      ? "Example: -1 0 +1, separated by spaces or commas"
+      : "Example: 4 5 3, separated by spaces or commas"
+    : relative
+      ? "例如：-1 0 +1，用空格或逗号分隔"
+      : "例如：4 5 3，用空格或逗号分隔";
+  elements.scoreStyleControl.hidden = !relative;
+  elements.highlightControl.hidden = relative;
+  elements.highlightInput.value = [...state.highlights].join(",");
+  document.querySelectorAll(".score-mode-target").forEach((button) => {
+    button.classList.toggle("is-active", button.dataset.scoreMode === state.scoreMode);
+  });
+  document.querySelectorAll(".score-style-target").forEach((button) => {
+    button.classList.toggle("is-active", button.dataset.scoreStyle === state.scoringStyle);
+  });
+}
+
 function syncAllControls() {
   elements.photoScale.value = String(Math.round(state.image.scale * 100));
   elements.photoScaleValue.textContent = `${Math.round(state.image.scale * 100)}%`;
@@ -835,15 +888,12 @@ function syncAllControls() {
   elements.edgeShrinkValue.textContent = `${state.edge.shrink > 0 ? "+" : ""}${state.edge.shrink}px`;
   elements.edgeFeather.value = String(state.edge.feather);
   elements.edgeFeatherValue.textContent = `${state.edge.feather}px`;
-  elements.scoreInput.value = state.scores.filter(Boolean).join(" ");
   elements.badgeText.value = state.badge;
   elements.scoreFont.value = state.fonts.score;
   elements.numberFont.value = state.fonts.total;
   elements.scorecardScale.value = String(Math.round(state.scorecard.scale * 100));
   elements.scorecardScaleValue.textContent = `${Math.round(state.scorecard.scale * 100)}%`;
-  document.querySelectorAll(".score-style-target").forEach((button) => {
-    button.classList.toggle("is-active", button.dataset.scoreStyle === state.scoringStyle);
-  });
+  syncScoreModeControls();
   syncColorControls();
   syncTotalControls();
   syncIdentityControls();
@@ -854,15 +904,22 @@ function syncAllControls() {
   updateRecognitionUi();
 }
 
-function parseScores(value) {
+function parseScores(value, mode = state.scoreMode) {
   const scores = value
     .split(/[\s,，、]+/)
-    .map((item) => scoreDifference(item))
+    .map((item) => mode === "relative" ? scoreDifference(item) : strokeScore(item))
     .filter((score) => score !== null)
-    .map(formatRelativeScore)
+    .map((score) => mode === "relative" ? formatRelativeScore(score) : String(score))
     .slice(0, 18);
   while (scores.length < 18) scores.push("");
   return scores;
+}
+
+function strokeScore(value) {
+  const normalized = String(value ?? "").trim();
+  if (!/^\d{1,2}$/.test(normalized)) return null;
+  const number = Number.parseInt(normalized, 10);
+  return number >= 1 && number <= 20 ? number : null;
 }
 
 function scoreDifference(value) {
@@ -883,13 +940,25 @@ function formatRelativeScore(value) {
   return value > 0 ? `+${value}` : String(value).replace("-", "−");
 }
 
+function parseHighlights(value) {
+  return new Set(
+    value
+      .split(/[\s,，、]+/)
+      .map((item) => Number.parseInt(item, 10))
+      .filter((number) => Number.isFinite(number) && number >= 1 && number <= 18)
+  );
+}
+
 function updateAutoTotal() {
   if (state.autoTotal) {
-    const numeric = state.scores
-      .map(scoreDifference)
+    const relative = state.scoreMode === "relative";
+    const numeric = activeScores()
+      .map(relative ? scoreDifference : strokeScore)
       .filter((score) => score !== null);
     state.total.value = numeric.length
-      ? formatRelativeScore(numeric.reduce((sum, score) => sum + score, 0))
+      ? relative
+        ? formatRelativeScore(numeric.reduce((sum, score) => sum + score, 0))
+        : String(numeric.reduce((sum, score) => sum + score, 0))
       : "";
   }
   syncTotalControls();
@@ -897,13 +966,18 @@ function updateAutoTotal() {
 }
 
 function updateTotalHint() {
-  const count = state.scores.filter((score) => scoreDifference(score) !== null).length;
+  const relative = state.scoreMode === "relative";
+  const count = activeScores().filter(
+    (score) => (relative ? scoreDifference(score) : strokeScore(score)) !== null
+  ).length;
   if (!state.autoTotal) {
     elements.totalHint.textContent = translate("totalHintManual");
   } else if (count) {
     elements.totalHint.textContent = translate("totalHintCount", { count });
   } else {
-    elements.totalHint.textContent = translate("totalHintEmpty");
+    elements.totalHint.textContent = translate(
+      relative ? "totalHintEmptyRelative" : "totalHintEmptyStrokes"
+    );
   }
 }
 
@@ -1190,7 +1264,7 @@ function drawScorecard(context, template, model, bounds) {
   context.textAlign = "center";
   context.textBaseline = "middle";
 
-  model.scores.forEach((score, index) => {
+  activeScores(model).forEach((score, index) => {
     const firstHalf = index < 9;
     const slot = index % 9;
     let x;
@@ -1209,25 +1283,55 @@ function drawScorecard(context, template, model, bounds) {
       y = board.y + board.h / 2 * (firstHalf ? 0 : 1) + board.h / 4;
     }
     const hole = index + 1;
-    const difference = scoreDifference(score);
     const radius = Math.min(28 * scale, cellWidth * 0.33, cellHeight * 0.35);
-    if (difference === null) return;
-    drawScoreMarker(
-      context,
-      x,
-      y,
-      radius,
-      difference,
-      model.scoringStyle,
-      model.style,
-      scale
-    );
-    const label = hole === 1 && model.badge
-      ? model.badge
-      : formatRelativeScore(difference);
-    const scoreColor = model.scoringStyle === "dp"
-      ? difference < 0 ? "#ef4e59" : difference > 0 ? "#4b8fe2" : model.style.scoreText
-      : model.style.scoreText;
+    let label;
+    let scoreColor = model.style.scoreText;
+    if (model.scoreMode === "relative") {
+      const difference = scoreDifference(score);
+      if (difference === null) return;
+      drawScoreMarker(
+        context,
+        x,
+        y,
+        radius,
+        difference,
+        model.scoringStyle,
+        model.style,
+        scale
+      );
+      label = hole === 1 && model.badge
+        ? model.badge
+        : formatRelativeScore(difference);
+      if (model.scoringStyle === "dp") {
+        scoreColor = difference < 0
+          ? "#ef4e59"
+          : difference > 0
+            ? "#4b8fe2"
+            : model.style.scoreText;
+      }
+    } else {
+      const strokes = strokeScore(score);
+      if (strokes === null) return;
+      label = hole === 1 && model.badge ? model.badge : String(strokes);
+      context.strokeStyle = model.style.line;
+      context.lineWidth = Math.max(2, 3 * scale);
+      if (hole === 1 && model.badge) {
+        context.beginPath();
+        context.arc(x, y, radius, 0, Math.PI * 2);
+        context.stroke();
+        context.beginPath();
+        context.arc(x, y, radius * 0.68, 0, Math.PI * 2);
+        context.stroke();
+      } else if (model.highlights.has(hole)) {
+        if (template.highlightShape === "mixed" && hole % 2 === 0) {
+          context.strokeRect(x - radius, y - radius, radius * 2, radius * 2);
+        } else {
+          context.beginPath();
+          context.arc(x, y, radius, 0, Math.PI * 2);
+          context.stroke();
+        }
+      }
+    }
     const adjustedFontSize = label.length >= 3 ? fontSize * 0.72 : fontSize;
     context.font = `900 ${Math.floor(adjustedFontSize)}px ${fontStack(model.fonts.score)}`;
     context.fillStyle = scoreColor;
@@ -1630,9 +1734,7 @@ function applyLanguage(nextLanguage, persist = true) {
   document.querySelectorAll("[data-i18n]").forEach((node) => {
     node.textContent = translate(node.dataset.i18n);
   });
-  elements.scoreInput.placeholder = language === "en"
-    ? "Example: -1 0 +1, separated by spaces or commas"
-    : "例如：-1 0 +1，用空格或逗号分隔";
+  syncScoreModeControls();
   renderTemplateGallery();
   renderPaletteList();
   renderStickerList();
@@ -2675,8 +2777,18 @@ function bindEvents() {
   elements.retrySegmentation.addEventListener("click", requestSegmentation);
 
   elements.scoreInput.addEventListener("input", () => {
-    state.scores = parseScores(elements.scoreInput.value);
+    state.scoreSets[state.scoreMode] = parseScores(
+      elements.scoreInput.value,
+      state.scoreMode
+    );
     updateAutoTotal();
+  });
+  document.querySelectorAll(".score-mode-target").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.scoreMode = button.dataset.scoreMode;
+      syncScoreModeControls();
+      updateAutoTotal();
+    });
   });
   document.querySelectorAll(".score-style-target").forEach((button) => {
     button.addEventListener("click", () => {
@@ -2686,6 +2798,10 @@ function bindEvents() {
       });
       renderMain();
     });
+  });
+  elements.highlightInput.addEventListener("input", () => {
+    state.highlights = parseHighlights(elements.highlightInput.value);
+    renderMain();
   });
   elements.badgeText.addEventListener("input", () => {
     state.badge = elements.badgeText.value.trim();

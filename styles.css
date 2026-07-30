@@ -432,8 +432,9 @@ button:disabled {
   display: block;
   width: auto;
   max-width: 100%;
-  height: 100%;
+  height: auto;
   max-height: 100%;
+  flex: 0 0 auto;
   aspect-ratio: 1000 / 1265;
   background: #173b2c;
   box-shadow: 0 6px 22px rgba(0, 0, 0, 0.34);
@@ -894,6 +895,7 @@ input[type="color"] {
   background: var(--yellow);
 }
 
+.score-mode-control,
 .score-style-control {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
