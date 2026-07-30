@@ -334,6 +334,30 @@
               </div>
             </div>
 
+            <div class="summary-free-edit">
+              <div class="switch-row">
+                <label class="switch-control">
+                  <span>
+                    <strong data-i18n="summaryFreeEdit">自由编辑</strong>
+                    <small data-i18n="summaryFreeEditHint">开启后可直接点选并拖动海报元素。</small>
+                  </span>
+                  <input id="summaryEditToggle" type="checkbox">
+                  <i aria-hidden="true"></i>
+                </label>
+              </div>
+
+              <label class="control-field">
+                <span class="summary-element-heading">
+                  <span data-i18n="summaryElementSize">当前元素大小</span>
+                  <output id="summarySelectedLabel" data-i18n="summaryNoSelection">未选择</output>
+                </span>
+                <div class="range-line">
+                  <input id="summaryElementScale" type="range" min="10" max="260" value="100" disabled>
+                  <output id="summaryElementScaleValue">--</output>
+                </div>
+              </label>
+            </div>
+
             <div class="summary-actions">
               <button class="summary-edit" type="button" data-edit-step="template" data-i18n="editTemplate">修改模板</button>
               <button class="summary-edit" type="button" data-edit-step="photo" data-i18n="editPhoto">修改照片</button>

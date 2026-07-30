@@ -307,6 +307,10 @@ const translations = {
     removeSticker: "删除选中贴纸",
     summaryStep: "完成海报",
     summaryStepHint: "可直接跳回任意步骤修改，确认后自动返回这里。",
+    summaryFreeEdit: "自由编辑",
+    summaryFreeEditHint: "开启后可直接点选并拖动海报元素。",
+    summaryElementSize: "当前元素大小",
+    summaryNoSelection: "未选择",
     editTemplate: "修改模板",
     editPhoto: "修改照片",
     editScorecard: "修改成绩卡",
@@ -320,6 +324,7 @@ const translations = {
     identityGesture: "拖动移动当前文字，双指缩放",
     stickerGesture: "拖动移动选中贴纸，双指缩放",
     summaryGesture: "完整预览",
+    summaryEditGesture: "点选并拖动元素，下方滑杆调整大小",
     selectTemplateFirst: "请先选择模板"
   },
   en: {
@@ -386,6 +391,10 @@ const translations = {
     removeSticker: "REMOVE STICKER",
     summaryStep: "Poster complete",
     summaryStepHint: "Jump directly to any step; confirm to return here.",
+    summaryFreeEdit: "Free edit",
+    summaryFreeEditHint: "Enable to select and drag poster elements directly.",
+    summaryElementSize: "Active element size",
+    summaryNoSelection: "Nothing selected",
     editTemplate: "EDIT TEMPLATE",
     editPhoto: "EDIT PHOTO",
     editScorecard: "EDIT SCORECARD",
@@ -399,6 +408,7 @@ const translations = {
     identityGesture: "Drag active text; pinch to scale",
     stickerGesture: "Drag selected sticker; pinch to scale",
     summaryGesture: "Full preview",
+    summaryEditGesture: "Select and drag an element; use the slider below to resize",
     selectTemplateFirst: "Choose a template first"
   }
 };
@@ -437,6 +447,8 @@ const elements = Object.fromEntries(
     "identitySize", "identitySizeValue", "brandText", "stickerUploadButton",
     "stickerInput", "stickerCount", "stickerList", "stickerScale",
     "stickerScaleValue", "removeSticker", "downloadPoster", "backButton",
+    "summaryEditToggle", "summarySelectedLabel", "summaryElementScale",
+    "summaryElementScaleValue",
     "nextButton", "previewModal", "closePreviewModal", "previewModalTitle",
     "modalCanvas", "useTemplateButton"
   ].map((id) => [id, document.getElementById(id)])
@@ -451,6 +463,8 @@ let selectedTemplateId = null;
 let currentStep = "template";
 let returnToSummary = false;
 let activeIdentityTarget = "nickname";
+let summaryEditEnabled = false;
+let summaryEditTarget = null;
 let modalMode = "template";
 let modalTemplateId = null;
 let state = createModel("academy", false);
@@ -465,6 +479,7 @@ let gestureTarget = null;
 const activePointers = new Map();
 let lastGestureCenter = null;
 let lastGestureDistance = 0;
+let sceneBounds = {};
 
 function translate(key, params = {}) {
   const dictionary = translations[language] || translations.zh;
@@ -811,6 +826,7 @@ function syncAllControls() {
   syncTotalControls();
   syncIdentityControls();
   syncStickerControls();
+  syncSummaryEditControls();
   renderPaletteList();
   renderStickerList();
   updateRecognitionUi();
@@ -1041,14 +1057,17 @@ function drawTotal(context, template, model, bounds) {
   context.textBaseline = "middle";
   context.fillStyle = model.style.total;
   context.font = `900 ${model.total.size}px ${fontStack(model.fonts.total)}`;
+  const metrics = context.measureText(model.total.value);
   context.fillText(model.total.value, model.total.x, model.total.y);
   context.restore();
   const base = template.layout.total;
+  const width = Math.max(base.w, metrics.width);
+  const height = Math.max(base.h, model.total.size * 0.9);
   bounds.total = {
-    x: model.total.x - base.w / 2,
-    y: model.total.y - base.h / 2,
-    w: base.w,
-    h: base.h
+    x: model.total.x - width / 2,
+    y: model.total.y - height / 2,
+    w: width,
+    h: height
   };
 }
 
@@ -1287,6 +1306,14 @@ function renderScene(context, model, options = {}) {
   const bounds = {};
   context.clearRect(0, 0, POSTER_WIDTH, POSTER_HEIGHT);
   drawBackground(context, template, model);
+  if (model.photo) {
+    bounds.photo = {
+      x: 0,
+      y: BRAND_HEIGHT,
+      w: POSTER_WIDTH,
+      h: POSTER_HEIGHT - BRAND_HEIGHT
+    };
+  }
   drawAtmosphere(context, template);
   if (model.total.aboveSubject) {
     drawSubject(context, template, model);
@@ -1306,6 +1333,7 @@ function renderScene(context, model, options = {}) {
 }
 
 function currentGuideTarget() {
+  if (currentStep === "summary" && summaryEditEnabled) return summaryEditTarget;
   if (currentStep === "scorecard") return "scorecard";
   if (currentStep === "total") return "total";
   if (currentStep === "identity") return effectiveIdentityTarget();
@@ -1315,8 +1343,8 @@ function currentGuideTarget() {
 
 function renderMain(exporting = false) {
   if (!selectedTemplateId) return;
-  renderScene(ctx, state, {
-    showGuide: !exporting && currentStep !== "summary",
+  sceneBounds = renderScene(ctx, state, {
+    showGuide: !exporting && (currentStep !== "summary" || summaryEditEnabled),
     guideTarget: currentGuideTarget()
   });
 }
@@ -1353,6 +1381,148 @@ function selectedSticker() {
   return state.stickers.find((sticker) => sticker.id === state.selectedStickerId) || null;
 }
 
+function summaryTargetExists(target) {
+  if (!target) return false;
+  if (target === "photo") return Boolean(state.photo);
+  if (target === "scorecard") return true;
+  if (target === "total") return Boolean(state.total.value);
+  if (["nickname", "course", "date", "extra"].includes(target)) {
+    if (target === "date" && !posterTemplates[state.templateId].layout.date) return false;
+    if (target === "course") {
+      const layout = posterTemplates[state.templateId].layout.course;
+      return Boolean(state.identity.course.value || (layout?.combinesDate && state.identity.date.value));
+    }
+    return Boolean(state.identity[target].value);
+  }
+  if (target.startsWith("sticker:")) {
+    return state.stickers.some((sticker) => `sticker:${sticker.id}` === target);
+  }
+  return false;
+}
+
+function summaryTargetName(target) {
+  const keys = {
+    photo: "photoStep",
+    scorecard: "scorecardStep",
+    total: "totalStep",
+    nickname: "nickname",
+    course: "course",
+    date: "date",
+    extra: "extraInfo"
+  };
+  if (target?.startsWith("sticker:")) {
+    const index = state.stickers.findIndex((sticker) => `sticker:${sticker.id}` === target);
+    return index >= 0 ? `${translate("stickerStep")} ${index + 1}` : translate("stickerStep");
+  }
+  return target && keys[target] ? translate(keys[target]) : translate("summaryNoSelection");
+}
+
+function summaryScaleConfig(target) {
+  if (target === "photo") {
+    return { min: 80, max: 260, step: 1, value: state.image.scale * 100, suffix: "%" };
+  }
+  if (target === "scorecard") {
+    return { min: 55, max: 180, step: 1, value: state.scorecard.scale * 100, suffix: "%" };
+  }
+  if (target === "total") {
+    return { min: 100, max: 1600, step: 5, value: state.total.size, suffix: "px" };
+  }
+  if (["nickname", "course", "date", "extra"].includes(target)) {
+    return { min: 12, max: 100, step: 1, value: state.identity[target].size, suffix: "px" };
+  }
+  if (target?.startsWith("sticker:")) {
+    const sticker = state.stickers.find((item) => `sticker:${item.id}` === target);
+    if (sticker) {
+      return { min: 10, max: 260, step: 1, value: sticker.scale * 100, suffix: "%" };
+    }
+  }
+  return null;
+}
+
+function setSummaryTargetScale(target, value) {
+  if (target === "photo") {
+    state.image.scale = clamp(value / 100, 0.8, 2.6);
+  } else if (target === "scorecard") {
+    state.scorecard.scale = clamp(value / 100, 0.55, 1.8);
+  } else if (target === "total") {
+    state.total.size = clamp(value, 100, 1600);
+  } else if (["nickname", "course", "date", "extra"].includes(target)) {
+    state.identity[target].size = clamp(value, 12, 100);
+  } else if (target?.startsWith("sticker:")) {
+    const sticker = state.stickers.find((item) => `sticker:${item.id}` === target);
+    if (sticker) sticker.scale = clamp(value / 100, 0.1, 2.6);
+  }
+}
+
+function syncSummaryEditControls() {
+  if (!summaryTargetExists(summaryEditTarget)) summaryEditTarget = null;
+  elements.summaryEditToggle.checked = summaryEditEnabled;
+  elements.editorScreen.classList.toggle(
+    "is-free-edit",
+    currentStep === "summary" && summaryEditEnabled
+  );
+  const config = summaryScaleConfig(summaryEditTarget);
+  const available = currentStep === "summary" && summaryEditEnabled && Boolean(config);
+  elements.summarySelectedLabel.textContent = summaryTargetName(summaryEditTarget);
+  elements.summaryElementScale.disabled = !available;
+  if (config) {
+    elements.summaryElementScale.min = String(config.min);
+    elements.summaryElementScale.max = String(config.max);
+    elements.summaryElementScale.step = String(config.step);
+    elements.summaryElementScale.value = String(Math.round(config.value));
+    elements.summaryElementScaleValue.textContent =
+      `${Math.round(config.value)}${config.suffix}`;
+  } else {
+    elements.summaryElementScale.min = "10";
+    elements.summaryElementScale.max = "260";
+    elements.summaryElementScale.step = "1";
+    elements.summaryElementScale.value = "100";
+    elements.summaryElementScaleValue.textContent = "--";
+  }
+  if (currentStep === "summary") {
+    elements.gestureHint.textContent = translate(
+      summaryEditEnabled ? "summaryEditGesture" : "summaryGesture"
+    );
+  }
+}
+
+function selectSummaryTarget(target) {
+  summaryEditTarget = summaryTargetExists(target) ? target : null;
+  if (["nickname", "course", "date", "extra"].includes(summaryEditTarget)) {
+    activeIdentityTarget = summaryEditTarget;
+    syncIdentityControls();
+  } else if (summaryEditTarget?.startsWith("sticker:")) {
+    state.selectedStickerId = summaryEditTarget.slice("sticker:".length);
+    renderStickerList();
+    syncStickerControls();
+  }
+  syncSummaryEditControls();
+  renderMain();
+}
+
+function pointInsideRegion(point, region, padding = 10) {
+  return Boolean(region) &&
+    point.x >= region.x - padding &&
+    point.x <= region.x + region.w + padding &&
+    point.y >= region.y - padding &&
+    point.y <= region.y + region.h + padding;
+}
+
+function hitTestSummaryTarget(point) {
+  const targets = [
+    ...state.stickers.slice().reverse().map((sticker) => `sticker:${sticker.id}`),
+    "scorecard",
+    "extra",
+    "date",
+    "course",
+    "nickname",
+    "total"
+  ];
+  const matched = targets.find((target) => pointInsideRegion(point, sceneBounds[target]));
+  if (matched) return matched;
+  return state.photo ? "photo" : null;
+}
+
 function setStep(step) {
   currentStep = step;
   elements.app.dataset.step = step;
@@ -1360,6 +1530,7 @@ function setStep(step) {
   elements.templateScreen.hidden = !isTemplate;
   elements.editorScreen.hidden = isTemplate;
   if (isTemplate) {
+    elements.editorScreen.classList.remove("is-free-edit");
     elements.templateNext.querySelector("span").textContent = translate(returnToSummary ? "confirmChange" : "next");
     return;
   }
@@ -1375,6 +1546,7 @@ function setStep(step) {
   elements.editorScreen.querySelector(".wizard-nav").hidden = step === "summary";
   elements.nextButton.querySelector("span").textContent = translate(returnToSummary ? "confirmChange" : "next");
   elements.controlScroller.scrollTop = 0;
+  syncSummaryEditControls();
   renderMain();
 }
 
@@ -1451,6 +1623,7 @@ function distanceBetween(points) {
 }
 
 function targetForStep() {
+  if (currentStep === "summary" && summaryEditEnabled) return summaryEditTarget;
   if (currentStep === "photo") return "photo";
   if (currentStep === "scorecard") return "scorecard";
   if (currentStep === "total") return "total";
@@ -1510,6 +1683,7 @@ function syncGestureOutputs() {
   elements.totalSizeValue.textContent = `${Math.round(state.total.size)}px`;
   syncIdentityControls();
   syncStickerControls();
+  syncSummaryEditControls();
 }
 
 function resetGestureBaseline() {
@@ -1519,8 +1693,14 @@ function resetGestureBaseline() {
 }
 
 function startPointer(event) {
-  gestureTarget = gestureTarget || targetForStep();
+  if (currentStep === "summary" && summaryEditEnabled && !activePointers.size) {
+    selectSummaryTarget(hitTestSummaryTarget(canvasPoint(event)));
+    gestureTarget = summaryEditTarget;
+  } else {
+    gestureTarget = gestureTarget || targetForStep();
+  }
   if (!gestureTarget) return;
+  event.preventDefault();
   canvas.setPointerCapture(event.pointerId);
   activePointers.set(event.pointerId, canvasPoint(event));
   resetGestureBaseline();
@@ -2214,6 +2394,9 @@ function resetAll() {
   state = createModel("academy", false);
   returnToSummary = false;
   activeIdentityTarget = "nickname";
+  summaryEditEnabled = false;
+  summaryEditTarget = null;
+  sceneBounds = {};
   elements.photoInput.value = "";
   elements.stickerInput.value = "";
   elements.templateNext.disabled = true;
@@ -2387,6 +2570,21 @@ function bindEvents() {
   });
   elements.removeSticker.addEventListener("click", removeSelectedSticker);
   elements.downloadPoster.addEventListener("click", downloadPoster);
+  elements.summaryEditToggle.addEventListener("change", () => {
+    summaryEditEnabled = elements.summaryEditToggle.checked;
+    if (!summaryEditEnabled) {
+      gestureTarget = null;
+      activePointers.clear();
+    }
+    syncSummaryEditControls();
+    renderMain();
+  });
+  elements.summaryElementScale.addEventListener("input", () => {
+    if (!summaryEditEnabled || !summaryEditTarget) return;
+    setSummaryTargetScale(summaryEditTarget, Number(elements.summaryElementScale.value));
+    syncGestureOutputs();
+    renderMain();
+  });
 
   document.querySelectorAll(".summary-edit").forEach((button) => {
     button.addEventListener("click", () => {

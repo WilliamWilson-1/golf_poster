@@ -443,6 +443,14 @@ button:disabled {
   touch-action: none;
 }
 
+.editor-screen.is-free-edit #posterCanvas {
+  cursor: grab;
+}
+
+.editor-screen.is-free-edit #posterCanvas:active {
+  cursor: grabbing;
+}
+
 .gesture-hint {
   display: flex;
   align-items: center;
@@ -924,6 +932,45 @@ input[type="color"] {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
+}
+
+.summary-free-edit {
+  display: grid;
+  gap: 12px;
+  padding: 2px 0 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.summary-free-edit .switch-control > span {
+  display: grid;
+  gap: 3px;
+}
+
+.summary-free-edit .switch-control strong {
+  color: var(--navy-deep);
+  font-size: 12px;
+}
+
+.summary-free-edit .switch-control small {
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 750;
+}
+
+.summary-element-heading {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.summary-element-heading output {
+  overflow: hidden;
+  color: var(--navy);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .summary-edit {
