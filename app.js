@@ -847,6 +847,13 @@ function renderFixedColorOptions(container, styleKey) {
 }
 
 function renderFixedColorControls() {
+  const markerStyleKeys = new Set([
+    "underMarker",
+    "eagleMarker",
+    "overMarker",
+    "doubleBogeyMarker"
+  ]);
+  const showTourMarkerColors = isLightNeutralBoard(state.style.card);
   [
     [elements.cardColorOptions, "card"],
     [elements.lineColorOptions, "line"],
@@ -856,7 +863,13 @@ function renderFixedColorControls() {
     [elements.overMarkerColorOptions, "overMarker"],
     [elements.doubleBogeyMarkerColorOptions, "doubleBogeyMarker"],
     [elements.totalColorOptions, "total"]
-  ].forEach(([container, styleKey]) => renderFixedColorOptions(container, styleKey));
+  ].forEach(([container, styleKey]) => {
+    const field = container.closest(".color-choice-field");
+    if (field && markerStyleKeys.has(styleKey)) {
+      field.hidden = !showTourMarkerColors;
+    }
+    renderFixedColorOptions(container, styleKey);
+  });
 }
 
 function syncColorControls() {
@@ -1057,6 +1070,19 @@ function readableScoreColor(background, preferred) {
   return colorContrast(background, "#ffffff") >= colorContrast(background, "#101820")
     ? "#ffffff"
     : "#101820";
+}
+
+function isLightNeutralBoard(value) {
+  const rgb = rgbFromHex(value);
+  if (!rgb) return false;
+  const channels = [rgb.r, rgb.g, rgb.b];
+  const channelSpread = Math.max(...channels) - Math.min(...channels);
+  return colorLuminance(value) >= 0.68 && channelSpread <= 32;
+}
+
+function scorecardTextColor(modelStyle) {
+  if (!isLightNeutralBoard(modelStyle.card)) return "#ffffff";
+  return readableScoreColor(modelStyle.card, modelStyle.scoreText);
 }
 
 function parseHighlights(value) {
@@ -1345,12 +1371,12 @@ function scoreGeometry(template, model) {
 }
 
 function drawScoreMarker(context, x, y, radius, difference, scoringStyle, modelStyle, scale) {
-  const regularScoreColor = readableScoreColor(modelStyle.card, modelStyle.scoreText);
+  const regularScoreColor = scorecardTextColor(modelStyle);
   if (difference === 0) return regularScoreColor;
   const markerCount = Math.min(2, Math.abs(difference));
   context.save();
 
-  if (scoringStyle === "dp") {
+  if (scoringStyle === "dp" && isLightNeutralBoard(modelStyle.card)) {
     const markerColor = difference < -1
       ? modelStyle.eagleMarker
       : difference < 0
@@ -1376,10 +1402,10 @@ function drawScoreMarker(context, x, y, radius, difference, scoringStyle, modelS
   }
 
   context.strokeStyle = regularScoreColor;
-  context.lineWidth = Math.max(2, 3 * scale);
+  context.lineWidth = Math.max(2, 2.5 * scale);
+  const ringGap = Math.max(3, 4 * scale);
   for (let ring = 0; ring < markerCount; ring += 1) {
-    const inset = ring * radius * 0.26;
-    const size = Math.max(radius * 0.58, radius - inset);
+    const size = Math.max(radius * 0.72, radius - ring * ringGap);
     context.beginPath();
     if (difference < 0) context.arc(x, y, size, 0, Math.PI * 2);
     else context.rect(x - size, y - size, size * 2, size * 2);
@@ -1459,12 +1485,14 @@ function drawScorecard(context, template, model, bounds) {
       y = board.y + board.h / 2 * (firstHalf ? 0 : 1) + board.h / 4;
     }
     const hole = index + 1;
-    const radius = Math.min(28 * scale, cellWidth * 0.33, cellHeight * 0.35);
+    const radius = Math.min(34 * scale, cellWidth * 0.41, cellHeight * 0.4);
     let label;
-    let scoreColor = readableScoreColor(model.style.card, model.style.scoreText);
+    let markerDifference = null;
+    let scoreColor = scorecardTextColor(model.style);
     if (model.scoreMode === "relative") {
       const difference = scoreDifference(score);
       if (difference === null) return;
+      markerDifference = difference;
       scoreColor = drawScoreMarker(
         context,
         x,
@@ -1502,7 +1530,18 @@ function drawScorecard(context, template, model, bounds) {
       }
     }
     const adjustedFontSize = label.length >= 3 ? fontSize * 0.72 : fontSize;
-    context.font = `900 ${Math.floor(adjustedFontSize)}px ${fontStack(model.fonts.score)}`;
+    const markerTextWidth = markerDifference !== null && markerDifference !== 0
+      ? Math.max(20, (radius - Math.max(4, 5 * scale)) * 1.55)
+      : cellWidth * 0.78;
+    fitFont(
+      context,
+      label,
+      markerTextWidth,
+      Math.floor(adjustedFontSize),
+      Math.max(14, Math.floor(fontSize * 0.5)),
+      model.fonts.score,
+      900
+    );
     context.fillStyle = scoreColor;
     context.fillText(label, x, y);
   });
