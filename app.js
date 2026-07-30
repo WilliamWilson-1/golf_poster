@@ -2,7 +2,7 @@ const POSTER_WIDTH = 1000;
 const POSTER_HEIGHT = 1265;
 const BRAND_HEIGHT = 70;
 const MAX_STICKERS = 5;
-const MASK_MAX_DIMENSION = 800;
+const MASK_MAX_DIMENSION = 960;
 
 const paletteCatalog = {
   forestGold: {
@@ -263,15 +263,15 @@ const translations = {
     edgeFeather: "边缘柔化",
     subjectDepth: "人物景深",
     waitingPhoto: "等待上传照片",
-    analyzingPhoto: "正在识别并精修人物边缘",
-    personDetected: "人物已识别，精细边缘已生成",
+    analyzingPhoto: "正在进行双层识别并精修人物边缘",
+    personDetected: "人物已识别，高清边缘已生成",
     noPerson: "未识别到人物，按普通照片生成",
     retryRecognition: "重新识别",
     scorecardStep: "成绩卡",
     scorecardStepHint: "当前画布手势仅调整成绩卡。",
     palette: "模板配色",
-    scores: "逐洞成绩",
-    highlightHoles: "高亮洞号",
+    scoringStyle: "记分方式",
+    scores: "逐洞杆差",
     badge: "首洞标记",
     scoreFont: "成绩字体",
     cardColor: "底板",
@@ -282,7 +282,7 @@ const translations = {
     totalStepHint: "当前画布手势仅调整总成绩。",
     totalScore: "总成绩",
     autoTotal: "自动统计",
-    totalHintEmpty: "录入成绩后自动合计",
+    totalHintEmpty: "录入杆差后自动合计",
     totalHintManual: "自动统计已关闭，可手动输入",
     totalHintCount: "已统计 {count} 洞",
     numberFont: "数字字体",
@@ -347,15 +347,15 @@ const translations = {
     edgeFeather: "Edge feather",
     subjectDepth: "Subject depth",
     waitingPhoto: "Waiting for a photo",
-    analyzingPhoto: "Detecting and refining subject edges",
-    personDetected: "Subject detected; refined edges are ready",
+    analyzingPhoto: "Running two-pass subject detection and edge refinement",
+    personDetected: "Subject detected; high-detail edges are ready",
     noPerson: "No subject detected; using the full photo",
     retryRecognition: "RETRY",
     scorecardStep: "Scorecard",
     scorecardStepHint: "Canvas gestures adjust only the scorecard.",
     palette: "Template palette",
-    scores: "Hole scores",
-    highlightHoles: "Highlight holes",
+    scoringStyle: "Scoring style",
+    scores: "Hole-by-hole to par",
     badge: "First-hole badge",
     scoreFont: "Score font",
     cardColor: "Board",
@@ -366,7 +366,7 @@ const translations = {
     totalStepHint: "Canvas gestures adjust only the total.",
     totalScore: "Total score",
     autoTotal: "Auto total",
-    totalHintEmpty: "Scores will be totaled automatically",
+    totalHintEmpty: "Scores to par will be totaled automatically",
     totalHintManual: "Auto total is off; enter a value",
     totalHintCount: "{count} holes counted",
     numberFont: "Number font",
@@ -439,7 +439,7 @@ const elements = Object.fromEntries(
     "photoScale", "photoScaleValue", "backgroundBlur", "backgroundBlurValue",
     "edgeShrink", "edgeShrinkValue", "edgeFeather", "edgeFeatherValue",
     "recognitionDetail", "retrySegmentation", "paletteList", "scoreInput",
-    "highlightInput", "badgeText", "scoreFont", "cardColor", "lineColor",
+    "badgeText", "scoreFont", "cardColor", "lineColor",
     "scoreTextColor", "scorecardScale", "scorecardScaleValue", "totalScore",
     "autoTotal", "totalHint", "numberFont", "totalColor", "totalOpacity",
     "totalOpacityValue", "totalSize", "totalSizeValue", "totalAboveSubject",
@@ -528,12 +528,14 @@ function createModel(templateId, sample) {
     segmentationState: "idle",
     image: { scale: 1, x: 0, y: 0, blur: 0 },
     edge: { shrink: 2, feather: 1 },
-    scores: sample ? ["4", "4", "5", "3", "4", "3", "4", "4", "5", "4", "3", "4", "4", "4", "3", "4", "3", "5"] : Array(18).fill(""),
-    highlights: sample ? new Set([3, 6, 14]) : new Set(),
+    scores: sample
+      ? ["-1", "0", "0", "+1", "-1", "-2", "0", "+1", "0", "0", "-1", "+1", "0", "0", "-1", "0", "+1", "0"]
+      : Array(18).fill(""),
+    scoringStyle: "pga",
     badge: "",
     autoTotal: true,
     total: {
-      value: sample ? (templateId === "duo" ? "61" : templateId === "masters" ? "66" : "67") : "",
+      value: sample ? "−3" : "",
       x: total.x,
       y: total.y,
       size: template.defaults.totalSize,
@@ -602,7 +604,7 @@ function preserveContent(next, previous) {
   next.image = { ...previous.image };
   next.edge = { ...previous.edge };
   next.scores = [...previous.scores];
-  next.highlights = new Set(previous.highlights);
+  next.scoringStyle = previous.scoringStyle;
   next.badge = previous.badge;
   next.autoTotal = previous.autoTotal;
   next.total.value = previous.total.value;
@@ -766,6 +768,10 @@ function syncIdentityControls() {
     : "";
   elements.extraInfo.value = state.identity.extra.value;
   elements.brandText.value = state.identity.brand;
+  syncIdentitySelectionControls();
+}
+
+function syncIdentitySelectionControls() {
   const target = effectiveIdentityTarget();
   elements.textFont.value = state.identity[target].font;
   elements.textColor.value = state.identity[target].color;
@@ -777,6 +783,20 @@ function syncIdentityControls() {
       button.disabled = !posterTemplates[state.templateId].layout.date;
     }
   });
+}
+
+function activateIdentityTarget(target, render = true) {
+  const layout = posterTemplates[state.templateId].layout;
+  activeIdentityTarget = target === "date" && !layout.date ? "course" : target;
+  syncIdentitySelectionControls();
+  if (render) renderMain();
+}
+
+function commitIdentityInputs() {
+  state.identity.nickname.value = elements.nickname.value;
+  state.identity.course.value = elements.course.value;
+  state.identity.date.value = elements.dateInput.value;
+  state.identity.extra.value = elements.extraInfo.value;
 }
 
 function syncStickerControls() {
@@ -816,12 +836,14 @@ function syncAllControls() {
   elements.edgeFeather.value = String(state.edge.feather);
   elements.edgeFeatherValue.textContent = `${state.edge.feather}px`;
   elements.scoreInput.value = state.scores.filter(Boolean).join(" ");
-  elements.highlightInput.value = [...state.highlights].join(",");
   elements.badgeText.value = state.badge;
   elements.scoreFont.value = state.fonts.score;
   elements.numberFont.value = state.fonts.total;
   elements.scorecardScale.value = String(Math.round(state.scorecard.scale * 100));
   elements.scorecardScaleValue.textContent = `${Math.round(state.scorecard.scale * 100)}%`;
+  document.querySelectorAll(".score-style-target").forEach((button) => {
+    button.classList.toggle("is-active", button.dataset.scoreStyle === state.scoringStyle);
+  });
   syncColorControls();
   syncTotalControls();
   syncIdentityControls();
@@ -835,35 +857,47 @@ function syncAllControls() {
 function parseScores(value) {
   const scores = value
     .split(/[\s,，、]+/)
-    .map((item) => item.trim())
-    .filter(Boolean)
+    .map((item) => scoreDifference(item))
+    .filter((score) => score !== null)
+    .map(formatRelativeScore)
     .slice(0, 18);
   while (scores.length < 18) scores.push("");
   return scores;
 }
 
-function parseHighlights(value) {
-  return new Set(
-    value
-      .split(/[\s,，、]+/)
-      .map((item) => Number.parseInt(item, 10))
-      .filter((number) => Number.isFinite(number) && number >= 1 && number <= 18)
-  );
+function scoreDifference(value) {
+  const normalized = String(value ?? "")
+    .trim()
+    .toUpperCase()
+    .replace(/[−–—]/g, "-");
+  if (!normalized) return null;
+  if (normalized === "E" || normalized === "EVEN") return 0;
+  if (!/^[+-]?\d+$/.test(normalized)) return null;
+  const number = Number.parseInt(normalized, 10);
+  return Number.isFinite(number) && number >= -9 && number <= 9 ? number : null;
+}
+
+function formatRelativeScore(value) {
+  if (!Number.isFinite(value)) return "";
+  if (value === 0) return "E";
+  return value > 0 ? `+${value}` : String(value).replace("-", "−");
 }
 
 function updateAutoTotal() {
   if (state.autoTotal) {
     const numeric = state.scores
-      .map((score) => Number.parseInt(score, 10))
-      .filter(Number.isFinite);
-    state.total.value = numeric.length ? String(numeric.reduce((sum, score) => sum + score, 0)) : "";
+      .map(scoreDifference)
+      .filter((score) => score !== null);
+    state.total.value = numeric.length
+      ? formatRelativeScore(numeric.reduce((sum, score) => sum + score, 0))
+      : "";
   }
   syncTotalControls();
   renderMain();
 }
 
 function updateTotalHint() {
-  const count = state.scores.filter((score) => Number.isFinite(Number.parseInt(score, 10))).length;
+  const count = state.scores.filter((score) => scoreDifference(score) !== null).length;
   if (!state.autoTotal) {
     elements.totalHint.textContent = translate("totalHintManual");
   } else if (count) {
@@ -1082,6 +1116,29 @@ function scoreGeometry(template, model) {
   return { base, board, columns, scale: transform.scale };
 }
 
+function drawScoreMarker(context, x, y, radius, difference, scoringStyle, modelStyle, scale) {
+  if (difference === 0) return;
+  const markerColor = scoringStyle === "dp"
+    ? difference < 0 ? "#ef4e59" : "#4b8fe2"
+    : modelStyle.line;
+  const rings = Math.min(2, Math.abs(difference));
+  context.save();
+  context.strokeStyle = markerColor;
+  context.lineWidth = Math.max(2, 3 * scale);
+  for (let ring = 0; ring < rings; ring += 1) {
+    const inset = ring * radius * 0.26;
+    const size = Math.max(radius * 0.58, radius - inset);
+    context.beginPath();
+    if (difference < 0) {
+      context.arc(x, y, size, 0, Math.PI * 2);
+    } else {
+      context.rect(x - size, y - size, size * 2, size * 2);
+    }
+    context.stroke();
+  }
+  context.restore();
+}
+
 function drawScorecard(context, template, model, bounds) {
   const geometry = scoreGeometry(template, model);
   const { board, columns, scale } = geometry;
@@ -1152,33 +1209,29 @@ function drawScorecard(context, template, model, bounds) {
       y = board.y + board.h / 2 * (firstHalf ? 0 : 1) + board.h / 4;
     }
     const hole = index + 1;
+    const difference = scoreDifference(score);
     const radius = Math.min(28 * scale, cellWidth * 0.33, cellHeight * 0.35);
-    if (score && model.highlights.has(hole)) {
-      context.strokeStyle = model.style.line;
-      context.lineWidth = Math.max(2, 3 * scale);
-      if (template.highlightShape === "mixed" && hole % 2 === 0) {
-        context.strokeRect(x - radius, y - radius, radius * 2, radius * 2);
-      } else {
-        context.beginPath();
-        context.arc(x, y, radius, 0, Math.PI * 2);
-        context.stroke();
-      }
-    }
-    if (hole === 1 && model.badge) {
-      context.strokeStyle = model.style.line;
-      context.lineWidth = Math.max(2, 3 * scale);
-      context.beginPath();
-      context.arc(x, y, radius, 0, Math.PI * 2);
-      context.stroke();
-      context.beginPath();
-      context.arc(x, y, radius * 0.68, 0, Math.PI * 2);
-      context.stroke();
-      context.fillStyle = model.style.scoreText;
-      context.fillText(model.badge, x, y);
-    } else if (score) {
-      context.fillStyle = model.style.scoreText;
-      context.fillText(score, x, y);
-    }
+    if (difference === null) return;
+    drawScoreMarker(
+      context,
+      x,
+      y,
+      radius,
+      difference,
+      model.scoringStyle,
+      model.style,
+      scale
+    );
+    const label = hole === 1 && model.badge
+      ? model.badge
+      : formatRelativeScore(difference);
+    const scoreColor = model.scoringStyle === "dp"
+      ? difference < 0 ? "#ef4e59" : difference > 0 ? "#4b8fe2" : model.style.scoreText
+      : model.style.scoreText;
+    const adjustedFontSize = label.length >= 3 ? fontSize * 0.72 : fontSize;
+    context.font = `900 ${Math.floor(adjustedFontSize)}px ${fontStack(model.fonts.score)}`;
+    context.fillStyle = scoreColor;
+    context.fillText(label, x, y);
   });
   context.restore();
 }
@@ -1578,8 +1631,8 @@ function applyLanguage(nextLanguage, persist = true) {
     node.textContent = translate(node.dataset.i18n);
   });
   elements.scoreInput.placeholder = language === "en"
-    ? "Up to 18 scores, separated by spaces or commas"
-    : "输入最多 18 洞成绩，用空格或逗号分隔";
+    ? "Example: -1 0 +1, separated by spaces or commas"
+    : "例如：-1 0 +1，用空格或逗号分隔";
   renderTemplateGallery();
   renderPaletteList();
   renderStickerList();
@@ -1777,18 +1830,134 @@ function loadPhoto(file) {
   reader.readAsDataURL(file);
 }
 
-function copyMask(mask) {
-  const photoWidth = state.photo.naturalWidth || state.photo.width;
-  const photoHeight = state.photo.naturalHeight || state.photo.height;
-  const scale = Math.min(1, MASK_MAX_DIMENSION / Math.max(photoWidth, photoHeight));
+function copyMask(mask, sourceWidth, sourceHeight) {
+  const width = sourceWidth || state.photo.naturalWidth || state.photo.width;
+  const height = sourceHeight || state.photo.naturalHeight || state.photo.height;
+  const scale = Math.min(1, MASK_MAX_DIMENSION / Math.max(width, height));
   const canvasElement = document.createElement("canvas");
-  canvasElement.width = Math.max(1, Math.round(photoWidth * scale));
-  canvasElement.height = Math.max(1, Math.round(photoHeight * scale));
+  canvasElement.width = Math.max(1, Math.round(width * scale));
+  canvasElement.height = Math.max(1, Math.round(height * scale));
   const context = canvasElement.getContext("2d", { willReadFrequently: true });
   context.imageSmoothingEnabled = true;
   context.imageSmoothingQuality = "high";
   context.drawImage(mask, 0, 0, canvasElement.width, canvasElement.height);
   return canvasElement;
+}
+
+function confidenceBounds(confidence, width, height, threshold = 0.35) {
+  let left = width;
+  let right = -1;
+  let top = height;
+  let bottom = -1;
+  for (let index = 0; index < confidence.length; index += 1) {
+    if (confidence[index] < threshold) continue;
+    const x = index % width;
+    const y = Math.floor(index / width);
+    left = Math.min(left, x);
+    right = Math.max(right, x);
+    top = Math.min(top, y);
+    bottom = Math.max(bottom, y);
+  }
+  return right > left && bottom > top ? { left, right, top, bottom } : null;
+}
+
+function createSubjectCrop(photo, confidence, width, height) {
+  const bounds = confidenceBounds(confidence, width, height);
+  if (!bounds) return null;
+  const subjectWidth = bounds.right - bounds.left + 1;
+  const subjectHeight = bounds.bottom - bounds.top + 1;
+  const paddingX = Math.max(subjectWidth * 0.18, width * 0.04);
+  const paddingY = Math.max(subjectHeight * 0.14, height * 0.04);
+  const left = clamp(Math.floor(bounds.left - paddingX), 0, width - 1);
+  const right = clamp(Math.ceil(bounds.right + paddingX), 0, width - 1);
+  const top = clamp(Math.floor(bounds.top - paddingY), 0, height - 1);
+  const bottom = clamp(Math.ceil(bounds.bottom + paddingY), 0, height - 1);
+  const cropWidth = right - left + 1;
+  const cropHeight = bottom - top + 1;
+  if (
+    cropWidth < 64 ||
+    cropHeight < 64 ||
+    cropWidth * cropHeight > width * height * 0.9
+  ) return null;
+
+  const photoWidth = photo.naturalWidth || photo.width;
+  const photoHeight = photo.naturalHeight || photo.height;
+  const sourceX = left / width * photoWidth;
+  const sourceY = top / height * photoHeight;
+  const sourceWidth = cropWidth / width * photoWidth;
+  const sourceHeight = cropHeight / height * photoHeight;
+  const cropScale = Math.min(
+    1,
+    MASK_MAX_DIMENSION / Math.max(sourceWidth, sourceHeight)
+  );
+  const canvasElement = document.createElement("canvas");
+  canvasElement.width = Math.max(64, Math.round(sourceWidth * cropScale));
+  canvasElement.height = Math.max(64, Math.round(sourceHeight * cropScale));
+  const context = canvasElement.getContext("2d");
+  context.imageSmoothingEnabled = true;
+  context.imageSmoothingQuality = "high";
+  context.drawImage(
+    photo,
+    sourceX,
+    sourceY,
+    sourceWidth,
+    sourceHeight,
+    0,
+    0,
+    canvasElement.width,
+    canvasElement.height
+  );
+  return {
+    canvas: canvasElement,
+    left,
+    top,
+    width: cropWidth,
+    height: cropHeight
+  };
+}
+
+function bilinearConfidence(confidence, width, height, x, y) {
+  const x0 = clamp(Math.floor(x), 0, width - 1);
+  const y0 = clamp(Math.floor(y), 0, height - 1);
+  const x1 = Math.min(width - 1, x0 + 1);
+  const y1 = Math.min(height - 1, y0 + 1);
+  const tx = clamp(x - x0, 0, 1);
+  const ty = clamp(y - y0, 0, 1);
+  const top = confidence[y0 * width + x0] * (1 - tx) +
+    confidence[y0 * width + x1] * tx;
+  const bottom = confidence[y1 * width + x0] * (1 - tx) +
+    confidence[y1 * width + x1] * tx;
+  return top * (1 - ty) + bottom * ty;
+}
+
+function mergeSubjectCrop(base, cropConfidence, cropWidth, cropHeight, crop) {
+  const merged = new Float32Array(base.confidence);
+  const endX = Math.min(base.width, crop.left + crop.width);
+  const endY = Math.min(base.height, crop.top + crop.height);
+  for (let y = crop.top; y < endY; y += 1) {
+    const v = (y - crop.top) / Math.max(1, crop.height - 1);
+    const cropY = v * (cropHeight - 1);
+    for (let x = crop.left; x < endX; x += 1) {
+      const u = (x - crop.left) / Math.max(1, crop.width - 1);
+      const cropX = u * (cropWidth - 1);
+      const edgeDistance = Math.min(u, 1 - u, v, 1 - v);
+      const edgeWeight = smoothStep(0.015, 0.11, edgeDistance);
+      if (edgeWeight <= 0) continue;
+      const index = y * base.width + x;
+      const detail = bilinearConfidence(
+        cropConfidence,
+        cropWidth,
+        cropHeight,
+        cropX,
+        cropY
+      );
+      if (detail > merged[index] && merged[index] < 0.04) continue;
+      const detailWeight = detail < merged[index] ? 0.82 : 0.66;
+      const weight = edgeWeight * detailWeight;
+      merged[index] = merged[index] * (1 - weight) + detail * weight;
+    }
+  }
+  return merged;
 }
 
 function extractMaskConfidence(mask) {
@@ -2267,20 +2436,35 @@ function getSegmenter() {
   return selfieSegmenter;
 }
 
+async function runSegmentationPass(image, timeout = 30000) {
+  let timeoutId;
+  try {
+    const resultPromise = new Promise((resolve, reject) => {
+      timeoutId = setTimeout(() => {
+        pendingSegmentationResolve = null;
+        reject(new Error("timeout"));
+      }, timeout);
+      pendingSegmentationResolve = (results) => {
+        clearTimeout(timeoutId);
+        resolve(results);
+      };
+    });
+    await getSegmenter().send({ image });
+    return await resultPromise;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    pendingSegmentationResolve = null;
+    throw error;
+  }
+}
+
 async function runSegmentation(token) {
   if (!state.photo || token !== segmentationToken) return;
   state.segmentationState = "loading";
   updateRecognitionUi();
   try {
     await ensureSegmentationLibrary();
-    const resultPromise = new Promise((resolve) => {
-      pendingSegmentationResolve = resolve;
-    });
-    await getSegmenter().send({ image: state.photo });
-    const results = await Promise.race([
-      resultPromise,
-      new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 30000))
-    ]);
+    const results = await runSegmentationPass(state.photo);
     if (token !== segmentationToken) return;
     const mask = copyMask(results.segmentationMask);
     const confidence = extractMaskConfidence(mask);
@@ -2289,8 +2473,46 @@ async function runSegmentation(token) {
       metrics.strongRatio <= 0.82 &&
       metrics.meanConfidence >= 0.018;
     if (person) {
+      let refinedConfidence = confidence;
+      const crop = createSubjectCrop(
+        state.photo,
+        confidence,
+        mask.width,
+        mask.height
+      );
+      if (crop) {
+        try {
+          await new Promise((resolve) => requestAnimationFrame(resolve));
+          const cropResults = await runSegmentationPass(crop.canvas, 20000);
+          if (token !== segmentationToken) return;
+          const cropMask = copyMask(
+            cropResults.segmentationMask,
+            crop.canvas.width,
+            crop.canvas.height
+          );
+          refinedConfidence = mergeSubjectCrop(
+            {
+              width: mask.width,
+              height: mask.height,
+              confidence
+            },
+            extractMaskConfidence(cropMask),
+            cropMask.width,
+            cropMask.height,
+            crop
+          );
+        } catch {
+          pendingSegmentationResolve = null;
+          if (selfieSegmenter?.close) selfieSegmenter.close();
+          selfieSegmenter = null;
+        }
+      }
       await new Promise((resolve) => requestAnimationFrame(resolve));
-      const refinedMask = refineSegmentationMask(mask, state.photo, confidence);
+      const refinedMask = refineSegmentationMask(
+        mask,
+        state.photo,
+        refinedConfidence
+      );
       if (token !== segmentationToken) return;
       state.subjectMaskBase = refinedMask;
       rebuildSubjectAssets();
@@ -2456,9 +2678,14 @@ function bindEvents() {
     state.scores = parseScores(elements.scoreInput.value);
     updateAutoTotal();
   });
-  elements.highlightInput.addEventListener("input", () => {
-    state.highlights = parseHighlights(elements.highlightInput.value);
-    renderMain();
+  document.querySelectorAll(".score-style-target").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.scoringStyle = button.dataset.scoreStyle;
+      document.querySelectorAll(".score-style-target").forEach((item) => {
+        item.classList.toggle("is-active", item === button);
+      });
+      renderMain();
+    });
   });
   elements.badgeText.addEventListener("input", () => {
     state.badge = elements.badgeText.value.trim();
@@ -2524,24 +2751,39 @@ function bindEvents() {
 
   document.querySelectorAll(".identity-target").forEach((button) => {
     button.addEventListener("click", () => {
-      activeIdentityTarget = button.dataset.target;
-      syncIdentityControls();
-      renderMain();
+      activateIdentityTarget(button.dataset.target);
     });
   });
+  [
+    [elements.nickname, "nickname"],
+    [elements.course, "course"],
+    [elements.dateInput, "date"],
+    [elements.extraInfo, "extra"]
+  ].forEach(([input, target]) => {
+    input.addEventListener("focus", () => activateIdentityTarget(target));
+  });
   elements.nickname.addEventListener("input", () => {
+    activateIdentityTarget("nickname", false);
     state.identity.nickname.value = elements.nickname.value;
     renderMain();
   });
   elements.course.addEventListener("input", () => {
+    activateIdentityTarget("course", false);
     state.identity.course.value = elements.course.value;
     renderMain();
   });
   elements.dateInput.addEventListener("input", () => {
+    activateIdentityTarget("date", false);
+    state.identity.date.value = elements.dateInput.value;
+    renderMain();
+  });
+  elements.dateInput.addEventListener("change", () => {
+    activateIdentityTarget("date", false);
     state.identity.date.value = elements.dateInput.value;
     renderMain();
   });
   elements.extraInfo.addEventListener("input", () => {
+    activateIdentityTarget("extra", false);
     state.identity.extra.value = elements.extraInfo.value;
     renderMain();
   });
@@ -2588,6 +2830,7 @@ function bindEvents() {
 
   document.querySelectorAll(".summary-edit").forEach((button) => {
     button.addEventListener("click", () => {
+      if (button.dataset.editStep === "identity") commitIdentityInputs();
       returnToSummary = true;
       setStep(button.dataset.editStep);
     });

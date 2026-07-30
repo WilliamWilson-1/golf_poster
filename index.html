@@ -134,21 +134,23 @@
               <div id="paletteList" class="palette-list"></div>
             </div>
 
+            <div class="control-field">
+              <span data-i18n="scoringStyle">记分方式</span>
+              <div class="segmented-control score-style-control" role="group" aria-label="记分方式">
+                <button class="score-style-target is-active" type="button" data-score-style="pga">PGA TOUR</button>
+                <button class="score-style-target" type="button" data-score-style="dp">DP WORLD TOUR</button>
+              </div>
+            </div>
+
             <label class="control-field">
-              <span data-i18n="scores">逐洞成绩</span>
-              <textarea id="scoreInput" rows="3" spellcheck="false" placeholder="输入最多 18 洞成绩，用空格或逗号分隔"></textarea>
+              <span data-i18n="scores">逐洞杆差</span>
+              <textarea id="scoreInput" rows="3" spellcheck="false" placeholder="例如：-1 0 +1，用空格或逗号分隔"></textarea>
             </label>
 
-            <div class="two-column">
-              <label class="control-field">
-                <span data-i18n="highlightHoles">高亮洞号</span>
-                <input id="highlightInput" type="text" inputmode="numeric" placeholder="3,6">
-              </label>
-              <label class="control-field">
-                <span data-i18n="badge">首洞标记</span>
-                <input id="badgeText" type="text" maxlength="2" inputmode="numeric">
-              </label>
-            </div>
+            <label class="control-field">
+              <span data-i18n="badge">首洞标记</span>
+              <input id="badgeText" type="text" maxlength="2" inputmode="numeric">
+            </label>
 
             <label class="control-field">
               <span data-i18n="scoreFont">成绩字体</span>

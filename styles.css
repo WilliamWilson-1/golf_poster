@@ -894,6 +894,10 @@ input[type="color"] {
   background: var(--yellow);
 }
 
+.score-style-control {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .sticker-list {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
