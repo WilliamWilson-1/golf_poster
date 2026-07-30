@@ -84,10 +84,10 @@ const fixedColorOptions = [
   { value: "#101820", zh: "墨黑", en: "Black" },
   { value: "#dc3f4d", zh: "巡回红", en: "Tour Red" },
   { value: "#f28aa5", zh: "玫瑰粉", en: "Rose" },
-  { value: "#d8bd55", zh: "冠军金", en: "Gold" },
+  { value: "#f2b321", zh: "老鹰金", en: "Eagle Gold" },
   { value: "#f4df3b", zh: "大师黄", en: "Yellow" },
   { value: "#15533a", zh: "松柏绿", en: "Green" },
-  { value: "#1c5fa8", zh: "宝石蓝", en: "Blue" }
+  { value: "#1c75bc", zh: "巡回蓝", en: "Tour Blue" }
 ];
 
 const sharedBrand = { x: 0, y: 0, w: 1000, h: 70 };
@@ -282,7 +282,7 @@ const translations = {
     scorecardStepHint: "当前画布手势仅调整成绩卡。",
     palette: "模板配色",
     scoreMode: "成绩类型",
-    strokesMode: "普通成绩",
+    strokesMode: "逐洞总杆",
     relativeMode: "杆差成绩",
     scoringStyle: "记分方式",
     scoresStrokes: "逐洞成绩",
@@ -293,17 +293,22 @@ const translations = {
     cardColor: "底板",
     lineColor: "分隔线",
     scoreTextColor: "数字",
-    underMarkerColor: "鸟 / 鹰标记",
-    overMarkerColor: "+1 / +2标记",
+    underMarkerColor: "小鸟标记",
+    eagleMarkerColor: "老鹰及更好",
+    overMarkerColor: "柏忌标记",
+    doubleBogeyMarkerColor: "双柏忌及更差",
     scorecardScale: "成绩卡大小",
     totalStep: "总成绩",
     totalStepHint: "当前画布手势仅调整总成绩。",
-    totalScore: "总成绩",
+    totalScore: "总杆",
     autoTotal: "自动统计",
     totalHintEmptyStrokes: "录入逐洞成绩后自动合计",
-    totalHintEmptyRelative: "录入杆差后自动合计",
+    totalHintEmptyRelative: "录入杆差并设置标准杆合计后换算总杆",
     totalHintManual: "自动统计已关闭，可手动输入",
-    totalHintCount: "已统计 {count} 洞",
+    totalHintCount: "已统计 {count} 洞 · 总杆 {total}",
+    totalHintRelativeCount: "标准杆 {par}，杆差 {difference}，总杆 {total}",
+    roundParTotal: "本轮 / 已完成球洞标准杆合计",
+    roundParHint: "18洞通常为72，9洞通常为36；用于把杆差换算成总杆。",
     numberFont: "数字字体",
     totalColor: "总成绩颜色",
     totalOpacity: "透明度",
@@ -374,7 +379,7 @@ const translations = {
     scorecardStepHint: "Canvas gestures adjust only the scorecard.",
     palette: "Template palette",
     scoreMode: "Score input",
-    strokesMode: "Hole scores",
+    strokesMode: "Strokes",
     relativeMode: "To par",
     scoringStyle: "Scoring style",
     scoresStrokes: "Hole scores",
@@ -385,17 +390,22 @@ const translations = {
     cardColor: "Board",
     lineColor: "Rules",
     scoreTextColor: "Numbers",
-    underMarkerColor: "Birdie / eagle",
-    overMarkerColor: "+1 / +2",
+    underMarkerColor: "Birdie",
+    eagleMarkerColor: "Eagle or better",
+    overMarkerColor: "Bogey",
+    doubleBogeyMarkerColor: "Double bogey +",
     scorecardScale: "Scorecard size",
     totalStep: "Total",
     totalStepHint: "Canvas gestures adjust only the total.",
-    totalScore: "Total score",
+    totalScore: "Total strokes",
     autoTotal: "Auto total",
     totalHintEmptyStrokes: "Hole scores will be totaled automatically",
-    totalHintEmptyRelative: "Scores to par will be totaled automatically",
+    totalHintEmptyRelative: "Enter scores to par and a par total to calculate strokes",
     totalHintManual: "Auto total is off; enter a value",
-    totalHintCount: "{count} holes counted",
+    totalHintCount: "{count} holes counted · {total} strokes",
+    totalHintRelativeCount: "Par {par}, {difference} to par, {total} strokes",
+    roundParTotal: "Round / completed-hole par total",
+    roundParHint: "Usually 72 for 18 holes or 36 for 9; converts scores to par into strokes.",
     numberFont: "Number font",
     totalColor: "Total color",
     totalOpacity: "Opacity",
@@ -468,9 +478,11 @@ const elements = Object.fromEntries(
     "recognitionDetail", "retrySegmentation", "paletteList", "scoreStyleControl",
     "scoreInputLabel", "scoreInput", "highlightControl", "highlightInput",
     "badgeText", "scoreFont", "cardColorOptions", "lineColorOptions",
-    "scoreTextColorOptions", "underMarkerColorOptions", "overMarkerColorOptions",
+    "scoreTextColorOptions", "underMarkerColorOptions", "eagleMarkerColorOptions",
+    "overMarkerColorOptions", "doubleBogeyMarkerColorOptions",
     "scorecardScale", "scorecardScaleValue", "totalScore",
-    "autoTotal", "totalHint", "numberFont", "totalColorOptions", "totalOpacity",
+    "autoTotal", "totalHint", "roundParControl", "roundParInput",
+    "numberFont", "totalColorOptions", "totalOpacity",
     "totalOpacityValue", "totalSize", "totalSizeValue", "totalAboveSubject",
     "nickname", "course", "dateInput", "extraInfo", "textFont", "textColor",
     "identitySize", "identitySizeValue", "brandText", "stickerUploadButton",
@@ -572,8 +584,9 @@ function createModel(templateId, sample) {
     highlights: sample ? new Set([3, 6, 14]) : new Set(),
     badge: "",
     autoTotal: true,
+    roundPar: 72,
     total: {
-      value: sample ? "−3" : "",
+      value: sample ? "70" : "",
       x: total.x,
       y: total.y,
       size: template.defaults.totalSize,
@@ -624,7 +637,9 @@ function createModel(templateId, sample) {
       scoreText: palette.scoreText,
       text: palette.text,
       underMarker: "#dc3f4d",
-      overMarker: "#1c5fa8"
+      eagleMarker: "#f2b321",
+      overMarker: "#101820",
+      doubleBogeyMarker: "#1c75bc"
     },
     fonts: {
       score: templateId === "client1" ? "arialBlack" : "georgia",
@@ -652,6 +667,7 @@ function preserveContent(next, previous) {
   next.highlights = new Set(previous.highlights);
   next.badge = previous.badge;
   next.autoTotal = previous.autoTotal;
+  next.roundPar = previous.roundPar;
   next.total.value = previous.total.value;
   next.total.aboveSubject = previous.total.aboveSubject;
   next.identity.nickname.value = previous.identity.nickname.value;
@@ -687,7 +703,9 @@ function applyPalette(paletteId) {
     scoreText: palette.scoreText,
     text: palette.text,
     underMarker: "#dc3f4d",
-    overMarker: "#1c5fa8"
+    eagleMarker: "#f2b321",
+    overMarker: "#101820",
+    doubleBogeyMarker: "#1c75bc"
   };
   ["nickname", "course", "date", "extra"].forEach((key) => {
     state.identity[key].color = palette.text;
@@ -834,7 +852,9 @@ function renderFixedColorControls() {
     [elements.lineColorOptions, "line"],
     [elements.scoreTextColorOptions, "scoreText"],
     [elements.underMarkerColorOptions, "underMarker"],
+    [elements.eagleMarkerColorOptions, "eagleMarker"],
     [elements.overMarkerColorOptions, "overMarker"],
+    [elements.doubleBogeyMarkerColorOptions, "doubleBogeyMarker"],
     [elements.totalColorOptions, "total"]
   ].forEach(([container, styleKey]) => renderFixedColorOptions(container, styleKey));
 }
@@ -901,6 +921,7 @@ function syncTotalControls() {
   elements.totalScore.readOnly = state.autoTotal;
   elements.totalScore.classList.toggle("is-auto", state.autoTotal);
   elements.autoTotal.checked = state.autoTotal;
+  elements.roundParInput.value = Number.isFinite(state.roundPar) ? String(state.roundPar) : "";
   elements.totalOpacity.value = String(state.total.opacity);
   elements.totalOpacityValue.textContent = `${Math.round(state.total.opacity)}%`;
   elements.totalSize.value = String(Math.round(state.total.size));
@@ -927,6 +948,7 @@ function syncScoreModeControls() {
       ? "例如：-1 0 +1，用空格或逗号分隔"
       : "例如：4 5 3，用空格或逗号分隔";
   elements.scoreStyleControl.hidden = !relative;
+  elements.roundParControl.hidden = !relative;
   elements.highlightControl.hidden = relative;
   elements.highlightInput.value = [...state.highlights].join(",");
   document.querySelectorAll(".score-mode-target").forEach((button) => {
@@ -998,6 +1020,45 @@ function formatRelativeScore(value) {
   return value > 0 ? `+${value}` : String(value).replace("-", "−");
 }
 
+function rgbFromHex(value) {
+  const normalized = String(value || "").trim().replace("#", "");
+  const hex = normalized.length === 3
+    ? normalized.split("").map((character) => character + character).join("")
+    : normalized;
+  if (!/^[0-9a-f]{6}$/i.test(hex)) return null;
+  return {
+    r: Number.parseInt(hex.slice(0, 2), 16),
+    g: Number.parseInt(hex.slice(2, 4), 16),
+    b: Number.parseInt(hex.slice(4, 6), 16)
+  };
+}
+
+function colorLuminance(value) {
+  const rgb = rgbFromHex(value);
+  if (!rgb) return 0;
+  const channels = [rgb.r, rgb.g, rgb.b].map((channel) => {
+    const normalized = channel / 255;
+    return normalized <= 0.04045
+      ? normalized / 12.92
+      : ((normalized + 0.055) / 1.055) ** 2.4;
+  });
+  return channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722;
+}
+
+function colorContrast(first, second) {
+  const light = Math.max(colorLuminance(first), colorLuminance(second));
+  const dark = Math.min(colorLuminance(first), colorLuminance(second));
+  return (light + 0.05) / (dark + 0.05);
+}
+
+function readableScoreColor(background, preferred) {
+  if (colorLuminance(background) < 0.28) return "#ffffff";
+  if (colorContrast(background, preferred) >= 3) return preferred;
+  return colorContrast(background, "#ffffff") >= colorContrast(background, "#101820")
+    ? "#ffffff"
+    : "#101820";
+}
+
 function parseHighlights(value) {
   return new Set(
     value
@@ -1013,11 +1074,15 @@ function updateAutoTotal() {
     const numeric = activeScores()
       .map(relative ? scoreDifference : strokeScore)
       .filter((score) => score !== null);
-    state.total.value = numeric.length
-      ? relative
-        ? formatRelativeScore(numeric.reduce((sum, score) => sum + score, 0))
-        : String(numeric.reduce((sum, score) => sum + score, 0))
-      : "";
+    if (!numeric.length) {
+      state.total.value = "";
+    } else if (relative) {
+      state.total.value = Number.isFinite(state.roundPar)
+        ? String(state.roundPar + numeric.reduce((sum, score) => sum + score, 0))
+        : "";
+    } else {
+      state.total.value = String(numeric.reduce((sum, score) => sum + score, 0));
+    }
   }
   syncTotalControls();
   renderMain();
@@ -1025,13 +1090,30 @@ function updateAutoTotal() {
 
 function updateTotalHint() {
   const relative = state.scoreMode === "relative";
-  const count = activeScores().filter(
-    (score) => (relative ? scoreDifference(score) : strokeScore(score)) !== null
-  ).length;
+  const numeric = activeScores()
+    .map(relative ? scoreDifference : strokeScore)
+    .filter((score) => score !== null);
+  const count = numeric.length;
   if (!state.autoTotal) {
     elements.totalHint.textContent = translate("totalHintManual");
   } else if (count) {
-    elements.totalHint.textContent = translate("totalHintCount", { count });
+    if (relative) {
+      if (Number.isFinite(state.roundPar)) {
+        const difference = numeric.reduce((sum, score) => sum + score, 0);
+        elements.totalHint.textContent = translate("totalHintRelativeCount", {
+          par: state.roundPar,
+          difference: formatRelativeScore(difference),
+          total: state.total.value
+        });
+      } else {
+        elements.totalHint.textContent = translate("totalHintEmptyRelative");
+      }
+    } else {
+      elements.totalHint.textContent = translate("totalHintCount", {
+        count,
+        total: state.total.value
+      });
+    }
   } else {
     elements.totalHint.textContent = translate(
       relative ? "totalHintEmptyRelative" : "totalHintEmptyStrokes"
@@ -1263,30 +1345,38 @@ function scoreGeometry(template, model) {
 }
 
 function drawScoreMarker(context, x, y, radius, difference, scoringStyle, modelStyle, scale) {
-  if (difference === 0) return modelStyle.scoreText;
-  const markerColor = difference < 0
-    ? modelStyle.underMarker
-    : modelStyle.overMarker;
+  const regularScoreColor = readableScoreColor(modelStyle.card, modelStyle.scoreText);
+  if (difference === 0) return regularScoreColor;
   const markerCount = Math.min(2, Math.abs(difference));
   context.save();
-  context.strokeStyle = markerColor;
-  context.fillStyle = markerColor;
-  context.lineWidth = Math.max(2, 3 * scale);
 
   if (scoringStyle === "dp") {
-    const filled = markerCount === 2;
+    const markerColor = difference < -1
+      ? modelStyle.eagleMarker
+      : difference < 0
+        ? modelStyle.underMarker
+        : difference > 1
+          ? modelStyle.doubleBogeyMarker
+          : modelStyle.overMarker;
+    context.fillStyle = markerColor;
     context.beginPath();
     if (difference < 0) {
       context.arc(x, y, radius, 0, Math.PI * 2);
     } else {
       context.rect(x - radius, y - radius, radius * 2, radius * 2);
     }
-    if (filled) context.fill();
-    else context.stroke();
+    context.fill();
+    if (colorContrast(markerColor, modelStyle.card) < 1.7) {
+      context.strokeStyle = readableScoreColor(modelStyle.card, "#ffffff");
+      context.lineWidth = Math.max(2, 2.5 * scale);
+      context.stroke();
+    }
     context.restore();
-    return filled ? "#ffffff" : markerColor;
+    return readableScoreColor(markerColor, "#ffffff");
   }
 
+  context.strokeStyle = regularScoreColor;
+  context.lineWidth = Math.max(2, 3 * scale);
   for (let ring = 0; ring < markerCount; ring += 1) {
     const inset = ring * radius * 0.26;
     const size = Math.max(radius * 0.58, radius - inset);
@@ -1296,7 +1386,7 @@ function drawScoreMarker(context, x, y, radius, difference, scoringStyle, modelS
     context.stroke();
   }
   context.restore();
-  return modelStyle.scoreText;
+  return regularScoreColor;
 }
 
 function drawScorecard(context, template, model, bounds) {
@@ -1371,7 +1461,7 @@ function drawScorecard(context, template, model, bounds) {
     const hole = index + 1;
     const radius = Math.min(28 * scale, cellWidth * 0.33, cellHeight * 0.35);
     let label;
-    let scoreColor = model.style.scoreText;
+    let scoreColor = readableScoreColor(model.style.card, model.style.scoreText);
     if (model.scoreMode === "relative") {
       const difference = scoreDifference(score);
       if (difference === null) return;
@@ -1392,7 +1482,7 @@ function drawScorecard(context, template, model, bounds) {
       const strokes = strokeScore(score);
       if (strokes === null) return;
       label = hole === 1 && model.badge ? model.badge : String(strokes);
-      context.strokeStyle = model.style.underMarker;
+      context.strokeStyle = scoreColor;
       context.lineWidth = Math.max(2, 3 * scale);
       if (hole === 1 && model.badge) {
         context.beginPath();
@@ -2966,6 +3056,11 @@ function bindEvents() {
 
   elements.autoTotal.addEventListener("change", () => {
     state.autoTotal = elements.autoTotal.checked;
+    updateAutoTotal();
+  });
+  elements.roundParInput.addEventListener("input", () => {
+    const value = Number.parseInt(elements.roundParInput.value, 10);
+    state.roundPar = Number.isFinite(value) ? clamp(value, 1, 180) : null;
     updateAutoTotal();
   });
   elements.totalScore.addEventListener("input", () => {

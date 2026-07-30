@@ -184,12 +184,20 @@
                 <div id="scoreTextColorOptions" class="fixed-color-options"></div>
               </div>
               <div class="color-choice-field">
-                <span data-i18n="underMarkerColor">鸟 / 鹰</span>
+                <span data-i18n="underMarkerColor">小鸟</span>
                 <div id="underMarkerColorOptions" class="fixed-color-options"></div>
               </div>
               <div class="color-choice-field">
-                <span data-i18n="overMarkerColor">+1 / +2</span>
+                <span data-i18n="eagleMarkerColor">老鹰及更好</span>
+                <div id="eagleMarkerColorOptions" class="fixed-color-options"></div>
+              </div>
+              <div class="color-choice-field">
+                <span data-i18n="overMarkerColor">柏忌</span>
                 <div id="overMarkerColorOptions" class="fixed-color-options"></div>
+              </div>
+              <div class="color-choice-field">
+                <span data-i18n="doubleBogeyMarkerColor">双柏忌及更差</span>
+                <div id="doubleBogeyMarkerColorOptions" class="fixed-color-options"></div>
               </div>
             </div>
 
@@ -213,7 +221,7 @@
 
             <div class="total-input-block">
               <div class="field-heading">
-                <label for="totalScore" data-i18n="totalScore">总成绩</label>
+                <label for="totalScore" data-i18n="totalScore">总杆</label>
                 <label class="switch-control">
                   <span data-i18n="autoTotal">自动统计</span>
                   <input id="autoTotal" type="checkbox" checked>
@@ -221,8 +229,14 @@
                 </label>
               </div>
               <input id="totalScore" type="text" maxlength="4" inputmode="numeric" readonly>
-              <small id="totalHint" data-i18n="totalHintEmptyRelative">录入杆差后自动合计</small>
+              <small id="totalHint" data-i18n="totalHintEmptyRelative">录入杆差并设置标准杆合计后换算总杆</small>
             </div>
+
+            <label id="roundParControl" class="control-field">
+              <span data-i18n="roundParTotal">本轮 / 已完成球洞标准杆合计</span>
+              <input id="roundParInput" type="number" min="1" max="180" value="72" inputmode="numeric">
+              <small data-i18n="roundParHint">18洞通常为72，9洞通常为36；用于把杆差换算成总杆。</small>
+            </label>
 
             <label class="control-field">
               <span data-i18n="numberFont">数字字体</span>

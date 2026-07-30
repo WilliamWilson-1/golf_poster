@@ -510,6 +510,13 @@ button:disabled {
   font-weight: 950;
 }
 
+.control-field > small {
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 750;
+  line-height: 1.4;
+}
+
 .control-field input:not([type="range"]):not([type="color"]),
 .control-field textarea,
 .control-field select,
