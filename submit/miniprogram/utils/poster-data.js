@@ -274,6 +274,7 @@ function createPosterModel(templateId, sample, brand) {
     photoPath: "",
     subject: null,
     segmentationStatus: "idle",
+    segmentationSource: "none",
     image: { scale: 1, x: 0, y: 0, blur: 0 },
     scoreMode: "relative",
     scoreSets: {
@@ -376,6 +377,7 @@ function switchTemplate(previous, templateId, brand) {
   next.photoPath = previous.photoPath;
   next.subject = previous.subject;
   next.segmentationStatus = previous.segmentationStatus;
+  next.segmentationSource = previous.segmentationSource;
   next.image = Object.assign({}, previous.image);
   next.scoreMode = previous.scoreMode;
   next.scoreSets = {

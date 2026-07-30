@@ -44,6 +44,7 @@ miniprogram/
   brand="GOLFBROTHERS"
   initial-language="zh"
   segmentation-endpoint="https://api.example.com/person-cutout"
+  segmentation-quality="hd"
   save-to-album="{{true}}"
   bindexport="onPosterExport"
 />
@@ -68,6 +69,7 @@ Page({
 | `initial-language` | String | `zh` | `zh` 或 `en` |
 | `segmentation-endpoint` | String | 空 | 可选人物抠图 HTTPS 地址 |
 | `segmentation-headers` | Object | `{}` | 抠图请求的认证请求头 |
+| `segmentation-quality` | String | `hd` | 传给抠图服务的质量档位 |
 | `save-to-album` | Boolean | `true` | 导出后是否直接保存到相册 |
 
 ## 组件事件
@@ -76,7 +78,7 @@ Page({
 | --- | --- | --- |
 | `export` | `{ tempFilePath }` | 1000 x 1265 PNG 已生成 |
 | `segmentationstart` | `{ filePath }` | 开始人物识别 |
-| `segmentationend` | `{ status }` | `person` 或 `fallback` |
+| `segmentationend` | `{ status, source }` | 状态与抠图来源；高清服务成功时 `source=hd` |
 
 ## 人物抠图接口
 
@@ -88,7 +90,11 @@ Page({
 - 文件字段：`image`
 - 附加字段：
   - `output=full-frame-transparent-png`
+  - `quality=hd`
+  - `matting=alpha`
   - `refineEdges=true`
+  - `preserveFineDetails=hair,club,limbs`
+  - `edgeDecontamination=true`
 
 成功响应可使用 URL：
 
@@ -117,6 +123,8 @@ Page({
 ```
 
 抠图结果必须是与原图相同画幅、背景透明的 PNG，这样人物图层与背景缩放、位移可以保持完全一致。
+
+推荐服务端使用支持 alpha matting 的高分辨率人物模型，而不是只返回二值分割蒙版。服务端应在原图分辨率完成头发、球杆、四肢间隙等细节求解，并做前景颜色去污染，避免白边、绿边和半透明雾边。API 密钥应保存在服务端或云函数中，不应写入小程序源码。
 
 如甲方使用云函数而非普通 HTTPS 接口，也可以监听 `segmentationstart` 事件自行处理，完成后调用组件公开方法：
 

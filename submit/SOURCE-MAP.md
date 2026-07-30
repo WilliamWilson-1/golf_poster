@@ -10,12 +10,12 @@ This package is a native port, not an embedded webpage. Shared behavior must be 
 | `../app.js` controls and gestures | `miniprogram/components/golf-poster/index.js` | Workflow, state, touch targets, uploads, export |
 | `../index.html` | `miniprogram/components/golf-poster/index.wxml` | Editor structure |
 | `../styles.css` | `miniprogram/components/golf-poster/index.wxss` | Mobile interface styling |
-| MediaPipe browser loader | `miniprogram/services/segmentation.js` | Native HTTPS segmentation adapter |
+| MediaPipe, color-guided alpha refinement, and HD cutout adapter | `miniprogram/services/segmentation.js` | Full-frame HD alpha-matting contract and fallback |
 
 After every synchronized update:
 
 1. Increase `packageVersion` in `VERSION.json`.
-2. Update `updatedAt` and `webBaselineCommit`.
+2. Update `updatedAt`; when web and mini-program sources are committed together, set `webBaselineCommit` to `same-as-delivery-commit`.
 3. Add a changelog entry.
 4. Run `node submit/scripts/validate.js`.
 5. Import `submit/` in WeChat DevTools and perform one device preview before delivery.

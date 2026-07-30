@@ -98,8 +98,8 @@
               <label class="control-field">
                 <span data-i18n="edgeShrink">边缘收缩</span>
                 <div class="range-line">
-                  <input id="edgeShrink" type="range" min="-4" max="4" value="2">
-                  <output id="edgeShrinkValue">+2px</output>
+                  <input id="edgeShrink" type="range" min="-4" max="4" value="1">
+                  <output id="edgeShrinkValue">+1px</output>
                 </div>
               </label>
               <label class="control-field">
@@ -436,6 +436,13 @@
       </section>
     </div>
 
-    <script src="./app.js"></script>
-  </body>
+  <script>
+    window.GOLF_POSTER_CONFIG = window.GOLF_POSTER_CONFIG || {
+      segmentationEndpoint: "",
+      segmentationHeaders: {},
+      quality: "hd"
+    };
+  </script>
+  <script src="./app.js"></script>
+</body>
 </html>

@@ -64,6 +64,7 @@ const COPY = {
     waitingPhoto: "等待上传照片",
     segmenting: "正在处理人物边缘",
     personReady: "人物图层已生成",
+    personReadyHd: "高清模型人物图层已生成",
     fullPhotoFallback: "使用完整照片",
     retry: "重新识别",
     palette: "模板配色",
@@ -155,6 +156,7 @@ const COPY = {
     waitingPhoto: "Waiting for a photo",
     segmenting: "Refining subject edges",
     personReady: "Subject layer is ready",
+    personReadyHd: "HD model subject layer is ready",
     fullPhotoFallback: "Using the full photo",
     retry: "RETRY",
     palette: "Template palette",
@@ -259,6 +261,10 @@ Component({
     segmentationHeaders: {
       type: Object,
       value: defaultConfig.segmentationHeaders
+    },
+    segmentationQuality: {
+      type: String,
+      value: defaultConfig.segmentationQuality
     },
     saveToAlbum: {
       type: Boolean,
@@ -379,7 +385,11 @@ Component({
     _photoStatusText(status, copyArg) {
       const copy = copyArg || this.data.copy;
       if (status === "loading") return copy.segmenting;
-      if (status === "person") return copy.personReady;
+      if (status === "person") {
+        return this.posterState.segmentationSource === "hd"
+          ? copy.personReadyHd
+          : copy.personReady;
+      }
       if (status === "fallback") return copy.fullPhotoFallback;
       return copy.waitingPhoto;
     },
@@ -558,6 +568,7 @@ Component({
         this.posterState.photoPath = filePath;
         this.posterState.subject = null;
         this.posterState.segmentationStatus = "loading";
+        this.posterState.segmentationSource = "none";
         this.posterState.image.scale = 1;
         this.posterState.image.x = 0;
         this.posterState.image.y = 0;
@@ -578,25 +589,30 @@ Component({
         const result = await requestSubjectCutout({
           filePath,
           endpoint: this.properties.segmentationEndpoint,
-          headers: this.properties.segmentationHeaders
+          headers: this.properties.segmentationHeaders,
+          quality: this.properties.segmentationQuality
         });
         if (result.status === "person" && result.filePath) {
           this.posterState.subject = await this._loadCanvasImage(result.filePath);
           this.posterState.segmentationStatus = "person";
+          this.posterState.segmentationSource = result.source || "hd";
         } else {
           this.posterState.subject = null;
           this.posterState.segmentationStatus = "fallback";
+          this.posterState.segmentationSource = "none";
         }
       } catch (error) {
         this.posterState.subject = null;
         this.posterState.segmentationStatus = "fallback";
+        this.posterState.segmentationSource = "none";
         wx.showToast({ title: this.data.copy.segmentFailed, icon: "none" });
       }
       this.setData({
         photoStatus: this._photoStatusText(this.posterState.segmentationStatus)
       });
       this.triggerEvent("segmentationend", {
-        status: this.posterState.segmentationStatus
+        status: this.posterState.segmentationStatus,
+        source: this.posterState.segmentationSource
       });
       this._render();
     },
@@ -613,9 +629,11 @@ Component({
       if (!hasPerson || !filePath) {
         this.posterState.subject = null;
         this.posterState.segmentationStatus = "fallback";
+        this.posterState.segmentationSource = "none";
       } else {
         this.posterState.subject = await this._loadCanvasImage(filePath);
         this.posterState.segmentationStatus = "person";
+        this.posterState.segmentationSource = "hd";
       }
       this.setData({
         photoStatus: this._photoStatusText(this.posterState.segmentationStatus)

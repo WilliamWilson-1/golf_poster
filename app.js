@@ -2,7 +2,13 @@ const POSTER_WIDTH = 1000;
 const POSTER_HEIGHT = 1265;
 const BRAND_HEIGHT = 70;
 const MAX_STICKERS = 5;
-const MASK_MAX_DIMENSION = 960;
+const MASK_MAX_DIMENSION = 1080;
+const CUTOUT_CONFIG = {
+  segmentationEndpoint: "",
+  segmentationHeaders: {},
+  quality: "hd",
+  ...(window.GOLF_POSTER_CONFIG || {})
+};
 
 const paletteCatalog = {
   forestGold: {
@@ -275,7 +281,8 @@ const translations = {
     subjectDepth: "人物景深",
     waitingPhoto: "等待上传照片",
     analyzingPhoto: "正在进行双层识别并精修人物边缘",
-    personDetected: "人物已识别，高清边缘已生成",
+    personDetected: "人物已识别，本地精细边缘已生成",
+    personDetectedHd: "人物已识别，高清模型抠图已生成",
     noPerson: "未识别到人物，按普通照片生成",
     retryRecognition: "重新识别",
     scorecardStep: "成绩卡",
@@ -372,7 +379,8 @@ const translations = {
     subjectDepth: "Subject depth",
     waitingPhoto: "Waiting for a photo",
     analyzingPhoto: "Running two-pass subject detection and edge refinement",
-    personDetected: "Subject detected; high-detail edges are ready",
+    personDetected: "Subject detected; locally refined edges are ready",
+    personDetectedHd: "Subject detected; HD model cutout is ready",
     noPerson: "No subject detected; using the full photo",
     retryRecognition: "RETRY",
     scorecardStep: "Scorecard",
@@ -516,6 +524,7 @@ let segmentationLibraryPromise = null;
 let pendingSegmentationResolve = null;
 let segmentationQueue = Promise.resolve();
 let maskTuningTimer = null;
+let sourcePhotoFile = null;
 let gestureTarget = null;
 const activePointers = new Map();
 let lastGestureCenter = null;
@@ -569,8 +578,9 @@ function createModel(templateId, sample) {
     subjectMaskBase: null,
     subjectCutout: null,
     segmentationState: "idle",
+    segmentationSource: "none",
     image: { scale: 1, x: 0, y: 0, blur: 0 },
-    edge: { shrink: 2, feather: 1 },
+    edge: { shrink: 1, feather: 1 },
     scoreMode: "relative",
     scoreSets: {
       strokes: sample
@@ -656,6 +666,7 @@ function preserveContent(next, previous) {
   next.subjectMaskBase = previous.subjectMaskBase;
   next.subjectCutout = previous.subjectCutout;
   next.segmentationState = previous.segmentationState;
+  next.segmentationSource = previous.segmentationSource;
   next.image = { ...previous.image };
   next.edge = { ...previous.edge };
   next.scoreMode = previous.scoreMode;
@@ -2209,6 +2220,7 @@ function resetPhoto() {
 
 function loadPhoto(file) {
   if (!file) return;
+  sourcePhotoFile = file;
   const reader = new FileReader();
   reader.onload = () => {
     const image = new Image();
@@ -2217,6 +2229,7 @@ function loadPhoto(file) {
       state.subjectMaskBase = null;
       state.subjectCutout = null;
       state.segmentationState = "loading";
+      state.segmentationSource = "none";
       state.image = { scale: 1, x: 0, y: 0, blur: state.image.blur };
       syncAllControls();
       renderMain();
@@ -2480,6 +2493,78 @@ function guidedFilter(guidance, confidence, width, height) {
   return refined;
 }
 
+function refineAlphaMatte(confidence, pixels, width, height) {
+  const refined = new Float32Array(confidence);
+  const radius = clamp(Math.round(Math.min(width, height) / 130), 5, 9);
+  const foregroundThreshold = 0.9;
+  const backgroundThreshold = 0.1;
+
+  for (let index = 0; index < confidence.length; index += 1) {
+    const base = confidence[index];
+    if (base <= 0.012) {
+      refined[index] = 0;
+      continue;
+    }
+    if (base >= 0.988) {
+      refined[index] = 1;
+      continue;
+    }
+
+    const x = index % width;
+    const y = Math.floor(index / width);
+    let foregroundIndex = -1;
+    let backgroundIndex = -1;
+
+    for (
+      let distance = 1;
+      distance <= radius && (foregroundIndex < 0 || backgroundIndex < 0);
+      distance += 1
+    ) {
+      for (let dy = -distance; dy <= distance; dy += 1) {
+        const sampleY = y + dy;
+        if (sampleY < 0 || sampleY >= height) continue;
+        for (let dx = -distance; dx <= distance; dx += 1) {
+          if (Math.abs(dx) !== distance && Math.abs(dy) !== distance) continue;
+          const sampleX = x + dx;
+          if (sampleX < 0 || sampleX >= width) continue;
+          const sampleIndex = sampleY * width + sampleX;
+          const sample = confidence[sampleIndex];
+          if (foregroundIndex < 0 && sample >= foregroundThreshold) {
+            foregroundIndex = sampleIndex;
+          }
+          if (backgroundIndex < 0 && sample <= backgroundThreshold) {
+            backgroundIndex = sampleIndex;
+          }
+        }
+      }
+    }
+
+    if (foregroundIndex < 0 || backgroundIndex < 0) continue;
+    const pixel = index * 4;
+    const foregroundPixel = foregroundIndex * 4;
+    const backgroundPixel = backgroundIndex * 4;
+    let numerator = 0;
+    let denominator = 0;
+    for (let channel = 0; channel < 3; channel += 1) {
+      const foreground = pixels[foregroundPixel + channel] / 255;
+      const background = pixels[backgroundPixel + channel] / 255;
+      const current = pixels[pixel + channel] / 255;
+      const difference = foreground - background;
+      numerator += (current - background) * difference;
+      denominator += difference * difference;
+    }
+    if (denominator < 0.008) continue;
+
+    const colorAlpha = clamp(numerator / denominator, 0, 1);
+    const separation = clamp(Math.sqrt(denominator) / 0.8, 0, 1);
+    const uncertainty = 1 - Math.abs(base - 0.5) * 2;
+    const weight = clamp(0.28 + separation * 0.42 + uncertainty * 0.18, 0.28, 0.78);
+    const guardedAlpha = clamp(colorAlpha, base - 0.42, base + 0.42);
+    refined[index] = base * (1 - weight) + guardedAlpha * weight;
+  }
+  return refined;
+}
+
 function colorSignature(red, green, blue) {
   const r = red / 255;
   const g = green / 255;
@@ -2695,18 +2780,24 @@ function smoothStep(low, high, value) {
 
 function buildAlphaMask(base, edge) {
   const radius = Math.abs(Math.round(edge.shrink));
-  const confidence = radius
+  let confidence = radius
     ? extremeFilter(base.confidence, base.width, base.height, radius, edge.shrink > 0)
     : base.confidence;
-  const transition = edge.feather === 0 ? 0.01 : 0.0275 + edge.feather * 0.0175;
-  const center = clamp(0.5 + edge.shrink * 0.018, 0.42, 0.62);
-  const low = center - transition / 2;
-  const high = center + transition / 2;
+  if (edge.feather > 0) {
+    const featherRadius = clamp(Math.ceil(edge.feather / 2), 1, 4);
+    confidence = boxMean(
+      confidence,
+      base.width,
+      base.height,
+      featherRadius,
+      new Float64Array((base.width + 1) * (base.height + 1))
+    );
+  }
   const alpha = new Float32Array(confidence.length);
   for (let index = 0; index < confidence.length; index += 1) {
     let value = edge.feather === 0
-      ? Number(confidence[index] >= center)
-      : smoothStep(low, high, confidence[index]);
+      ? Number(confidence[index] >= 0.5)
+      : smoothStep(0.035, 0.965, confidence[index]);
     if (value < 0.006) value = 0;
     if (value > 0.994) value = 1;
     alpha[index] = value;
@@ -2724,7 +2815,7 @@ function createSubjectCutout(photo, width, height, alpha) {
   context.drawImage(photo, 0, 0, width, height);
   const imageData = context.getImageData(0, 0, width, height);
   const source = new Uint8ClampedArray(imageData.data);
-  const searchRadius = 8;
+  const searchRadius = 9;
 
   for (let index = 0; index < alpha.length; index += 1) {
     const value = alpha[index];
@@ -2732,9 +2823,13 @@ function createSubjectCutout(photo, width, height, alpha) {
     if (value > 0.015 && value < 0.985) {
       const x = index % width;
       const y = Math.floor(index / width);
-      let bestIndex = -1;
-      let bestAlpha = 0;
-      for (let radius = 1; radius <= searchRadius && bestAlpha < 0.985; radius += 1) {
+      let foregroundIndex = -1;
+      let backgroundIndex = -1;
+      for (
+        let radius = 1;
+        radius <= searchRadius && (foregroundIndex < 0 || backgroundIndex < 0);
+        radius += 1
+      ) {
         for (let dy = -radius; dy <= radius; dy += 1) {
           const sampleY = y + dy;
           if (sampleY < 0 || sampleY >= height) continue;
@@ -2743,19 +2838,36 @@ function createSubjectCutout(photo, width, height, alpha) {
             const sampleX = x + dx;
             if (sampleX < 0 || sampleX >= width) continue;
             const sampleIndex = sampleY * width + sampleX;
-            if (alpha[sampleIndex] > bestAlpha) {
-              bestAlpha = alpha[sampleIndex];
-              bestIndex = sampleIndex;
+            if (foregroundIndex < 0 && alpha[sampleIndex] >= 0.985) {
+              foregroundIndex = sampleIndex;
+            }
+            if (backgroundIndex < 0 && alpha[sampleIndex] <= 0.015) {
+              backgroundIndex = sampleIndex;
             }
           }
         }
       }
-      if (bestIndex >= 0 && bestAlpha >= 0.985) {
-        const sourcePixel = bestIndex * 4;
-        const blend = clamp((1 - value) * 0.86, 0, 0.82);
-        imageData.data[pixel] = Math.round(source[pixel] * (1 - blend) + source[sourcePixel] * blend);
-        imageData.data[pixel + 1] = Math.round(source[pixel + 1] * (1 - blend) + source[sourcePixel + 1] * blend);
-        imageData.data[pixel + 2] = Math.round(source[pixel + 2] * (1 - blend) + source[sourcePixel + 2] * blend);
+      if (foregroundIndex >= 0) {
+        const foregroundPixel = foregroundIndex * 4;
+        const backgroundPixel = backgroundIndex >= 0 ? backgroundIndex * 4 : -1;
+        for (let channel = 0; channel < 3; channel += 1) {
+          const original = source[pixel + channel];
+          const foreground = source[foregroundPixel + channel];
+          let target = foreground;
+          if (backgroundPixel >= 0 && value >= 0.22) {
+            const background = source[backgroundPixel + channel];
+            target = clamp(
+              (original - (1 - value) * background) / Math.max(value, 0.22),
+              0,
+              255
+            );
+            target = target * 0.78 + foreground * 0.22;
+          }
+          const blend = clamp((1 - value) * 0.82, 0.08, 0.78);
+          imageData.data[pixel + channel] = Math.round(
+            original * (1 - blend) + target * blend
+          );
+        }
       }
     }
     imageData.data[pixel + 3] = Math.round(value * 255);
@@ -2772,11 +2884,17 @@ function refineSegmentationMask(mask, photo, confidence = extractMaskConfidence(
     mask.width,
     mask.height
   );
+  const recovered = recoverInteriorBackground(
+    guided,
+    analysis.pixels,
+    mask.width,
+    mask.height
+  );
   return {
     width: mask.width,
     height: mask.height,
-    confidence: recoverInteriorBackground(
-      guided,
+    confidence: refineAlphaMatte(
+      recovered,
       analysis.pixels,
       mask.width,
       mask.height
@@ -2801,6 +2919,79 @@ function scheduleMaskTuning() {
     rebuildSubjectAssets();
     renderMain();
   }, 70);
+}
+
+function loadCutoutImage(source, revokeAfterLoad = false) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => {
+      if (revokeAfterLoad) URL.revokeObjectURL(source);
+      resolve(image);
+    };
+    image.onerror = () => {
+      if (revokeAfterLoad) URL.revokeObjectURL(source);
+      reject(new Error("cutout-image-load-failed"));
+    };
+    image.src = source;
+  });
+}
+
+async function imageFromCutoutResponse(response) {
+  const contentType = response.headers.get("content-type") || "";
+  if (contentType.startsWith("image/")) {
+    const objectUrl = URL.createObjectURL(await response.blob());
+    return { hasPerson: true, image: await loadCutoutImage(objectUrl, true) };
+  }
+
+  const payload = await response.json();
+  const data = payload.data || payload;
+  if (payload.hasPerson === false || data.hasPerson === false) {
+    return { hasPerson: false, image: null };
+  }
+  const base64 = data.cutoutBase64 || data.subjectBase64;
+  if (base64) {
+    const source = /^data:image\//.test(base64)
+      ? base64
+      : `data:image/png;base64,${base64}`;
+    return { hasPerson: true, image: await loadCutoutImage(source) };
+  }
+
+  const cutoutUrl = data.cutoutUrl || data.subjectUrl;
+  if (!cutoutUrl) throw new Error("cutout-payload-missing");
+  const cutoutResponse = await fetch(cutoutUrl);
+  if (!cutoutResponse.ok) throw new Error(`cutout-download-${cutoutResponse.status}`);
+  const objectUrl = URL.createObjectURL(await cutoutResponse.blob());
+  return { hasPerson: true, image: await loadCutoutImage(objectUrl, true) };
+}
+
+async function requestHdCutout(file) {
+  if (!CUTOUT_CONFIG.segmentationEndpoint || !file) return null;
+  const form = new FormData();
+  form.append("image", file, file.name || "photo.jpg");
+  form.append("output", "full-frame-transparent-png");
+  form.append("quality", CUTOUT_CONFIG.quality || "hd");
+  form.append("matting", "alpha");
+  form.append("refineEdges", "true");
+  form.append("preserveFineDetails", "hair,club,limbs");
+  form.append("edgeDecontamination", "true");
+  const response = await fetch(CUTOUT_CONFIG.segmentationEndpoint, {
+    method: "POST",
+    headers: CUTOUT_CONFIG.segmentationHeaders || {},
+    body: form
+  });
+  if (!response.ok) throw new Error(`cutout-request-${response.status}`);
+  const result = await imageFromCutoutResponse(response);
+  if (!result.hasPerson) return { hasPerson: false };
+
+  const photoWidth = state.photo.naturalWidth || state.photo.width;
+  const photoHeight = state.photo.naturalHeight || state.photo.height;
+  const cutoutWidth = result.image.naturalWidth || result.image.width;
+  const cutoutHeight = result.image.naturalHeight || result.image.height;
+  const aspectDifference = Math.abs(
+    photoWidth / photoHeight - cutoutWidth / cutoutHeight
+  );
+  if (aspectDifference > 0.03) throw new Error("cutout-must-use-full-frame");
+  return result;
 }
 
 function ensureSegmentationLibrary() {
@@ -2860,6 +3051,24 @@ async function runSegmentation(token) {
   state.segmentationState = "loading";
   updateRecognitionUi();
   try {
+    if (CUTOUT_CONFIG.segmentationEndpoint && sourcePhotoFile) {
+      try {
+        const hdResult = await requestHdCutout(sourcePhotoFile);
+        if (token !== segmentationToken) return;
+        if (hdResult?.hasPerson && hdResult.image) {
+          state.subjectMaskBase = null;
+          state.subjectCutout = hdResult.image;
+          state.segmentationState = "person";
+          state.segmentationSource = "hd";
+          updateRecognitionUi();
+          renderMain();
+          return;
+        }
+      } catch (error) {
+        console.warn("HD cutout unavailable; using local refinement.", error);
+      }
+    }
+
     await ensureSegmentationLibrary();
     const results = await runSegmentationPass(state.photo);
     if (token !== segmentationToken) return;
@@ -2913,9 +3122,11 @@ async function runSegmentation(token) {
       if (token !== segmentationToken) return;
       state.subjectMaskBase = refinedMask;
       rebuildSubjectAssets();
+      state.segmentationSource = "local";
     } else {
       state.subjectMaskBase = null;
       state.subjectCutout = null;
+      state.segmentationSource = "none";
     }
     state.segmentationState = person ? "person" : "fallback";
   } catch {
@@ -2923,6 +3134,7 @@ async function runSegmentation(token) {
     state.subjectMaskBase = null;
     state.subjectCutout = null;
     state.segmentationState = "fallback";
+    state.segmentationSource = "none";
     pendingSegmentationResolve = null;
     if (selfieSegmenter?.close) selfieSegmenter.close();
     selfieSegmenter = null;
@@ -2937,6 +3149,7 @@ function requestSegmentation() {
   state.segmentationState = "loading";
   state.subjectMaskBase = null;
   state.subjectCutout = null;
+  state.segmentationSource = "none";
   updateRecognitionUi();
   segmentationQueue = segmentationQueue.catch(() => undefined).then(() => runSegmentation(token));
 }
@@ -2948,9 +3161,12 @@ function updateRecognitionUi() {
     person: "personDetected",
     fallback: "noPerson"
   };
-  elements.recognitionDetail.textContent = translate(keys[state.segmentationState] || "waitingPhoto");
+  const statusKey = state.segmentationState === "person" && state.segmentationSource === "hd"
+    ? "personDetectedHd"
+    : keys[state.segmentationState] || "waitingPhoto";
+  elements.recognitionDetail.textContent = translate(statusKey);
   elements.retrySegmentation.disabled = !state.photo || state.segmentationState === "loading";
-  const unavailable = state.segmentationState !== "person";
+  const unavailable = state.segmentationState !== "person" || !state.subjectMaskBase;
   elements.edgeShrink.disabled = unavailable;
   elements.edgeFeather.disabled = unavailable;
 }
@@ -3009,6 +3225,7 @@ function downloadPoster() {
 function resetAll() {
   segmentationToken += 1;
   clearTimeout(maskTuningTimer);
+  sourcePhotoFile = null;
   selectedTemplateId = null;
   state = createModel("academy", false);
   returnToSummary = false;

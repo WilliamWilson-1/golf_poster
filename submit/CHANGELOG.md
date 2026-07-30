@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.0 - 2026-07-31
+
+- Upgraded the person-cutout contract to HD alpha matting with fine-detail preservation and edge decontamination.
+- Added an explicit cutout source status and configurable segmentation quality.
+- Kept the full-photo fallback when the HD service is unavailable or no person is detected.
+- Synchronized the web editor with color-guided local alpha refinement and optional HD service priority.
+
 ## 1.0.0 - 2026-07-31
 
 - Added a complete project importable by WeChat DevTools.

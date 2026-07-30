@@ -9,10 +9,11 @@ function parseResponse(data) {
   return data || {};
 }
 
-function downloadFile(url) {
+function downloadFile(url, headers) {
   return new Promise((resolve, reject) => {
     wx.downloadFile({
       url,
+      header: headers || {},
       success(result) {
         if (result.statusCode >= 200 && result.statusCode < 300) {
           resolve(result.tempFilePath);
@@ -40,14 +41,12 @@ function writeBase64File(base64) {
   });
 }
 
-async function resolveCutout(payload) {
-  const cutoutUrl = payload.cutoutUrl
-    || payload.subjectUrl
-    || payload.data && (payload.data.cutoutUrl || payload.data.subjectUrl);
-  const cutoutBase64 = payload.cutoutBase64
-    || payload.data && payload.data.cutoutBase64;
+async function resolveCutout(payload, headers) {
+  const data = payload.data || payload;
+  const cutoutUrl = data.cutoutUrl || data.subjectUrl;
+  const cutoutBase64 = data.cutoutBase64 || data.subjectBase64;
   if (cutoutBase64) return writeBase64File(cutoutBase64);
-  if (cutoutUrl) return downloadFile(cutoutUrl);
+  if (cutoutUrl) return downloadFile(cutoutUrl, headers);
   throw new Error("抠图服务未返回 cutoutUrl 或 cutoutBase64");
 }
 
@@ -68,7 +67,11 @@ function requestSubjectCutout(options) {
       header: settings.headers || {},
       formData: {
         output: "full-frame-transparent-png",
-        refineEdges: "true"
+        quality: settings.quality || "hd",
+        matting: "alpha",
+        refineEdges: "true",
+        preserveFineDetails: "hair,club,limbs",
+        edgeDecontamination: "true"
       },
       success: async (result) => {
         try {
@@ -82,8 +85,8 @@ function requestSubjectCutout(options) {
             resolve({ status: "fallback", reason: "no-person" });
             return;
           }
-          const filePath = await resolveCutout(payload);
-          resolve({ status: "person", filePath });
+          const filePath = await resolveCutout(payload, settings.downloadHeaders);
+          resolve({ status: "person", source: "hd", filePath });
         } catch (error) {
           reject(error);
         }

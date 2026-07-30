@@ -202,6 +202,7 @@ function validateComponentLifecycle() {
       initialLanguage: "zh",
       segmentationEndpoint: "",
       segmentationHeaders: {},
+      segmentationQuality: "hd",
       saveToAlbum: false
     },
     data: JSON.parse(JSON.stringify(definition.data)),
@@ -235,6 +236,20 @@ function validateComponentLifecycle() {
   }), "Component white-only color lock failed");
 }
 
+function validateSegmentationContract() {
+  const config = require(path.join(miniRoot, "config"));
+  const source = read("miniprogram/services/segmentation.js");
+  assert(config.segmentationQuality === "hd", "Expected HD segmentation quality");
+  [
+    'output: "full-frame-transparent-png"',
+    'matting: "alpha"',
+    'preserveFineDetails: "hair,club,limbs"',
+    'edgeDecontamination: "true"'
+  ].forEach((field) => {
+    assert(source.includes(field), `Missing segmentation contract field: ${field}`);
+  });
+}
+
 function validatePackageSize() {
   let bytes = 0;
   function collect(directory) {
@@ -257,6 +272,7 @@ validateRenderer();
 validateWxml();
 validateComponentMethodGraph();
 validateComponentLifecycle();
+validateSegmentationContract();
 const packageBytes = validatePackageSize();
 
 console.log(`Validation passed. Mini Program source size: ${packageBytes} bytes.`);
