@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.1 - 2026-07-31
+
+- Rebuilt Mini Program control layouts with compatibility-safe Flexbox.
+- Fixed language, reset, palette, swatch, segmented, and footer button dimensions.
+- Removed CSS Grid and `aspect-ratio` dependencies that caused stretched controls in WeChat DevTools.
+- Isolated component styles from host-app button rules.
+
 ## 1.1.0 - 2026-07-31
 
 - Upgraded the person-cutout contract to HD alpha matting with fine-detail preservation and edge decontamination.

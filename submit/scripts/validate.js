@@ -177,6 +177,23 @@ function validateWxml() {
   assert(!stack.length, `Unclosed WXML tags: ${stack.join(", ")}`);
 }
 
+function validateWxssCompatibility() {
+  const wxss = read("miniprogram/components/golf-poster/index.wxss");
+  const componentJson = JSON.parse(read("miniprogram/components/golf-poster/index.json"));
+  assert(!/\bdisplay\s*:\s*grid\b/.test(wxss), "Component WXSS must not rely on CSS Grid");
+  assert(!/\baspect-ratio\s*:/.test(wxss), "Component WXSS must not rely on aspect-ratio");
+  assert(componentJson.styleIsolation === "isolated", "Component styles must be isolated");
+  [
+    "width: 78rpx;",
+    "width: 58rpx;",
+    "height: 104rpx;",
+    "width: 48rpx;",
+    "height: 48rpx;"
+  ].forEach((contract) => {
+    assert(wxss.includes(contract), `Missing fixed control size: ${contract}`);
+  });
+}
+
 function validateComponentMethodGraph() {
   const source = read("miniprogram/components/golf-poster/index.js");
   const calls = [...source.matchAll(/this\.(_[A-Za-z_$][\w$]*)\s*\(/g)].map((match) => match[1]);
@@ -270,6 +287,7 @@ validateJavaScriptSyntax();
 validateScoreModel();
 validateRenderer();
 validateWxml();
+validateWxssCompatibility();
 validateComponentMethodGraph();
 validateComponentLifecycle();
 validateSegmentationContract();
