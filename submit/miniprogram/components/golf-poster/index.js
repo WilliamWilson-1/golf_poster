@@ -44,6 +44,8 @@ const COPY = {
     useTemplate: "使用此模板",
     next: "下一步",
     back: "上一步",
+    confirmChange: "确认修改",
+    backToSummary: "返回完成",
     preview: "预览",
     close: "关闭",
     stepTitles: ["模板", "照片", "成绩卡", "总成绩", "文字信息", "贴纸", "完成海报"],
@@ -136,6 +138,8 @@ const COPY = {
     useTemplate: "USE TEMPLATE",
     next: "NEXT",
     back: "BACK",
+    confirmChange: "CONFIRM",
+    backToSummary: "RETURN",
     preview: "PREVIEW",
     close: "CLOSE",
     stepTitles: ["Template", "Photo", "Scorecard", "Total", "Text", "Stickers", "Complete"],
@@ -280,6 +284,10 @@ Component({
     stepTitle: COPY.zh.stepTitles[0],
     gestureHint: "",
     showWizardFooter: false,
+    returnToSummaryMode: false,
+    primaryActionLabel: COPY.zh.next,
+    primaryActionIcon: "›",
+    backActionLabel: COPY.zh.back,
     templates: templateCards("zh"),
     selectedTemplateId: "",
     templatePreviewOpen: false,
@@ -376,7 +384,10 @@ Component({
         templates: templateCards(language),
         stepTitle: copy.stepTitles[this.data.step],
         gestureHint: copy.gestureHints[this.data.step],
-        photoStatus: this._photoStatusText(this.posterState.segmentationStatus, copy)
+        photoStatus: this._photoStatusText(this.posterState.segmentationStatus, copy),
+        primaryActionLabel: this.returnToSummary ? copy.confirmChange : copy.next,
+        primaryActionIcon: this.returnToSummary ? "✓" : "›",
+        backActionLabel: this.returnToSummary ? copy.backToSummary : copy.back
       });
       this._rebuildColorControls(language);
       this._rebuildPaletteOptions(language);
@@ -425,13 +436,15 @@ Component({
     _activateSelectedTemplate() {
       const templateId = this.data.selectedTemplateId;
       if (!templateId) return;
+      const shouldReturnToSummary = this.returnToSummary;
       const hasStarted = this.posterCanvas || this.data.step > 0;
       this.posterState = hasStarted
         ? switchTemplate(this.posterState, templateId, this.properties.brand)
         : createPosterModel(templateId, false, this.properties.brand);
+      this.returnToSummary = false;
       this.setData({
         templatePreviewOpen: false,
-        step: this.returnToSummary ? 6 : 1
+        step: shouldReturnToSummary ? 6 : 1
       }, () => {
         this.templateCanvas = null;
         this.templateContext = null;
@@ -441,12 +454,15 @@ Component({
           this._renderNow();
           this._refreshCanvasRect();
         });
-        this.returnToSummary = false;
       });
     },
 
     nextStep() {
       if (this.data.step >= 6) return;
+      if (this.returnToSummary) {
+        this._returnToSummary();
+        return;
+      }
       this.setData({ step: this.data.step + 1 }, () => {
         this._updateStepMeta();
         this._syncAllControls();
@@ -456,6 +472,10 @@ Component({
     },
 
     previousStep() {
+      if (this.returnToSummary) {
+        this._returnToSummary();
+        return;
+      }
       if (this.data.step <= 1) {
         this.setData({ step: 0 }, () => this._updateStepMeta());
         return;
@@ -470,14 +490,38 @@ Component({
 
     _updateStepMeta() {
       const step = this.data.step;
+      const summaryEdit = Boolean(this.returnToSummary);
       this.setData({
         stepCounter: `${String(step + 1).padStart(2, "0")} / 07`,
         stepTitle: this.data.copy.stepTitles[step],
         gestureHint: this.data.largeEdit
           ? this.data.copy.freeEditHint
           : this.data.copy.gestureHints[step],
-        showWizardFooter: !this.data.largeEdit && step > 0 && step < 6
+        showWizardFooter: !this.data.largeEdit && step > 0 && step < 6,
+        returnToSummaryMode: summaryEdit,
+        primaryActionLabel: summaryEdit ? this.data.copy.confirmChange : this.data.copy.next,
+        primaryActionIcon: summaryEdit ? "✓" : "›",
+        backActionLabel: summaryEdit ? this.data.copy.backToSummary : this.data.copy.back
       });
+    },
+
+    _returnToSummary() {
+      this.returnToSummary = false;
+      this.setData({
+        step: 6,
+        templatePreviewOpen: false
+      }, () => {
+        this.templateCanvas = null;
+        this.templateContext = null;
+        this._updateStepMeta();
+        this._syncAllControls();
+        this._render();
+        this._refreshCanvasRect();
+      });
+    },
+
+    cancelSummaryEdit() {
+      this._returnToSummary();
     },
 
     jumpToStep(event) {

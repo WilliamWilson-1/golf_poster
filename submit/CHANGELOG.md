@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.2 - 2026-08-01
+
+- Fixed completion-page edit shortcuts so confirmation returns directly to the completed poster.
+- Added explicit confirm-change and back-to-completion actions in Chinese and English.
+- Added a direct cancel path when editing the template from the completion page.
+- Added regression coverage for the summary edit return workflow.
+
 ## 1.1.1 - 2026-07-31
 
 - Rebuilt Mini Program control layouts with compatibility-safe Flexbox.

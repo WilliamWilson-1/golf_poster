@@ -51,8 +51,11 @@
     </scroll-view>
 
     <view class="template-footer">
+      <button wx:if="{{returnToSummaryMode}}" class="back-action" bindtap="cancelSummaryEdit">
+        <text>‹</text> {{backActionLabel}}
+      </button>
       <button class="primary-action" disabled="{{!selectedTemplateId}}" bindtap="useSelectedTemplate">
-        {{copy.next}} <text class="button-arrow">›</text>
+        {{primaryActionLabel}} <text class="button-arrow">{{primaryActionIcon}}</text>
       </button>
     </view>
   </view>
@@ -402,8 +405,8 @@
     </scroll-view>
 
     <view wx:if="{{showWizardFooter}}" class="wizard-footer">
-      <button class="back-action" bindtap="previousStep"><text>‹</text> {{copy.back}}</button>
-      <button class="primary-action" bindtap="nextStep">{{copy.next}} <text class="button-arrow">›</text></button>
+      <button class="back-action" bindtap="previousStep"><text>‹</text> {{backActionLabel}}</button>
+      <button class="primary-action" bindtap="nextStep">{{primaryActionLabel}} <text class="button-arrow">{{primaryActionIcon}}</text></button>
     </view>
   </view>
 

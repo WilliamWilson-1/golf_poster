@@ -251,6 +251,24 @@ function validateComponentLifecycle() {
   assert(instance.data.scoreColorRows.every((row) => {
     return row.options[0].locked && row.options.slice(1).every((option) => option.disabled);
   }), "Component white-only color lock failed");
+
+  instance.setData({ step: 6 });
+  instance.jumpToStep({ currentTarget: { dataset: { step: "photo" } } });
+  assert(instance.data.step === 1, "Summary edit did not open the requested step");
+  assert(instance.data.returnToSummaryMode, "Summary edit mode was not enabled");
+  assert(instance.data.primaryActionLabel === "确认修改", "Summary edit confirmation label failed");
+  instance.nextStep();
+  assert(instance.data.step === 6, "Summary edit did not return directly to completion");
+  assert(!instance.returnToSummary, "Summary return flag was not cleared");
+
+  instance.jumpToStep({ currentTarget: { dataset: { step: "scorecard" } } });
+  instance.previousStep();
+  assert(instance.data.step === 6, "Summary edit back action did not return to completion");
+
+  instance.jumpToStep({ currentTarget: { dataset: { step: "template" } } });
+  assert(instance.data.step === 0 && instance.data.returnToSummaryMode, "Template summary edit mode failed");
+  instance.cancelSummaryEdit();
+  assert(instance.data.step === 6, "Template edit cancel did not return to completion");
 }
 
 function validateSegmentationContract() {
